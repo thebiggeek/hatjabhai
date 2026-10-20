@@ -42,7 +42,7 @@ if (await pg.locator('#ovRevive:not([hidden])').count()){ await pg.click('#ovRev
 // levels: map opens, level 1-1 completes with stars and unlocks the next level and a vehicle
 await pg.evaluate(() => { localStorage.removeItem('bkc_lv'); localStorage.removeItem('bkc_lvUnlocks'); state = undefined; });
 await pg.evaluate(() => window.__bkc.openLevels()); await pg.waitForTimeout(200);
-if ((await pg.locator('.lvnode').count()) !== 5) fail('level map should show 5 levels per world');
+if ((await pg.locator('.lvcard').count()) !== 20) fail('levels should show 20 cards');
 await pg.evaluate(() => window.__bkc.startLevel(0)); await pg.waitForTimeout(1500);
 await pg.evaluate(() => { const G = window.__bkc.G; G.coins = G.coinsTotal; G.dayDist = G.dayTarget - 2; });
 await pg.waitForTimeout(800);

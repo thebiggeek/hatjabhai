@@ -101,6 +101,52 @@ p{margin:6px 0;line-height:1.45}
 .howto span{color:var(--muted);text-align:right}
 #stage.menu-open .hudbtn{display:none}
 .nextlv{font-size:13px;color:var(--muted);margin:8px 0 0}
+.lvover{align-items:center;padding-left:0;padding-right:0;overflow:hidden}
+.lvwrap{width:100%;max-width:560px;height:100%;max-height:760px;display:flex;flex-direction:column;margin:auto}
+.lvwrap .lvtop{padding:0 max(16px,env(safe-area-inset-left,0px));margin:0 0 8px}
+.lvwrap h2{font-size:22px}
+.lvcar{flex:1;min-height:0;display:flex;gap:14px;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;padding:4px 9%;scrollbar-width:none;outline:none;-webkit-overflow-scrolling:touch}
+.lvcar::-webkit-scrollbar{display:none}
+.lvcard{flex:0 0 82%;scroll-snap-align:center;display:flex;flex-direction:column;background:var(--panel);border:3px solid var(--marigold);border-radius:22px;padding:12px 16px 16px;text-align:center;min-height:0;box-shadow:0 10px 30px rgba(0,0,0,.45)}
+.lvcard.boss{border-color:var(--rani)}
+.lvcard.locked{filter:grayscale(.85);opacity:.7}
+.art{position:relative;flex:1 1 auto;min-height:120px;max-height:300px;border-radius:14px;overflow:hidden;display:flex;align-items:center;justify-content:center}
+.art .big{font-size:clamp(56px,16vh,110px);line-height:1;filter:drop-shadow(0 6px 8px rgba(0,0,0,.35));z-index:1}
+.art .sea{position:absolute;right:12px;top:10px;font-size:34px}
+.art .wtag{position:absolute;left:10px;top:10px;font-size:11px;font-weight:800;letter-spacing:.06em;background:rgba(0,0,0,.35);color:#fff;border-radius:999px;padding:3px 9px}
+.art .road{position:absolute;left:0;right:0;bottom:0;height:24%;background:#2f2d2c;border-top:5px solid #e8c22a}
+.art .road::after{content:"";position:absolute;left:0;right:0;top:45%;height:4px;background:repeating-linear-gradient(90deg,#f5f2e8 0 22px,transparent 22px 44px)}
+.lvcard .lvid{margin-top:10px}
+.lvcard h3{margin:2px 0 0;font-size:22px;letter-spacing:0;text-transform:none;color:var(--ink)}
+.stars-s{margin:2px 0;font-size:22px;color:var(--marigold);letter-spacing:3px}
+.stars-s span{color:#3a3442}
+.chip{display:inline-block;font-weight:700;font-size:13px;background:var(--asphalt-2);border-radius:999px;padding:5px 12px;margin:2px auto}
+.pickv{display:flex;justify-content:center;gap:4px;flex-wrap:wrap;margin:2px 0}
+.pickv button{font-size:20px;width:38px;height:38px;border-radius:10px;border:2px solid transparent;background:var(--asphalt-2);cursor:pointer}
+.pickv button[aria-pressed="true"]{border-color:var(--marigold)}
+.intro{font-size:14px;color:var(--muted);margin:6px 0 0;min-height:2.6em;line-height:1.35}
+.lvcard .cta{margin-top:12px}
+.result .bigem{font-size:64px;line-height:1;margin:8px 0 4px}
+.result h2{margin:0 0 6px}
+.result .lede{margin:0 auto;max-width:34ch;font-size:15px;color:var(--muted)}
+.result #ovRevive + #ovRetry:not([hidden]){background:var(--asphalt-2);color:var(--ink);box-shadow:none;margin-top:10px}
+.result #ovRevive[hidden] + #ovRetry{margin-top:22px}
+.trio{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:18px 0 0}
+.trio div{background:var(--asphalt-2);border-radius:14px;padding:10px 4px}
+.trio b{display:block;font-size:22px;color:var(--ink);font-variant-numeric:tabular-nums}
+.trio span{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
+.trio .hi b{color:var(--marigold)}
+.result .unlock{margin:14px 0 0;font-weight:700;color:var(--teal)}
+.result .kaamlist{text-align:left;margin:14px auto 0;max-width:320px}
+.result .note{margin-top:10px}
+.detail{margin-top:14px;text-align:left}
+.detail canvas{width:100%;max-width:300px;display:block;margin:0 auto}
+.lvnav{display:flex;align-items:center;justify-content:center;gap:10px;padding:10px 0 6px}
+.arrow{font:inherit;font-size:24px;width:40px;height:40px;border-radius:50%;border:0;background:var(--asphalt-2);color:var(--ink);cursor:pointer}
+.dots{display:flex;gap:5px;flex-wrap:wrap;justify-content:center;max-width:300px}
+.dots i{width:8px;height:8px;border-radius:50%;background:var(--c);opacity:.35;cursor:pointer;transition:transform .2s}
+.dots i.on{opacity:1;transform:scale(1.5)}
+@media (max-height:640px){.art{max-height:150px}.intro{min-height:0}}
 #playEndless{margin-top:12px}
 .lvtop{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
 .lvtop h2{margin:0}
@@ -319,19 +365,15 @@ kbd{font-family:var(--f-body);background:#3a3442;border-radius:3px;padding:0 5px
       </div>
     </div>
 
-    <!-- LEVEL MAP -->
-    <div class="overlay" id="levels" hidden>
-      <div class="panel launch">
-        <div class="lvtop"><button type="button" class="back" id="lvBack" aria-label="Wapas">‹</button><h2>Levels</h2><span class="tot" id="lvTot"></span></div>
-        <div class="seg worlds" id="worlds" role="tablist"></div>
-        <div class="lvpath" id="lvPath"></div>
-        <div class="lvsheet" id="lvSheet" hidden>
-          <p class="lvid" id="lsId"></p>
-          <h3 id="lsName"></h3>
-          <div id="lsVeh" class="lsveh"></div>
-          <p class="note" id="lsIntro"></p>
-          <ul class="goals" id="lsGoals"></ul>
-          <button class="cta" type="button" id="lsGo">Chalo</button>
+    <!-- LEVELS: one card at a time, swipe sideways -->
+    <div class="overlay lvover" id="levels" hidden>
+      <div class="lvwrap">
+        <div class="lvtop"><button type="button" class="back" id="lvBack" aria-label="Wapas">‹</button><h2 id="lvWorldName">Levels</h2><span class="tot" id="lvTot"></span></div>
+        <div class="lvcar" id="lvCar" tabindex="0" aria-label="Levels, swipe karo"></div>
+        <div class="lvnav">
+          <button type="button" class="arrow" id="lvPrev" aria-label="Pichhla level">‹</button>
+          <div class="dots" id="lvDots"></div>
+          <button type="button" class="arrow" id="lvNext" aria-label="Agla level">›</button>
         </div>
       </div>
     </div>
@@ -417,42 +459,50 @@ kbd{font-family:var(--f-body);background:#3a3442;border-radius:3px;padding:0 5px
 
     <!-- DAY CLEAR -->
     <div class="overlay" id="dayclear" hidden>
-      <div class="panel">
-        <div class="eyebrow" id="dcEyebrow">Din 1 poora</div>
-        <h2>Pahunch gaye! 🏠</h2>
+      <div class="panel launch result">
+        <p class="lvid" id="dcEyebrow">Din 1 poora</p>
+        <div class="bigem">🏠</div>
+        <h2>Pahunch gaye!</h2>
         <p class="lede" id="dcLine"></p>
-        <canvas id="dcMap" width="600" height="600" aria-label="Aaj ka raasta naqshe pe"></canvas>
         <div class="kaamlist" id="dcKaam"></div>
-        <div class="cii" id="dcCII"></div>
-        <div class="gyaan sach" id="dcSach" hidden></div>
-        <p class="muted">Raat ki neend: <b>+1 jaan</b>, BP normal.</p>
-        <div class="gyaan"><div class="eyebrow" id="dcNextEyebrow">Kal ka mausam</div><div id="dcNext"></div></div>
-        <div class="row"><button class="btn" type="button" id="dcGo">Kal ka safar shuru →</button></div>
+        <p class="note" id="dcNext"></p>
+        <button class="cta" type="button" id="dcGo">Agla din →</button>
+        <nav class="links"><button type="button" class="moreBtn" data-for="dcDetail">Poora hisaab</button></nav>
+        <div class="detail" id="dcDetail" hidden>
+          <canvas id="dcMap" width="600" height="600" aria-label="Aaj ka raasta naqshe pe"></canvas>
+          <div class="cii" id="dcCII"></div>
+          <div class="gyaan sach" id="dcSach" hidden></div>
+        </div>
       </div>
     </div>
 
     <!-- GAME OVER -->
     <div class="overlay" id="over" hidden>
-      <div class="panel">
-        <div class="eyebrow" id="ovEyebrow">Khel khatam</div>
+      <div class="panel launch result">
+        <p class="lvid" id="ovEyebrow">Khel khatam</p>
+        <div class="bigem" id="ovEm">💥</div>
         <h2 id="ovTitle">Gaddhe ne gale lagaya</h2>
         <p class="lede" id="ovDesc"></p>
-        <div class="gyaan"><div class="eyebrow">Aaj ka Aadmi-Gyaan</div><div id="ovGyaan"></div></div>
-        <div class="stats" id="ovStats"></div>
-        <div class="badges" id="ovBadges"></div>
-        <div class="cii" id="ovCII"></div>
+        <div class="trio" id="ovStats"></div>
         <p class="unlock" id="ovUnlock" hidden></p>
-        <div class="row">
-          <button class="btn" type="button" id="ovRevive" hidden>❤️ Ek jaan aur (aaj ki free)</button>
-          <button class="btn" type="button" id="ovRetry">Phir se (kal bhi yahi hoga)</button>
-          <button class="btn alt" type="button" id="ovShare">Share karo</button>
-        </div>
-        <textarea class="share-box" id="shareBox" rows="3" readonly hidden aria-label="Share text"></textarea>
-        <div class="row">
-          <button class="btn alt" type="button" id="ovCard">📸 Card share karo</button>
-          <a class="btn alt" id="waLink" href="#" target="_blank" rel="noopener">WhatsApp pe bhejo</a>
-          <button class="btn alt" type="button" id="ovMenu">Map / kirdaar badlo</button>
-          <button class="btn alt tipBtn" type="button">☕ Game pasand aaya? Chai pila do</button>
+        <button class="cta" type="button" id="ovRevive" hidden>❤️ Ek jaan aur</button>
+        <button class="cta" type="button" id="ovRetry">Phir se</button>
+        <nav class="links">
+          <button type="button" id="ovCard">Share</button>
+          <button type="button" id="ovMenu">Map</button>
+          <button type="button" class="moreBtn" data-for="ovDetail">Poora hisaab</button>
+        </nav>
+        <div class="detail" id="ovDetail" hidden>
+          <div class="gyaan"><div class="eyebrow">Aaj ka Aadmi-Gyaan</div><div id="ovGyaan"></div></div>
+          <div class="stats" id="ovMore"></div>
+          <div class="badges" id="ovBadges"></div>
+          <div class="cii" id="ovCII"></div>
+          <div class="row">
+            <button class="btn alt" type="button" id="ovShare">Text copy karo</button>
+            <a class="btn alt" id="waLink" href="#" target="_blank" rel="noopener">WhatsApp</a>
+            <button class="btn alt tipBtn" type="button">☕ Chai pila do</button>
+          </div>
+          <textarea class="share-box" id="shareBox" rows="3" readonly hidden aria-label="Share text"></textarea>
         </div>
       </div>
     </div>
@@ -648,6 +698,7 @@ const ENC = {
   ],
 };
 
+const CAUSE_EM = { manhole:'🕳️', manhole_car:'🕳️', trench:'🚧', pothole:'🕳️', vehicle:'💥', wrong:'↩️', bus:'🚌', fpbike:'🏍️', dog:'🐕', bp:'🤯', bp_horn:'📯', bp_jam:'🚗', bp_smog:'😷', bp_heat:'🥵', bp_noise:'🔊', bp_scratch:'😱', bp_near:'😰', bp_challan:'📸', bp_chhee:'🤢', bp_dark:'🌑', vipcar:'🚨', cliff:'🏔️', naala:'🌊', drain:'🌊', chowk:'🚦', wire:'⚡', rock:'🪨', saand:'🐂', heat:'🔥' };
 const CAUSES = {
   manhole: { t:'Gutter mein gaye', s:'khule manhole mein gira', d:'Dhakkan 2019 mein chori hua tha. Complaint ka status abhi bhi "Under Process" hai.' },
   manhole_car: { t:'Pahiya gutter mein', s:'manhole mein pahiya phansa', d:'Dhakkan nahi tha. Pahiya gaya, axle gaya, EMI wahin ki wahin.' },
@@ -2020,6 +2071,8 @@ const LEVELS = [
   { id:'4-5', world:'highway', name:'Ulta Raaj', char:null, season:'ultaraj', len:1000, d:1.6, tier:null, intro:'Final boss! Aadhe log ulte. Ghar pahunche toh legend.' },
 ];
 const WORLDS = [['city','🏙️ Ultapur'],['town','🌾 Dhoolnagar'],['hills','🏔️ Fisalgarh'],['highway','🛣️ Expressway']];
+const WORLD_ART = { city:['#ff8a5c','#ff3d7f'], town:['#e8b45a','#c97a2a'], hills:['#5aa9c9','#2e6b4f'], highway:['#c9b22e','#6b7a2e'] };
+const SEASON_EM = { normal:'🕳️', monsoon:'🌧️', smog:'😷', shaadi:'💃', vip:'🚨', tourist:'📸', landslide:'🪨', snow:'❄️', weekend:'🏕️', widening:'🚜', loo:'🔥', bijli:'⚡', aandhi:'🌪️', mela:'🎡', chunav:'📢', dhund:'🌫️', toll:'🛑', diversion:'🚧', overload:'🚚', ultaraj:'↩️' };
 const lvStars = () => store.get('lv', {});
 const lvOpen = i => i === 0 || (lvStars()[LEVELS[i-1].id] || 0) >= 1;
 const nextLevelIdx = () => { const st = lvStars(); const i = LEVELS.findIndex((L, j) => lvOpen(j) && !st[L.id]); return i < 0 ? LEVELS.length - 1 : i; };
@@ -4322,12 +4375,12 @@ function dayClear(){
   const legs = G.map.legs;
   $('dcEyebrow').textContent = 'Din ' + G.day + ' poora · ' + placeName(G.leg[1]) + ' · +200 pts';
   $('dcLine').textContent = DAY_LINES[(G.day-1) % DAY_LINES.length];
-  $('dcNextEyebrow').textContent = 'Din ' + next + ' ka mausam';
-  $('dcNext').textContent = nextSeason ? SEASONS[nextSeason].name + ': ' + SEASONS[nextSeason].sub : 'Ab sab kuch, kabhi bhi. Sheher ne aapko pehchaan liya hai.';
+  $('dcNext').textContent = '❤️ +1 jaan · Kal: ' + (nextSeason ? SEASONS[nextSeason].name : 'sab kuch, kabhi bhi');
+  $('dcDetail').hidden = true;
   checkKaam(true);
   $('dcCII').innerHTML = ciiHTML(G.ciiD, G.dayDist/10, 'Aaj ki Sadak Report Card');
   if (G.sachNew){ $('dcSach').hidden = false; $('dcSach').innerHTML = '<div class="eyebrow">📚 Sadak ka Sach (' + store.get('sach', []).length + '/' + Object.keys(SACH).length + ')</div>' + SACH[G.sachNew]; } else $('dcSach').hidden = true;
-  $('dcKaam').innerHTML = '<div class="eyebrow">Aaj ka kaam</div>' + G.kaam.map(k => `<div class="${k.done ? 'ok' : 'no'}">${k.done ? '✅' : '❌'} ${k.text}${k.done ? ' <b>+100</b>' : ''}</div>`).join('');
+  $('dcKaam').innerHTML = G.kaam.map(k => `<div class="${k.done ? 'ok' : 'no'}">${k.done ? '✅' : '❌'} ${k.text}${k.done ? ' <b>+100</b>' : ''}</div>`).join('');
   drawDayMap(next <= legs.length ? legs[next-1] : null);
   showOnly('dayclear');
   setGameButtons(false);
@@ -4345,10 +4398,11 @@ function gameOver(){
   G.xpAdded = runM; store.set('xp', before + gain);
   const newly = Object.keys(UNLOCK_M).filter(k => before < UNLOCK_M[k] && before + gain >= UNLOCK_M[k]);
   const nextLock = Object.keys(UNLOCK_M).filter(k => before + gain < UNLOCK_M[k]).sort((a, b) => UNLOCK_M[a] - UNLOCK_M[b])[0];
-  $('ovUnlock').hidden = !newly.length && !nextLock;
+  $('ovUnlock').hidden = !newly.length && !nextLock || !!G.lv;
   $('ovUnlock').textContent = newly.length ? '🔓 Naya unlock: ' + newly.map(k => CHARS[k].name).join(', ') + '!' : nextLock ? '🔒 ' + CHARS[nextLock].name + ' unlock hoga ' + ((UNLOCK_M[nextLock] - before - gain)/1000).toFixed(1) + ' km aur chalne pe.' : '';
   $('ovCII').innerHTML = ciiHTML(G.cii, runM, 'Sadak Report Card');
   $('ovRevive').hidden = G.revived || store.get('revive', '') === todayStr();
+  $('ovRetry').textContent = $('ovRevive').hidden ? 'Phir se' : 'Shuru se';
   Tape.stop();
   setGameButtons(false);
   const c = CAUSES[G.cause] || CAUSES.vehicle;
@@ -4356,8 +4410,9 @@ function gameOver(){
   const bestKey = 'best_' + G.regionKey + '_' + G.c.key;
   const best = store.get(bestKey, 0), isBest = score > best;
   if (isBest) store.set(bestKey, score);
-  $('ovEyebrow').textContent = (isBest && best > 0 ? 'Naya record! Phir bhi khel khatam · ' : 'Khel khatam · ') + G.c.name + ' · ' + G.R.name;
+  $('ovEyebrow').textContent = G.lv ? 'Level ' + G.lv.id + ' · ' + G.lv.name : (isBest && best > 0 ? '🏆 Naya record · ' : '') + G.c.name + ' · ' + G.R.name;
   $('ovTitle').textContent = c.t;
+  $('ovEm').textContent = CAUSE_EM[G.cause] || '💥';
   $('ovDesc').textContent = c.d.replace('{honks}', G.honks).replace('{near}', G.near).replace('{challans}', G.challans);
   const pool = AADMI.all.concat(AADMI[G.regionKey] || [], AADMI[G.regionKey] || []);
   $('ovGyaan').textContent = pick(R0, pool);
@@ -4369,7 +4424,12 @@ function gameOver(){
   if (G.insaniyat) rows.push(['Ambulance ko rasta', G.insaniyat]);
   rows.push(['Score', score], ['Best', Math.max(best, score)]);
   if (rows.length % 2) rows.splice(rows.length - 2, 0, ['Jagah', G.R.name]);
-  $('ovStats').innerHTML = rows.map(([k,v]) => `<div><span>${k}</span><b>${v}</b></div>`).join('');
+  $('ovMore').innerHTML = rows.map(([k,v]) => `<div><span>${k}</span><b>${v}</b></div>`).join('');
+  const km = v => (v/1000).toFixed(1) + ' km';
+  const trio = G.lv ? [['Raasta', Math.min(99, Math.floor(100*G.dayDist/G.dayTarget)) + '%', false], ['Chillar', '🪙 ' + G.coins, false], ['Best', '★'.repeat(lvStars()[G.lv.id] || 0) || '–', false]]
+    : [['Chale', km(m), false], ['Score', score, isBest], ['Best', Math.max(best, score), false]];
+  $('ovStats').innerHTML = trio.map(([k, v, hi]) => `<div class="${hi ? 'hi' : ''}"><b>${v}</b><span>${k}</span></div>`).join('');
+  $('ovDetail').hidden = true;
   const badges = [
     ['🦁 Sadak ka Sher', G.day >= 3], ['🚑 Insaan Hai Tu', G.insaniyat >= 2], ['📸 Challan King', G.challans >= 3], ['🙏 Bal-Bal Specialist', G.near >= 10],
     ['💥 Tod-Phod Express', G.smashed >= 15], ['⛏️ Gaddha Guru', G.dug >= 20], ['☕ ' + G.R.treat.n + ' Addict', G.treats >= 4], ['📋 Kaam ka Banda', G.kaamDone >= 3],
@@ -4424,43 +4484,66 @@ function buildMenu(){
     syncPlay();
   }));
 }
-let lvWorld = null, lvSel = null, lvChar = null;
-function openLevels(){
-  const nx = nextLevelIdx();
-  lvWorld = lvWorld || LEVELS[nx].world; lvSel = null;
-  const st = lvStars(), tot = Object.values(st).reduce((a, b) => a + b, 0);
+let lvChar = null, lvIdx = 0;
+function openLevels(focus){
+  const st = lvStars(), tot = Object.values(st).reduce((a, b) => a + b, 0), nx = focus != null ? focus : nextLevelIdx();
   $('lvTot').textContent = '★ ' + tot + '/' + LEVELS.length*3;
-  $('worlds').innerHTML = WORLDS.map(([k, n]) => { const i = LEVELS.findIndex(L => L.world === k), open = lvOpen(i); return `<button type="button" role="tab" data-w="${k}" aria-pressed="${k === lvWorld}" ${open ? '' : 'disabled'}>${open ? n : '🔒 ' + n.split(' ')[1]}</button>`; }).join('');
-  document.querySelectorAll('#worlds button').forEach(b => b.onclick = () => { lvWorld = b.dataset.w; openLevels(); });
-  const list = LEVELS.map((L, i) => [L, i]).filter(([L]) => L.world === lvWorld);
-  $('lvPath').innerHTML = list.map(([L, i]) => {
-    const s = st[L.id] || 0, open = lvOpen(i), boss = L.id.endsWith('-5');
-    const cls = ['lvnode', boss ? 'boss' : '', s ? 'done' : '', open ? '' : 'locked', i === nx ? 'next' : ''].join(' ');
-    return `<button type="button" class="${cls}" data-i="${i}"><span class="ball">${open ? L.id : '🔒'}</span><span class="st">${'★'.repeat(s)}${'☆'.repeat(3 - s)}</span><span class="nm">${L.name}</span></button>`;
+  const unlockedVeh = Object.keys(CHARS).filter(isUnlocked);
+  $('lvCar').innerHTML = LEVELS.map((L, i) => {
+    const s = st[L.id] || 0, open = lvOpen(i), boss = L.id.endsWith('-5'), [c1, c2] = WORLD_ART[L.world];
+    const veh = L.char ? `<span class="chip">${CHARS[L.char].emoji} ${CHARS[L.char].name}</span>`
+      : `<div class="pickv">${unlockedVeh.map(k => `<button type="button" data-k="${k}" title="${CHARS[k].name}">${CHARS[k].emoji}</button>`).join('')}</div>`;
+    return `<section class="lvcard${open ? '' : ' locked'}${boss ? ' boss' : ''}" data-i="${i}" aria-label="Level ${L.id} ${L.name}">
+      <div class="art" style="background:linear-gradient(160deg,${c1},${c2})">
+        <span class="wtag">${WORLDS.find(w => w[0] === L.world)[1]}</span>
+        <span class="big">${open ? (L.char ? CHARS[L.char].emoji : '🏆') : '🔒'}</span>
+        <span class="sea">${SEASON_EM[L.season] || ''}</span>
+        <span class="road"></span>
+      </div>
+      <p class="lvid">Level ${L.id}${boss ? ' · Boss' : ''}</p>
+      <h3>${L.name}</h3>
+      <p class="stars-s">${'★'.repeat(s)}<span>${'★'.repeat(3 - s)}</span></p>
+      ${open ? veh : ''}
+      <p class="intro">${open ? L.intro : 'Pichhla level poora karo, phir ye khulega.'}</p>
+      <button type="button" class="cta go" ${open ? '' : 'disabled'}>${open ? (s ? 'Phir se khelo' : 'Chalo') : '🔒 Band hai'}</button>
+    </section>`;
   }).join('');
-  document.querySelectorAll('.lvnode').forEach(b => b.onclick = () => { const i = +b.dataset.i; if (!lvOpen(i)){ toast('🔒 Pichhla level poora karo'); return; } showSheet(i); document.querySelectorAll('.lvnode').forEach(x => x.setAttribute('aria-pressed', x === b)); });
-  $('lvSheet').hidden = true;
+  $('lvDots').innerHTML = LEVELS.map((L, i) => `<i data-i="${i}" style="--c:${WORLD_ART[L.world][0]}"></i>`).join('');
+  $('lvCar').querySelectorAll('.lvcard').forEach(card => {
+    const i = +card.dataset.i, L = LEVELS[i];
+    card.querySelector('.go').onclick = () => { if (lvOpen(i)) startLevel(i, L.char || lvChar); };
+    card.querySelectorAll('.pickv button').forEach(b => b.onclick = () => { lvChar = b.dataset.k; card.querySelectorAll('.pickv button').forEach(x => x.setAttribute('aria-pressed', x === b)); });
+    const def = card.querySelector('.pickv button:last-child'); if (def){ def.setAttribute('aria-pressed', 'true'); }
+  });
+  lvChar = unlockedVeh[unlockedVeh.length - 1];
+  $('lvDots').querySelectorAll('i').forEach(d => d.onclick = () => goCard(+d.dataset.i));
   showOnly('levels');
-  const nb = document.querySelector('.lvnode.next'); if (nb) { nb.click(); }
+  goCard(nx, true);
 }
-function showSheet(i){
-  const L = LEVELS[i], best = lvStars()[L.id] || 0;
-  lvSel = i;
-  $('lsId').textContent = 'Level ' + L.id + (L.id.endsWith('-5') ? ' · Boss' : '');
-  $('lsName').textContent = L.name;
-  $('lsIntro').textContent = L.intro;
-  if (L.char){ lvChar = L.char; $('lsVeh').innerHTML = `<span>${CHARS[L.char].emoji} ${CHARS[L.char].name}</span>`; }
-  else {
-    const opts = Object.keys(CHARS).filter(isUnlocked);
-    lvChar = opts.includes(lvChar) ? lvChar : opts[opts.length - 1];
-    $('lsVeh').innerHTML = opts.map(k => `<button type="button" data-k="${k}" aria-pressed="${k === lvChar}">${CHARS[k].emoji} ${CHARS[k].name}</button>`).join('');
-    document.querySelectorAll('#lsVeh button').forEach(b => b.onclick = () => { lvChar = b.dataset.k; document.querySelectorAll('#lsVeh button').forEach(x => x.setAttribute('aria-pressed', x === b)); });
-  }
-  $('lsGoals').innerHTML = [['Ghar pahuncho', best >= 1], ['Ek bhi chot nahi', best >= 2], ['70% chillar 🪙 uthao', best >= 3]].map(([t, ok]) => `<li class="${ok ? 'ok' : ''}">${ok ? '★' : '☆'} ${t}</li>`).join('');
-  $('lvSheet').hidden = false;
+function goCard(i, instant){
+  i = clamp(i, 0, LEVELS.length - 1);
+  const card = $('lvCar').children[i]; if (!card) return;
+  $('lvCar').scrollTo({ left: card.offsetLeft - ($('lvCar').clientWidth - card.offsetWidth)/2, behavior: instant ? 'auto' : 'smooth' });
+  markCard(i);
 }
+function markCard(i){
+  lvIdx = i;
+  $('lvDots').querySelectorAll('i').forEach((d, j) => d.classList.toggle('on', j === i));
+  $('lvWorldName').textContent = WORLDS.find(w => w[0] === LEVELS[i].world)[1];
+}
+$('lvCar').addEventListener('scroll', () => {
+  clearTimeout(markCard._t);
+  markCard._t = setTimeout(() => {
+    const car = $('lvCar'), mid = car.scrollLeft + car.clientWidth/2;
+    let best = 0, bd = 1e9;
+    [...car.children].forEach((c, j) => { const d = Math.abs(c.offsetLeft + c.offsetWidth/2 - mid); if (d < bd){ bd = d; best = j; } });
+    markCard(best);
+  }, 60);
+});
+$('lvPrev').onclick = () => goCard(lvIdx - 1);
+$('lvNext').onclick = () => goCard(lvIdx + 1);
+$('lvCar').addEventListener('keydown', e => { if (e.key === 'ArrowLeft'){ e.preventDefault(); goCard(lvIdx - 1); } if (e.key === 'ArrowRight'){ e.preventDefault(); goCard(lvIdx + 1); } });
 function startLevel(i, ck){ const L = LEVELS[i]; ac(); newGame(ck || L.char || lvChar || 'paidal', L.world, L); }
-$('lsGo').onclick = () => { if (lvSel != null) startLevel(lvSel, lvChar); };
 $('playLevels').onclick = () => { ac(); openLevels(); };
 $('lvBack').onclick = () => { syncLaunch(); showOnly('menu'); };
 $('playEndless').onclick = () => { ac(); showOnly('endless'); };
@@ -4487,7 +4570,7 @@ function levelDone(){
 }
 $('ldNext').onclick = () => { const i = LEVELS.indexOf(G.lv); if (i + 1 < LEVELS.length) startLevel(i + 1); else openLevels(); };
 $('ldRetry').onclick = () => startLevel(LEVELS.indexOf(G.lv), G.c.key);
-$('ldMap').onclick = () => openLevels();
+$('ldMap').onclick = () => openLevels(LEVELS.indexOf(G.lv));
 let menuChar = store.get('char', 'paidal');
 function syncPlay(){ const c = CHARS[menuChar]; $('play').textContent = c ? 'Chalo · ' + c.name : 'Chalo'; $('play').disabled = !c; }
 function startPlay(){ if (!CHARS[menuChar]) return; ac(); lastChar = menuChar; newGame(lastChar, menuRegion); }
@@ -4580,6 +4663,7 @@ $('ovCard').onclick = () => {
 };
 $('ovRetry').onclick = () => G && G.lv ? startLevel(LEVELS.indexOf(G.lv), G.c.key) : newGame(lastChar, G ? G.regionKey : menuRegion);
 $('ovMenu').onclick = () => { const lv = G && G.lv; state = 'menu'; if (lv) openLevels(); else { syncLaunch(); showOnly('menu'); } };
+document.querySelectorAll('.moreBtn').forEach(b => b.onclick = () => { const d = $(b.dataset.for); d.hidden = !d.hidden; b.textContent = d.hidden ? 'Poora hisaab' : 'Kam dikhao'; if (!d.hidden) d.scrollIntoView({ behavior:'smooth', block:'start' }); });
 $('ovShare').onclick = () => {
   const box = $('shareBox'); box.hidden = false;
   const txt = box.value;
