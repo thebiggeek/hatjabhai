@@ -1,0 +1,5 @@
+node_modules/
+.devtest/
+.bak/
+image inspiration.png
+.DS_Store

@@ -1,0 +1,16 @@
+{
+  "name": "Hat Ja Bhai! — sadak ka survival game",
+  "short_name": "Hat Ja Bhai",
+  "description": "Race nahi jeetni, bas ghar zinda pahunchna hai. Ek vyangya (satire) game.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "fullscreen",
+  "orientation": "any",
+  "background_color": "#1c1a21",
+  "theme_color": "#1c1a21",
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
