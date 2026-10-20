@@ -78,6 +78,10 @@ p{margin:6px 0;line-height:1.45}
 .crew b{display:block;font-size:14px}
 .crew span{display:block;font-size:12px;color:var(--muted)}
 .crew a,.crew em{margin-left:auto;flex:0 0 auto;white-space:nowrap;font-weight:800;font-size:13px;color:#06240f;background:#25d366;border-radius:5px;padding:6px 10px;text-decoration:none;font-style:normal}
+.tipcard{background:rgba(255,184,28,.1);border-color:var(--marigold)}
+.tipcard .tipBtn{margin-left:auto;flex:0 0 auto;white-space:nowrap;font:inherit;font-weight:800;font-size:13px;color:#1a1300;background:var(--marigold);border:0;border-radius:5px;padding:6px 10px;cursor:pointer}
+.upiqr{display:block;margin:6px auto;border-radius:8px;max-width:100%;height:auto}
+.upiid{text-align:center}
 .contact{margin-top:8px;font-size:12px;color:var(--muted)}
 .contact a{color:var(--teal)}
 .char{font:inherit;cursor:pointer;background:var(--asphalt-2);color:var(--ink);border:2px solid var(--line);border-radius:6px;
@@ -261,6 +265,10 @@ kbd{font-family:var(--f-body);background:#3a3442;border-radius:3px;padding:0 5px
           <div><b>📲 Sadak Crew pe judo</b><span>Naye gaane, naye ilaake aur Aaj ki Sadak ke toppers, sabse pehle. WhatsApp pe, free.</span></div>
           <span id="crewCta"></span>
         </div>
+        <div class="crew tipcard">
+          <div><b>☕ Chai pila do</b><span>Game free hai, ad-free rehna chahiye. Pasand aaya toh ek cutting chai, UPI se.</span></div>
+          <button type="button" class="tipBtn">₹ Chai</button>
+        </div>
         <div class="disclaimer">
           Vyangya (satire). Ultapur, Fisalgarh, Dhoolnagar aur Ulta Expressway kaalpanik jagah hain. Saare kirdaar, vibhaag, khabrein aur gaddhe kaalpanik hain; kisi asli gaddhe se samanta sirf sanyog hai.
           <button class="linkish" type="button" id="aboutBtn">Ye kya hai?</button>
@@ -279,9 +287,9 @@ kbd{font-family:var(--f-body);background:#3a3442;border-radius:3px;padding:0 5px
         <p>Ye game kisi ek vibhaag ya neta pe ungli nahi uthata. Gaddhe banane mein sab ka haath hai: footpath pe parking karne wale, ulta chalane wale, kachra phenkne wale. Yaani <b>hum</b>.</p>
         <p class="muted">Prerna: Rahgir ka gaana "Aadmi Chutiya Hai", jo hamein khud pe hasna sikhata hai, aur <a href="https://mantarjantar.com" target="_blank" rel="noopener">Jantar Mantar Chalo</a> jaisa sheher-wala vyangya game.</p>
         <p><b>Sadak pe khelna mana hai.</b> Ye game ghar pe, ruk ke khelo. Chalte hue ya gaadi chalate hue phone mat dekho.</p>
-        <p class="muted"><b>Aapka data:</b> koi login nahi, koi location nahi, koi tracking nahi. Score aur unlocks sirf isi browser mein save hote hain. Gaane YouTube se chalte hain (YouTube apni cookies laga sakta hai); fonts Google Fonts se aate hain.</p>
+        <p class="muted"><b>Aapka data:</b> koi login nahi, koi location nahi, koi tracking nahi. Score aur unlocks sirf isi browser mein save hote hain. Gaane YouTube se chalte hain (privacy-enhanced YouTube player); fonts Google Fonts se aate hain.</p>
         <p class="muted" id="sachAlbum"></p>
-        <p><button class="linkish" type="button" id="resetData">Mera saara data saaf karo</button></p>
+        <p><button class="linkish tipBtn" type="button">☕ Chai pila do (UPI)</button> · <button class="linkish" type="button" id="resetData">Mera saara data saaf karo</button></p>
         <p class="muted">Saari jagah, naksha, vibhaag aur ticker ki khabrein kaalpanik hain. Koi asli vyakti, sanstha, sadak ya brand nahi dikhaya gaya hai. Radio ke gaane unke official YouTube channels se chalte hain; hum koi gaana host nahi karte.</p>
         <div class="row"><button class="btn" type="button" id="aboutClose">Theek hai, khelte hain</button></div>
       </div>
@@ -324,7 +332,26 @@ kbd{font-family:var(--f-body);background:#3a3442;border-radius:3px;padding:0 5px
           <button class="btn alt" type="button" id="ovCard">📸 Card share karo</button>
           <a class="btn alt" id="waLink" href="#" target="_blank" rel="noopener">WhatsApp pe bhejo</a>
           <button class="btn alt" type="button" id="ovMenu">Kirdaar / jagah badlo</button>
+          <button class="btn alt tipBtn" type="button">☕ Game pasand aaya? Chai pila do</button>
         </div>
+      </div>
+    </div>
+
+    <!-- TIP JAR -->
+    <div class="overlay" id="tip" hidden>
+      <div class="panel">
+        <div class="eyebrow">Chai pila do</div>
+        <h2>Ek cutting chai ☕</h2>
+        <p>Hat Ja Bhai free hai aur ad-free rehna chahiye. Agar sadak pe hasi aayi, toh ek chai pila do. Saara paisa hosting, naye ilaakon aur apne gaanon mein jaata hai.</p>
+        <div class="row tipamts">
+          <a class="btn" id="tip20" href="#">₹20 cutting</a>
+          <a class="btn" id="tip50" href="#">₹50 masala</a>
+          <a class="btn" id="tip100" href="#">₹100 chai + samosa</a>
+        </div>
+        <p class="muted">Phone pe button dabao, UPI app khul jayega. Computer pe QR scan karo:</p>
+        <img class="upiqr" src="icons/upi-qr.png" width="200" height="200" alt="UPI QR code for thebiggeek@ptyes">
+        <p class="upiid">UPI ID: <b id="upiText"></b> <button class="linkish" type="button" id="upiCopy">Copy</button></p>
+        <div class="row"><button class="btn alt" type="button" id="tipClose">Wapas</button></div>
       </div>
     </div>
 
@@ -354,7 +381,8 @@ kbd{font-family:var(--f-body);background:#3a3442;border-radius:3px;padding:0 5px
    DATA
    ===================================================================== */
 const SITE_URL = 'https://hatjabhai.com';
-const WHATSAPP_URL = '';   // paste the WhatsApp channel invite link here
+const WHATSAPP_URL = '';
+const UPI_ID = 'thebiggeek@ptyes';   // paste the WhatsApp channel invite link here
 const W = 400;            // world width: footpath + road + footpath
 let OX = 60, VW = W + 2*OX;     // view adds roadside (buildings / fields); wider on landscape screens
 let H = 720;          // world (logic) height: in driver view the world reaches far ahead
@@ -896,7 +924,7 @@ const Radio = {
   cur(){ return RADIO[this.station].tracks[this.order[this.i]]; },
   make(){
     const t = this.cur();
-    this.player = new YT.Player('ytp', { width:200, height:200, videoId:t[0],
+    this.player = new YT.Player('ytp', { host:'https://www.youtube-nocookie.com', width:200, height:200, videoId:t[0],
       playerVars:{ playsinline:1, rel:0, modestbranding:1 },
       events:{
         onReady: e => { this.ready = true; e.target.playVideo(); this.show(); },
@@ -940,7 +968,7 @@ const Dashcam = {
     this.userClosed = false; $('dashcam').hidden = false;
     if (this.player){ if (this.ready) this.player.playVideo(); return; }
     withYT(() => {
-      this.player = new YT.Player('dcp', { width:200, height:200, videoId:this.list[this.i],
+      this.player = new YT.Player('dcp', { host:'https://www.youtube-nocookie.com', width:200, height:200, videoId:this.list[this.i],
         playerVars:{ playsinline:1, rel:0, modestbranding:1, start: 5 + Math.floor(Math.random()*60) },
         events:{
           onReady: e => { this.ready = true; e.target.setVolume(45); e.target.playVideo(); },
@@ -4001,7 +4029,7 @@ function drawDayMap(nextLeg){
 /* =====================================================================
    SCREENS
    ===================================================================== */
-const overlays = ['menu','about','dayclear','over','pause'];
+const overlays = ['menu','about','dayclear','over','pause','tip'];
 function showOnly(id){ for (const o of overlays) $(o).hidden = o !== id; }
 function setGameButtons(on){
   $('actBtn').hidden = $('brkBtn').hidden = $('pauseBtn').hidden = !on;
@@ -4142,6 +4170,13 @@ $('viewTop').onclick = () => setView('top');
 $('reroll').onclick = () => { menuSeed = (Math.random()*4294967296)>>>0; buildMenu(); setTicker(menuRegion); };
 $('modeDaily').onclick = () => setMode('daily');
 $('modeRandom').onclick = () => setMode('random');
+let tipBack = 'menu';
+const upiLink = am => 'upi://pay?pa=' + UPI_ID + '&pn=Hat%20Ja%20Bhai&cu=INR' + (am ? '&am=' + am : '') + '&tn=Chai%20for%20Hat%20Ja%20Bhai';
+$('tip20').href = upiLink(20); $('tip50').href = upiLink(50); $('tip100').href = upiLink(100);
+$('upiText').textContent = UPI_ID;
+document.querySelectorAll('.tipBtn').forEach(b => b.addEventListener('click', () => { tipBack = overlays.find(o => !$(o).hidden) || 'menu'; showOnly('tip'); }));
+$('tipClose').onclick = () => showOnly(tipBack);
+$('upiCopy').onclick = () => { if (navigator.clipboard) navigator.clipboard.writeText(UPI_ID).then(() => toast('UPI ID copy ho gaya'), () => toast(UPI_ID)); else toast(UPI_ID); };
 $('aboutBtn').onclick = () => {
   const got = store.get('sach', []);
   $('sachAlbum').innerHTML = '<b>📚 Sadak ka Sach (' + got.length + '/' + Object.keys(SACH).length + '):</b> ' + (got.length ? got.map(k => SACH[k]).join(' · ') : 'abhi koi nahi. Khelte raho, sadak sikhayegi.');
