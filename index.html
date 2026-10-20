@@ -100,6 +100,41 @@ p{margin:6px 0;line-height:1.45}
 .howto li{display:flex;justify-content:space-between;gap:12px;padding:10px 0;border-bottom:1px solid var(--line);font-size:14px}
 .howto span{color:var(--muted);text-align:right}
 #stage.menu-open .hudbtn{display:none}
+.nextlv{font-size:13px;color:var(--muted);margin:8px 0 0}
+#playEndless{margin-top:12px}
+.lvtop{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.lvtop h2{margin:0}
+.back{font:inherit;font-size:28px;line-height:1;width:40px;height:40px;border-radius:50%;border:0;background:var(--asphalt-2);color:var(--ink);cursor:pointer}
+.tot{min-width:40px;font-weight:800;color:var(--marigold);font-size:14px}
+.worlds button{font-size:12px;padding:8px 4px}
+.lvpath{position:relative;display:flex;flex-direction:column;gap:6px;margin:8px 0 4px;padding:6px 0}
+.lvpath::before{content:"";position:absolute;left:50%;top:24px;bottom:24px;border-left:4px dashed #3a3442;transform:translateX(-50%)}
+.lvnode{position:relative;align-self:center;display:flex;flex-direction:column;align-items:center;gap:2px;background:none;border:0;cursor:pointer;font:inherit;color:var(--ink)}
+.lvnode:nth-child(5n+2),.lvnode:nth-child(5n+4){transform:translateX(-70px)}
+.lvnode:nth-child(5n+3){transform:translateX(70px)}
+.lvnode .ball{width:64px;height:64px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:17px;background:var(--marigold);color:#1a1300;box-shadow:0 5px 0 #b37d00}
+.lvnode.done .ball{background:var(--teal);box-shadow:0 5px 0 #0a7a6f;color:#00201c}
+.lvnode.boss .ball{width:76px;height:76px;background:var(--rani);color:#fff;box-shadow:0 5px 0 #a3194c}
+.lvnode.locked .ball{background:#3a3442;color:var(--muted);box-shadow:0 5px 0 #24202a}
+.lvnode.next .ball{animation:pulse 1.4s ease-in-out infinite}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.09)}}
+@media (prefers-reduced-motion:reduce){.lvnode.next .ball{animation:none}}
+.lvnode .st{font-size:13px;letter-spacing:1px;color:var(--marigold)}
+.lvnode .nm{font-size:11px;color:var(--muted);max-width:110px}
+.lvnode[aria-pressed="true"] .ball{outline:3px solid var(--ink);outline-offset:3px}
+.lvsheet{margin-top:10px;padding:14px;border-radius:14px;background:var(--asphalt-2);text-align:left}
+.lvsheet h3{margin:0 0 6px;font-size:19px;letter-spacing:0;text-transform:none;color:var(--ink)}
+.lvid{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--teal);font-weight:800;margin:0}
+.lsveh{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0}
+.lsveh button,.lsveh span{font:inherit;font-size:13px;font-weight:700;padding:6px 10px;border-radius:999px;border:2px solid transparent;background:#3a3442;color:var(--ink);cursor:pointer}
+.lsveh button[aria-pressed="true"]{border-color:var(--marigold)}
+.goals{list-style:none;padding:0;margin:8px 0 0;text-align:left;font-size:14px}
+.goals li{padding:5px 0;color:var(--muted)}
+.goals li.ok{color:var(--ink)}
+.stars{display:flex;justify-content:center;gap:10px;margin:10px 0 6px}
+.stars span{font-size:58px;line-height:1;color:#3a3442;transform:scale(.6);transition:transform .3s}
+.stars span.on{color:var(--marigold);text-shadow:0 0 18px rgba(255,184,28,.6);animation:pop .45s cubic-bezier(.2,1.8,.4,1) forwards}
+@keyframes pop{0%{transform:scale(0) rotate(-30deg)}100%{transform:scale(1) rotate(0)}}
 .regions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}
 .region{font:inherit;text-align:left;cursor:pointer;background:var(--asphalt-2);color:var(--ink);border:2px solid var(--line);border-radius:6px;padding:7px 9px;min-width:0}
 .region b{display:block;font-size:14px}
@@ -271,11 +306,9 @@ kbd{font-family:var(--f-body);background:#3a3442;border-radius:3px;padding:0 5px
         <h1 class="title">हट जा भाई!</h1>
         <p class="tagline">Race nahi jeetni. Bas ghar zinda pahunchna hai.</p>
 
-        <div class="seg" id="regions" role="radiogroup" aria-label="Kahan"></div>
-        <div class="vcards" id="chars" role="radiogroup" aria-label="Kaun"></div>
-        <button class="linkish more" type="button" id="reroll">🔀 Aur gaadiyan</button>
-
-        <button class="cta" type="button" id="play">Chalo</button>
+        <button class="cta" type="button" id="playLevels">▶ Khelo</button>
+        <p class="nextlv" id="nextLv"></p>
+        <button class="cta alt" type="button" id="playEndless">📅 Aaj ki Sadak · endless</button>
 
         <nav class="links" aria-label="More">
           <button type="button" id="settingsLink">Settings</button>
@@ -283,6 +316,48 @@ kbd{font-family:var(--f-body);background:#3a3442;border-radius:3px;padding:0 5px
           <button type="button" class="tipBtn">Chai ☕</button>
           <button type="button" id="aboutBtn">About</button>
         </nav>
+      </div>
+    </div>
+
+    <!-- LEVEL MAP -->
+    <div class="overlay" id="levels" hidden>
+      <div class="panel launch">
+        <div class="lvtop"><button type="button" class="back" id="lvBack" aria-label="Wapas">‹</button><h2>Levels</h2><span class="tot" id="lvTot"></span></div>
+        <div class="seg worlds" id="worlds" role="tablist"></div>
+        <div class="lvpath" id="lvPath"></div>
+        <div class="lvsheet" id="lvSheet" hidden>
+          <p class="lvid" id="lsId"></p>
+          <h3 id="lsName"></h3>
+          <div id="lsVeh" class="lsveh"></div>
+          <p class="note" id="lsIntro"></p>
+          <ul class="goals" id="lsGoals"></ul>
+          <button class="cta" type="button" id="lsGo">Chalo</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ENDLESS: pick a place and a vehicle -->
+    <div class="overlay" id="endless" hidden>
+      <div class="panel launch">
+        <div class="lvtop"><button type="button" class="back" id="endBack" aria-label="Wapas">‹</button><h2>Aaj ki Sadak</h2><span class="tot"></span></div>
+        <p class="note">Ek din, ek sadak, sabke liye ek jaisi. Kitna door jaoge?</p>
+        <div class="seg" id="regions" role="radiogroup" aria-label="Kahan"></div>
+        <div class="vcards" id="chars" role="radiogroup" aria-label="Kaun"></div>
+        <button class="linkish more" type="button" id="reroll">🔀 Aur gaadiyan</button>
+        <button class="cta" type="button" id="play">Chalo</button>
+      </div>
+    </div>
+
+    <!-- LEVEL DONE -->
+    <div class="overlay" id="lvdone" hidden>
+      <div class="panel launch">
+        <p class="lvid" id="ldId"></p>
+        <h2>Level poora!</h2>
+        <div class="stars" id="ldStars"><span>★</span><span>★</span><span>★</span></div>
+        <ul class="goals" id="ldGoals"></ul>
+        <p class="unlock" id="ldUnlock" hidden></p>
+        <button class="cta" type="button" id="ldNext">Agla level →</button>
+        <nav class="links"><button type="button" id="ldRetry">Phir se</button><button type="button" id="ldMap">Map</button></nav>
       </div>
     </div>
 
@@ -376,7 +451,7 @@ kbd{font-family:var(--f-body);background:#3a3442;border-radius:3px;padding:0 5px
         <div class="row">
           <button class="btn alt" type="button" id="ovCard">📸 Card share karo</button>
           <a class="btn alt" id="waLink" href="#" target="_blank" rel="noopener">WhatsApp pe bhejo</a>
-          <button class="btn alt" type="button" id="ovMenu">Kirdaar / jagah badlo</button>
+          <button class="btn alt" type="button" id="ovMenu">Map / kirdaar badlo</button>
           <button class="btn alt tipBtn" type="button">☕ Game pasand aaya? Chai pila do</button>
         </div>
       </div>
@@ -1247,9 +1322,9 @@ let lastChar = 'paidal';
 let attract = 0;
 const keys = {};
 
-function newGame(charKey, regionKey){
+function newGame(charKey, regionKey, L = null){
   const c = CHARS[charKey], R = REGIONS[regionKey];
-  const seed = selectedMode === 'daily' ? hashStr(todayStr()+'|'+regionKey+'|'+charKey) : (Math.random()*4294967296)>>>0;
+  const seed = L ? hashStr('lv|' + L.id) : selectedMode === 'daily' ? hashStr(todayStr()+'|'+regionKey+'|'+charKey) : (Math.random()*4294967296)>>>0;
   G = {
     c, R, regionKey, srng: mulberry32(seed), day:1, season:'normal', S:SEASONS.normal,
     ents:[], texts:[], parts:[], later:[],
@@ -1258,6 +1333,7 @@ function newGame(charKey, regionKey){
     dist:0, dayStart:0, dayDist:0, dayTarget:0, totalPx:0, score:0, near:0, honks:0, picks:0, challans:0, savaari:0, dug:0, insaniyat:0,
     stuckT:0, shake:0, flash:0, time:0, cause:'vehicle', banner:0, sp:{}, rain:[], fireT:0, darkT:0, dying:null, speedNow:c.speed,
     brk:0, lastBrk:-9, onDirt:false, map: buildMap(R.map), route:null, leg:null,
+    lv: L, coins:0, coinsTotal:0,
   };
   startDay(1);
   state = 'play';
@@ -1293,25 +1369,25 @@ function startPos(){
 function startDay(d){
   G.day = d;
   const R = G.R;
-  G.season = d <= 5 ? R.seasons[d-1] : R.seasons[Math.floor(G.srng()*5)];
-  G.S = SEASONS[G.season];
+  G.season = G.lv ? G.lv.season : d <= 5 ? R.seasons[d-1] : R.seasons[Math.floor(G.srng()*5)];
+  G.S = G.lv ? { ...SEASONS[G.season], name: G.lv.id + ' · ' + G.lv.name, sub: G.lv.intro } : SEASONS[G.season];
   if (G.S.fog) later(2, () => sach('fog'));
   G.dayStart = G.dist; G.dayDist = 0;
-  G.dayTarget = (600 + 120*(d-1)) * 10 * Math.max(1, G.c.speed/165);
+  G.dayTarget = G.lv ? G.lv.len*10 : (600 + 120*(d-1)) * 10 * Math.max(1, G.c.speed/165);
   G.ents = []; G.texts = []; G.parts = []; G.later = [];
-  G.sp = { traffic:260, ground:200, fp:120, pick:650, special:420, dog:900 };
+  G.sp = { traffic:260, ground:200, fp:120, pick:650, special:420, dog:900, coin:120 };
   G.destDone = false;
   G.ciiD = ciiZero(); G.sachNew = null;
-  pickKaam();
+  pickKaam(); if (G.lv) G.kaam = [];
   G.banner = 3.4; G.darkT = 0;
-  const legs = G.map.legs, lg = d <= legs.length ? legs[d-1] : legs[Math.floor(G.srng()*legs.length)];
+  const legs = G.map.legs, lvi = G.lv ? LEVELS.indexOf(G.lv) % 5 : -1, lg = G.lv ? legs[lvi % legs.length] : d <= legs.length ? legs[d-1] : legs[Math.floor(G.srng()*legs.length)];
   G.leg = lg; G.route = G.map.route(lg[0], lg[1]);
-  G.routeKm = Math.max(1.2, polyLen(G.route) * 0.035);
+  G.routeKm = G.lv ? G.lv.len/100 : Math.max(1.2, polyLen(G.route) * 0.035);
   const p = G.p;
   p.x = startPos(); p.y = H*0.72; p.bp = 118; p.invT = 1.5; p.tx = p.ty = null;
   p.jumpT = 0; p.slowT = 0; p.stunT = 0; p.slideV = 0;
 }
-const diff = () => 1 + 0.14*(G.day-1);
+const diff = () => G.lv ? G.lv.d : 1 + 0.14*(G.day-1);
 const placeName = i => G.map.places[i][0];
 
 /* =====================================================================
@@ -1397,8 +1473,9 @@ function spawnVehicle(type, opts={}){
 
 function spawnTraffic(){
   const R = G.srng, S = G.S;
-  const tbl = merge(G.R.traffic, S.trafficAdd);
-  tbl.wrong = (tbl.wrong || 0) * (S.wrong || 1) + 0.2*G.day;
+  const tbl = lvFilter(merge(G.R.traffic, S.trafficAdd), 'traffic');
+  tbl.wrong = (tbl.wrong || 0) * (S.wrong || 1) + (G.lv ? 0 : 0.2*G.day);
+  if (G.lv && G.lv.tier && !G.lv.tier.wrong) tbl.wrong = 0;
   const t = wpick(R, tbl);
   if (t === 'wrong') spawnVehicle(pick(R,['bike','bike','auto','car']), { wrong:true });
   else if (t === 'thar' && R() < 0.45){ const e = spawnVehicle('thar', { wrong:true }); if (e) e.label = 'BHAUKAAL · ULTA'; }
@@ -1434,8 +1511,8 @@ function addGround(kind, x, y, extra){
 
 function spawnGround(){
   const R = G.srng, R2 = G.R, S = G.S;
-  const tbl = merge(R2.ground, S.ground);
-  if (G.dayDist < 1500) tbl.manhole = 0;
+  const tbl = merge(lvFilter(R2.ground, 'ground'), S.ground);
+  if (G.dayDist < 1500 && !(G.lv && G.lv.id === '1-2')) tbl.manhole = 0;
   const t = wpick(R, tbl);
   if (!t) return;
   const fpOnly = t === 'poop' || t === 'broken' || t === 'drain';
@@ -1450,6 +1527,7 @@ function spawnGround(){
   const x = onFP ? (R() < 0.5 ? FP_L : FP_R) : rr(R, ROAD_L+20, ROAD_R-20);
   const e = addGround(t, x, -40);
   if (onFP && t === 'pothole'){ e.w = 34; }
+  if (G.c.act === 'jump' && ['pothole','manhole','trench','puddle'].includes(t) && G.srng() < 0.55) for (let i = -1; i <= 1; i++) addCoin(e.x, e.y + i*26, true);
   if (t === 'puddle' && R() < 0.5) for (let i=0;i<2;i++) addGround('puddle', rr(R,ROAD_L+30,ROAD_R-30), -40-rr(R,40,120), { w:rr(R,50,80), h:rr(R,26,36), hidden:R()<0.4 });
 }
 
@@ -1464,6 +1542,13 @@ function spawnFP(){
   G.ents.push(e);
 }
 
+function addCoin(x, y, air){ G.ents.push({ pickup:'coin', emoji:'🪙', x, y, u:0, w:20, h:20, bob:0, air:!!air }); G.coinsTotal++; }
+function spawnCoins(){
+  const R = G.srng, c = G.c;
+  const x = c.key === 'paidal' && edgeWalk(-1) && R() < 0.5 ? FP_L : pick(R, LANES);
+  const n = 5 + Math.floor(R()*3);
+  for (let i = 0; i < n; i++) addCoin(x, -30 - i*36);
+}
 function spawnPickup(){
   const R = G.srng, S = G.S, c = G.c;
   const t = wpick(R, {
@@ -1724,7 +1809,7 @@ const SPECIAL = {
 };
 
 function spawnSpecial(){
-  const tbl = merge(G.R.special, G.S.special);
+  const tbl = merge(lvFilter(G.R.special, 'special'), G.S.special);
   const k = wpick(G.srng, tbl);
   if (!k) return;
   if (FEEDTXT[k]) feed(FEEDTXT[k]);
@@ -1742,7 +1827,8 @@ function runSpawners(s){
   if (sp.fp      <= 0){ spawnFP();      sp.fp      = rr(R,150,300) * Math.max(0.6,k) * (c.fp ? 0.8 : 1.4); }
   if (sp.pick    <= 0){ spawnPickup();  sp.pick    = rr(R,650,1000); }
   if (sp.special <= 0){ spawnSpecial(); sp.special = rr(R,420,760) * Math.max(0.6,k) * big; }
-  if (sp.dog     <= 0){ if (R() < (c.twoWheel ? 0.9 : 0.35)) spawnChaser(); sp.dog = rr(R,650,1100); }
+  if (sp.dog     <= 0){ if (!(G.lv && G.lv.tier && !G.lv.tier.dogs) && R() < (c.twoWheel ? 0.9 : 0.35)) spawnChaser(); sp.dog = rr(R,650,1100); }
+  if (sp.coin    <= 0){ spawnCoins(); sp.coin = rr(R,260,420); }
 }
 
 /* =====================================================================
@@ -1904,8 +1990,46 @@ function sach(k){
 }
 
 /* progression: vehicles unlock by total metres walked/driven across runs */
-const UNLOCK_M = { paidal:0, cycle:0, scooty:0, car:0, thar:1500, suv:3000, truck:5000, bus:7500, jcb:10000 };
-const isUnlocked = k => store.get('xp', 0) >= UNLOCK_M[k];
+const UNLOCK_M = { paidal:0, cycle:300, scooty:800, car:1500, thar:3000, suv:5000, truck:7000, bus:9000, jcb:12000 };
+const isUnlocked = k => k === 'paidal' || store.get('lvUnlocks', []).includes(k) || store.get('xp', 0) >= UNLOCK_M[k];
+
+/* ---- LEVELS: four worlds, easy to hard. Each level teaches one new thing. ---- */
+const T1 = { ground:['pothole','kachra','broken','poop'], special:['cow','busstop','noparking','billgaddha','camera'], traffic:['car','auto','bike','erick','cart'], wrong:false, dogs:false };
+const T2 = { ground:[...T1.ground,'manhole','breaker','puddle','pee','tar','dirt'], special:[...T1.special,'parkjam','cctv','pillar','heap','tanker','breakers','saand'], traffic:[...T1.traffic,'bus','truck','tractor'], wrong:false, dogs:true };
+const T3 = { ground:[...T2.ground,'trench','drain','wire','ice','crater'], special:[...T2.special,'chowk','reels','mehngibump','hafta','metro','fob','craters','pole','pipe','selfiejam','rock','debris','row_goats','row_buffalo','amb'], traffic:[...T2.traffic,'thar','dj','roller'], wrong:true, dogs:true };
+const LEVELS = [
+  { id:'1-1', world:'city', name:'Pehla Kadam', char:'paidal', season:'normal', len:350, d:0.55, tier:T1, intro:'Footpath pe chalo. Gaddhon se bacho, chillar uthao.', unlock:'cycle' },
+  { id:'1-2', world:'city', name:'Do Pahiye, Do Kutte', char:'cycle', season:'normal', len:450, d:0.65, tier:{ ...T2 }, intro:'Kutte peeche bhaagenge. Manhole ke upar se KOODO!', unlock:'scooty' },
+  { id:'1-3', world:'city', name:'Ulta Raasta', char:'scooty', season:'normal', len:550, d:0.75, tier:{ ...T2, wrong:true }, intro:'Wrong-side wale aa rahe hain. Lane badlo, bacho.', unlock:'car' },
+  { id:'1-4', world:'city', name:'Monsoon Masti', char:'car', season:'monsoon', len:650, d:0.85, tier:{ ...T2, wrong:true }, intro:'Paani ke neeche gaddhe chhupe hain. HORN bajao, rasta banao.', unlock:'thar' },
+  { id:'1-5', world:'city', name:'VIP Movement', char:null, season:'vip', len:800, d:1.0, tier:T3, intro:'Boss level! Barricade, convoy, ambulance. Sab ek saath.', unlock:'suv' },
+  { id:'2-1', world:'town', name:'Garmi aur Loo', char:'scooty', season:'loo', len:600, d:0.8, tier:{ ...T2, wrong:true }, intro:'48°C. Lassi uthao, BP sambhalo.' },
+  { id:'2-2', world:'town', name:'Bijli Gayi', char:'cycle', season:'bijli', len:650, d:0.85, tier:T3, intro:'Andhera aur latakte taar. Taaron ke neeche mat koodo!' },
+  { id:'2-3', world:'town', name:'Aandhi', char:'car', season:'aandhi', len:700, d:0.95, tier:T3, intro:'Dhool mein kuch nahi dikhta. Dheere chalo.', unlock:'truck' },
+  { id:'2-4', world:'town', name:'Mela Sadak Pe', char:'paidal', season:'mela', len:600, d:1.0, tier:T3, intro:'Bheed, DJ aur jhoole. Gap dhoondho.' },
+  { id:'2-5', world:'town', name:'Chunav Season', char:null, season:'chunav', len:850, d:1.1, tier:null, intro:'Boss level! Raaton-raat sadak, juloos aur garam taar.', unlock:'bus' },
+  { id:'3-1', world:'hills', name:'Selfie Point', char:'car', season:'tourist', len:650, d:0.9, tier:T3, intro:'Railing kahin kahin hai. Khaai se door!' },
+  { id:'3-2', world:'hills', name:'Landslide', char:'thar', season:'landslide', len:700, d:1.0, tier:T3, intro:'Pahad se patthar girenge. Bhaukaal sab tod deti hai, JCB ko chhod ke.' },
+  { id:'3-3', world:'hills', name:'Barfbaari', char:'scooty', season:'snow', len:650, d:1.05, tier:T3, intro:'Barf pe fisloge. Halka haath, halka brake.' },
+  { id:'3-4', world:'hills', name:'Long Weekend', char:'suv', season:'weekend', len:750, d:1.15, tier:null, intro:'Poora sheher pahad pe. Scratch se bachao.', unlock:'jcb' },
+  { id:'3-5', world:'hills', name:'Pahad Katai', char:null, season:'widening', len:900, d:1.25, tier:null, intro:'Boss level! Pahad kaat ke four-lane.' },
+  { id:'4-1', world:'highway', name:'Dhund', char:'truck', season:'dhund', len:800, d:1.2, tier:null, intro:'Visibility 5 meter. Aaj tera bhai truck chalayega.' },
+  { id:'4-2', world:'highway', name:'Toll Plaza', char:'bus', season:'toll', len:850, d:1.25, tier:null, intro:'Aadhi lane band. Savaari bhi uthani hai.' },
+  { id:'4-3', world:'highway', name:'Diversion', char:'jcb', season:'diversion', len:800, d:1.3, tier:null, intro:'Sadak khodo, points lo. Ulta game!' },
+  { id:'4-4', world:'highway', name:'Overload', char:'truck', season:'overload', len:900, d:1.4, tier:null, intro:'Truck pe truck. Taaron se bacho.' },
+  { id:'4-5', world:'highway', name:'Ulta Raaj', char:null, season:'ultaraj', len:1000, d:1.6, tier:null, intro:'Final boss! Aadhe log ulte. Ghar pahunche toh legend.' },
+];
+const WORLDS = [['city','🏙️ Ultapur'],['town','🌾 Dhoolnagar'],['hills','🏔️ Fisalgarh'],['highway','🛣️ Expressway']];
+const lvStars = () => store.get('lv', {});
+const lvOpen = i => i === 0 || (lvStars()[LEVELS[i-1].id] || 0) >= 1;
+const nextLevelIdx = () => { const st = lvStars(); const i = LEVELS.findIndex((L, j) => lvOpen(j) && !st[L.id]); return i < 0 ? LEVELS.length - 1 : i; };
+function lvFilter(tbl, cat){
+  const t = G && G.lv && G.lv.tier;
+  if (!t) return tbl;
+  const o = {};
+  for (const k in tbl) o[k] = t[cat].includes(k) || (cat === 'traffic' && k === 'wrong' && t.wrong) ? tbl[k] : 0;
+  return o;
+}
 function streakTouch(){
   const t = todayStr(), y = (() => { const d = new Date(); d.setDate(d.getDate() - 1); return d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate(); })();
   const last = store.get('lastDay', ''), n = store.get('streak', 0);
@@ -1955,6 +2079,7 @@ function damage(cause, txt){
     say(p.x, p.y-30, c.mass >= 2 ? 'Mechanic ka jugaad bacha gaya! 🔧' : 'Helmet ne bachaya! (ISI mark nahi tha)', '#13b3a3', 13, 1.6);
     return;
   }
+  if (navigator.vibrate) try { navigator.vibrate(40); } catch (e) {}
   p.hearts--; p.invT = 1.7; G.shake = 12; G.cause = cause; SFX.thud(); G.ds.hit++;
   feed('💔 ' + ((CAUSES[cause] || CAUSES.vehicle).t));
   if (txt) say(p.x, p.y-30, txt, '#ff4d3d', 15, 1.4);
@@ -2186,7 +2311,7 @@ function update(dt){
     }
     if (e.fountain && R0() < 0.5) G.parts.push({ x:e.x + rr(R0,-6,6), y:e.y, vx:rr(R0,-40,40), vy:-rr(R0,120,200), t:0.7, col:'#7fb7ff' });
 
-    if (e.pickup && !e.got && hitCR(p.x, p.y, p.r+6, e, 1)) takePickup(e);
+    if (e.pickup && !e.got && (!e.air || p.jumpT > 0.05) && hitCR(p.x, p.y, p.r+6, e, 1)) takePickup(e);
 
     // crossings: something passes the player's line
     if (!e._passed && e.y > p.y && e.y - p.y < 80){ e._passed = true; ciiCount(e); }
@@ -2260,7 +2385,7 @@ function update(dt){
   if (G.slowmo > 0) G.slowmo -= dt;
   if (G.kaamShowT > 0) G.kaamShowT -= dt;
   checkKaam(false);
-  if (G.dayDist >= G.dayTarget) dayClear();
+  if (G.dayDist >= G.dayTarget){ if (G.lv) levelDone(); else dayClear(); }
 }
 
 function updateVehicle(e, dt, s){
@@ -2457,6 +2582,7 @@ function groundHit(e){
 
 function takePickup(e){
   const p = G.p, c = G.c;
+  if (e.pickup === 'coin'){ e.got = true; e.dead = true; G.coins++; G.score += 5; tone(1318, .05, 'square', .04, 0, 0, 0, 'in'); tone(1760, .08, 'square', .04, 0, .05, 0, 'in'); return; }
   e.got = true; e.dead = true; G.picks++; G.score += 10; SFX.pick();
   if (e.pickup === 'treat'){ G.ds.treat++; G.treats++; addBP(-35); say(e.x, e.y-20, G.R.treat.n + '! BP −35', '#ffb81c', 14); }
   if (e.pickup === 'helmet'){ sach('helmet'); p.helmet = true; say(e.x, e.y-20, c.mass >= 2 ? 'Local mechanic ka jugaad 🔧' : 'Helmet mila (sasta wala)', '#13b3a3', 14); }
@@ -3371,8 +3497,8 @@ function drawHUD(){
   ctx.textAlign = 'left'; ctx.font = '800 10.5px ' + TXT_FONT; ctx.fillStyle = '#fff4dc';
   ctx.fillText('BP ' + Math.round(p.bp), bx + bw + 5, by + 5);
   ctx.textAlign = 'right';
-  ctx.font = '800 13px ' + TXT_FONT; ctx.fillStyle = '#ffb81c'; ctx.fillText('DIN ' + G.day + ' · ' + G.S.name, VW - 8, 13);
-  ctx.font = '700 11px ' + TXT_FONT; ctx.fillStyle = '#fff4dc'; ctx.fillText(Math.floor(G.score) + ' pts', VW - 8, 28);
+  ctx.font = '800 13px ' + TXT_FONT; ctx.fillStyle = '#ffb81c'; ctx.fillText(G.lv ? 'LEVEL ' + G.S.name : 'DIN ' + G.day + ' · ' + G.S.name, VW - 8, 13);
+  ctx.font = '700 11px ' + TXT_FONT; ctx.fillStyle = '#fff4dc'; ctx.fillText(Math.floor(G.score) + ' pts · 🪙 ' + G.coins + (G.lv ? '/' + G.coinsTotal : ''), VW - 8, 28);
   ctx.fillStyle = '#b9ae98';
   const extra = c.cams ? '📸 ' + G.challans + ' challan' : c.digger ? '⛏️ ' + G.dug + ' khudai' : '🙏 ' + G.near + ' bache';
   ctx.fillText(extra, VW - 8, 43);
@@ -3765,6 +3891,7 @@ function entityPOV(e, dz){
     return;
   }
   if (e.ground) return;
+  if (e.pickup === 'coin'){ const cq = proj(e.x, e.air ? 40 : 8, dz), spin = Math.abs(Math.cos((G ? G.time : 0)*5 + e.y*0.05)); ctx.save(); ctx.translate(cq.x, cq.y); ctx.scale(0.35 + 0.65*spin, 1); uprightEmoji('🪙', 0, 0, 20*sc); ctx.restore(); return; }
   if (e.pickup){ const b = Math.sin((G ? G.time : 0)*4 + e.bob)*4*sc; ctx.fillStyle = 'rgba(255,184,28,.28)'; ctx.beginPath(); ctx.arc(q.x, q.y - 26*sc + b, 18*sc, 0, Math.PI*2); ctx.fill(); uprightEmoji(e.emoji, q.x, q.y - 14*sc + b, 26*sc); return; }
   if (e.chaser){ uprightEmoji(e.emoji, q.x, q.y, esz(e.emoji, 26)*sc); return; }
   if (e.roller){ sideEmoji(e, q, esz(e.emoji, (e.fs || 30)*1.2)*sc); povLabel(e.label, q.x, q.y - 44*sc, q, '#ff4d3d'); return; }
@@ -4020,7 +4147,7 @@ function renderPOV(dt){
       ctx.globalAlpha = clamp(G.banner, 0, 1);
       ctx.fillStyle = 'rgba(20,18,24,.92)'; ctx.fillRect(0, SH*0.22, VW, 112);
       ctx.fillStyle = '#ff3d7f'; ctx.fillRect(0, SH*0.22, VW, 4);
-      ctx.fillStyle = '#ffb81c'; ctx.font = '24px "Yatra One",' + TXT_FONT; ctx.fillText('Din ' + G.day + ': ' + S2.name, VW/2, SH*0.22 + 28);
+      ctx.fillStyle = '#ffb81c'; ctx.font = '24px "Yatra One",' + TXT_FONT; ctx.fillText(G.lv ? 'Level ' + S2.name : 'Din ' + G.day + ': ' + S2.name, VW/2, SH*0.22 + 28);
       ctx.fillStyle = '#13b3a3'; ctx.font = '800 13px ' + TXT_FONT; ctx.fillText(placeName(G.leg[0]) + '  →  ' + placeName(G.leg[1]), VW/2, SH*0.22 + 52);
       ctx.fillStyle = '#fff4dc'; ctx.font = '600 14px ' + TXT_FONT; wrapText(S2.sub, VW/2, SH*0.22 + 76, VW - 60, 17);
       ctx.globalAlpha = 1;
@@ -4057,6 +4184,7 @@ function render(dt){
   for (const e of G.ents) if (e.decor && !e.overhead) drawDecor(e);
   for (const e of G.ents) if (e.block) drawBlock(e);
   for (const e of G.ents){
+    if (e.pickup === 'coin'){ emoji('🪙', e.x, e.y - (e.air ? 8 : 0), e.air ? 16 : 14); continue; }
     if (e.pickup){
       const b = Math.sin(G.time*4 + e.bob)*3;
       ctx.fillStyle = 'rgba(255,184,28,.22)'; ctx.beginPath(); ctx.arc(e.x, e.y + b, 17, 0, Math.PI*2); ctx.fill();
@@ -4122,7 +4250,7 @@ function render(dt){
     ctx.fillStyle = 'rgba(20,18,24,.92)'; ctx.fillRect(0, SH*0.22, VW, 112);
     ctx.fillStyle = '#ff3d7f'; ctx.fillRect(0, SH*0.22, VW, 4);
     ctx.fillStyle = '#ffb81c'; ctx.font = '24px "Yatra One",' + TXT_FONT;
-    ctx.fillText('Din ' + G.day + ': ' + S.name, VW/2, SH*0.22 + 28);
+    ctx.fillText(G.lv ? 'Level ' + S.name : 'Din ' + G.day + ': ' + S.name, VW/2, SH*0.22 + 28);
     ctx.fillStyle = '#13b3a3'; ctx.font = '800 13px ' + TXT_FONT;
     ctx.fillText(placeName(G.leg[0]) + '  →  ' + placeName(G.leg[1]), VW/2, SH*0.22 + 52);
     ctx.fillStyle = '#fff4dc'; ctx.font = '600 14px ' + TXT_FONT;
@@ -4161,8 +4289,8 @@ function drawDayMap(nextLeg){
 /* =====================================================================
    SCREENS
    ===================================================================== */
-const overlays = ['menu','about','dayclear','over','pause','tip','settings'];
-function showOnly(id){ for (const o of overlays) $(o).hidden = o !== id; stage.classList.toggle('menu-open', ['menu','settings','about','tip'].includes(id) && state !== 'over'); }
+const overlays = ['menu','about','dayclear','over','pause','tip','settings','levels','endless','lvdone'];
+function showOnly(id){ for (const o of overlays) $(o).hidden = o !== id; stage.classList.toggle('menu-open', ['menu','settings','about','tip','levels','endless'].includes(id) && state !== 'over'); }
 function setGameButtons(on){
   $('actBtn').hidden = $('brkBtn').hidden = $('pauseBtn').hidden = !on;
   if (!on) keys.brake = false;
@@ -4296,6 +4424,70 @@ function buildMenu(){
     syncPlay();
   }));
 }
+let lvWorld = null, lvSel = null, lvChar = null;
+function openLevels(){
+  const nx = nextLevelIdx();
+  lvWorld = lvWorld || LEVELS[nx].world; lvSel = null;
+  const st = lvStars(), tot = Object.values(st).reduce((a, b) => a + b, 0);
+  $('lvTot').textContent = '★ ' + tot + '/' + LEVELS.length*3;
+  $('worlds').innerHTML = WORLDS.map(([k, n]) => { const i = LEVELS.findIndex(L => L.world === k), open = lvOpen(i); return `<button type="button" role="tab" data-w="${k}" aria-pressed="${k === lvWorld}" ${open ? '' : 'disabled'}>${open ? n : '🔒 ' + n.split(' ')[1]}</button>`; }).join('');
+  document.querySelectorAll('#worlds button').forEach(b => b.onclick = () => { lvWorld = b.dataset.w; openLevels(); });
+  const list = LEVELS.map((L, i) => [L, i]).filter(([L]) => L.world === lvWorld);
+  $('lvPath').innerHTML = list.map(([L, i]) => {
+    const s = st[L.id] || 0, open = lvOpen(i), boss = L.id.endsWith('-5');
+    const cls = ['lvnode', boss ? 'boss' : '', s ? 'done' : '', open ? '' : 'locked', i === nx ? 'next' : ''].join(' ');
+    return `<button type="button" class="${cls}" data-i="${i}"><span class="ball">${open ? L.id : '🔒'}</span><span class="st">${'★'.repeat(s)}${'☆'.repeat(3 - s)}</span><span class="nm">${L.name}</span></button>`;
+  }).join('');
+  document.querySelectorAll('.lvnode').forEach(b => b.onclick = () => { const i = +b.dataset.i; if (!lvOpen(i)){ toast('🔒 Pichhla level poora karo'); return; } showSheet(i); document.querySelectorAll('.lvnode').forEach(x => x.setAttribute('aria-pressed', x === b)); });
+  $('lvSheet').hidden = true;
+  showOnly('levels');
+  const nb = document.querySelector('.lvnode.next'); if (nb) { nb.click(); }
+}
+function showSheet(i){
+  const L = LEVELS[i], best = lvStars()[L.id] || 0;
+  lvSel = i;
+  $('lsId').textContent = 'Level ' + L.id + (L.id.endsWith('-5') ? ' · Boss' : '');
+  $('lsName').textContent = L.name;
+  $('lsIntro').textContent = L.intro;
+  if (L.char){ lvChar = L.char; $('lsVeh').innerHTML = `<span>${CHARS[L.char].emoji} ${CHARS[L.char].name}</span>`; }
+  else {
+    const opts = Object.keys(CHARS).filter(isUnlocked);
+    lvChar = opts.includes(lvChar) ? lvChar : opts[opts.length - 1];
+    $('lsVeh').innerHTML = opts.map(k => `<button type="button" data-k="${k}" aria-pressed="${k === lvChar}">${CHARS[k].emoji} ${CHARS[k].name}</button>`).join('');
+    document.querySelectorAll('#lsVeh button').forEach(b => b.onclick = () => { lvChar = b.dataset.k; document.querySelectorAll('#lsVeh button').forEach(x => x.setAttribute('aria-pressed', x === b)); });
+  }
+  $('lsGoals').innerHTML = [['Ghar pahuncho', best >= 1], ['Ek bhi chot nahi', best >= 2], ['70% chillar 🪙 uthao', best >= 3]].map(([t, ok]) => `<li class="${ok ? 'ok' : ''}">${ok ? '★' : '☆'} ${t}</li>`).join('');
+  $('lvSheet').hidden = false;
+}
+function startLevel(i, ck){ const L = LEVELS[i]; ac(); newGame(ck || L.char || lvChar || 'paidal', L.world, L); }
+$('lsGo').onclick = () => { if (lvSel != null) startLevel(lvSel, lvChar); };
+$('playLevels').onclick = () => { ac(); openLevels(); };
+$('lvBack').onclick = () => { syncLaunch(); showOnly('menu'); };
+$('playEndless').onclick = () => { ac(); showOnly('endless'); };
+$('endBack').onclick = () => showOnly('menu');
+function syncLaunch(){ const i = nextLevelIdx(), L = LEVELS[i]; $('nextLv').textContent = 'Agla: ' + L.id + ' · ' + L.name; }
+function levelDone(){
+  state = 'lvdone'; Tape.stop(); setGameButtons(false); SFX.win();
+  const L = G.lv, i = LEVELS.indexOf(L);
+  const s2 = G.ds.hit === 0, s3 = G.coinsTotal === 0 || G.coins >= Math.ceil(G.coinsTotal*0.7);
+  const stars = 1 + (s2 ? 1 : 0) + (s3 ? 1 : 0);
+  const all = lvStars(), prev = all[L.id] || 0; all[L.id] = Math.max(prev, stars); store.set('lv', all);
+  const runM = Math.floor(G.totalPx/10); store.set('xp', store.get('xp', 0) + runM - G.xpAdded); G.xpAdded = runM;
+  let unlockTxt = '';
+  if (L.unlock && !store.get('lvUnlocks', []).includes(L.unlock)){ store.set('lvUnlocks', [...store.get('lvUnlocks', []), L.unlock]); unlockTxt = '🔓 Naya vehicle: ' + CHARS[L.unlock].emoji + ' ' + CHARS[L.unlock].name + '!'; }
+  if (i + 1 < LEVELS.length && LEVELS[i + 1].world !== L.world && prev === 0) unlockTxt += (unlockTxt ? ' · ' : '') + '🌍 Nayi duniya khuli: ' + WORLDS.find(w => w[0] === LEVELS[i + 1].world)[1];
+  $('ldId').textContent = 'Level ' + L.id + ' · ' + L.name;
+  $('ldGoals').innerHTML = [['Ghar pahuncho', true], ['Ek bhi chot nahi', s2], ['🪙 ' + G.coins + '/' + G.coinsTotal + ' chillar (70% chahiye)', s3]].map(([t, ok]) => `<li class="${ok ? 'ok' : ''}">${ok ? '★' : '☆'} ${t}</li>`).join('');
+  $('ldUnlock').hidden = !unlockTxt; $('ldUnlock').textContent = unlockTxt;
+  $('ldNext').textContent = i + 1 < LEVELS.length ? 'Agla level → ' + LEVELS[i + 1].id : '🏆 Saare levels poore!';
+  const sp = document.querySelectorAll('#ldStars span'); sp.forEach(x => x.classList.remove('on'));
+  showOnly('lvdone');
+  for (let k = 0; k < stars; k++) setTimeout(() => { sp[k].classList.add('on'); tone(880 + k*220, .16, 'triangle', .07, 0, 0, 0, 'in'); if (navigator.vibrate) try { navigator.vibrate(25); } catch (e) {} }, 350 + k*420);
+  setTimeout(() => $('ldNext').focus(), 400);
+}
+$('ldNext').onclick = () => { const i = LEVELS.indexOf(G.lv); if (i + 1 < LEVELS.length) startLevel(i + 1); else openLevels(); };
+$('ldRetry').onclick = () => startLevel(LEVELS.indexOf(G.lv), G.c.key);
+$('ldMap').onclick = () => openLevels();
 let menuChar = store.get('char', 'paidal');
 function syncPlay(){ const c = CHARS[menuChar]; $('play').textContent = c ? 'Chalo · ' + c.name : 'Chalo'; $('play').disabled = !c; }
 function startPlay(){ if (!CHARS[menuChar]) return; ac(); lastChar = menuChar; newGame(lastChar, menuRegion); }
@@ -4386,8 +4578,8 @@ $('ovCard').onclick = () => {
     toast('Card download ho gaya. WhatsApp pe bhejo!');
   }, 'image/png');
 };
-$('ovRetry').onclick = () => newGame(lastChar, G ? G.regionKey : menuRegion);
-$('ovMenu').onclick = () => { state = 'menu'; showOnly('menu'); };
+$('ovRetry').onclick = () => G && G.lv ? startLevel(LEVELS.indexOf(G.lv), G.c.key) : newGame(lastChar, G ? G.regionKey : menuRegion);
+$('ovMenu').onclick = () => { const lv = G && G.lv; state = 'menu'; if (lv) openLevels(); else { syncLaunch(); showOnly('menu'); } };
 $('ovShare').onclick = () => {
   const box = $('shareBox'); box.hidden = false;
   const txt = box.value;
@@ -4471,12 +4663,13 @@ $('crewCta').innerHTML = WHATSAPP_URL ? `<a href="${WHATSAPP_URL}" target="_blan
 if ('serviceWorker' in navigator && location.protocol.startsWith('http')) navigator.serviceWorker.register('sw.js').catch(() => {});
 stage.classList.add('menu-open');
 buildMenu();
+syncLaunch();
 setView(store.get('view', 'pov'));
 setTicker(menuRegion);
 setMuted(muted);
 resize();
 requestAnimationFrame(frame);
-window.__bkc = { get G(){ return G; }, newGame, REGIONS, CHARS, SPECIAL };
+window.__bkc = { get G(){ return G; }, newGame, REGIONS, CHARS, SPECIAL, LEVELS, startLevel, openLevels };
 })();
 </script>
 </body>

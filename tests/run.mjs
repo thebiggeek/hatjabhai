@@ -39,6 +39,18 @@ await pg.waitForTimeout(2500);
 if (!(await pg.locator('#over:not([hidden])').count())) fail('game over screen did not show');
 if (!(await pg.locator('#ovCII .grade').count())) fail('game over: no report card');
 if (await pg.locator('#ovRevive:not([hidden])').count()){ await pg.click('#ovRevive'); await pg.waitForTimeout(300); if (await pg.evaluate(() => document.querySelector('#over').hidden) !== true) fail('revive did not resume'); }
-console.log(errs.length ? 'FAIL\n' + [...new Set(errs)].join('\n') : 'PASS: 2 views × 4 places × 9 characters, all specials, day clear, game over, revive');
+// levels: map opens, level 1-1 completes with stars and unlocks the next level and a vehicle
+await pg.evaluate(() => { localStorage.removeItem('bkc_lv'); localStorage.removeItem('bkc_lvUnlocks'); state = undefined; });
+await pg.evaluate(() => window.__bkc.openLevels()); await pg.waitForTimeout(200);
+if ((await pg.locator('.lvnode').count()) !== 5) fail('level map should show 5 levels per world');
+await pg.evaluate(() => window.__bkc.startLevel(0)); await pg.waitForTimeout(1500);
+await pg.evaluate(() => { const G = window.__bkc.G; G.coins = G.coinsTotal; G.dayDist = G.dayTarget - 2; });
+await pg.waitForTimeout(800);
+if (!(await pg.locator('#lvdone:not([hidden])').count())) fail('level done screen did not show');
+const lv = await pg.evaluate(() => JSON.parse(localStorage.getItem('bkc_lv') || '{}'));
+if (lv['1-1'] !== 3) fail('level 1-1 should save 3 stars, got ' + lv['1-1']);
+await pg.click('#ldNext'); await pg.waitForTimeout(800);
+if ((await pg.evaluate(() => window.__bkc.G.lv.id)) !== '1-2') fail('next level did not start');
+console.log(errs.length ? 'FAIL\n' + [...new Set(errs)].join('\n') : 'PASS: 2 views × 4 places × 9 characters, all specials, day clear, game over, revive, levels');
 await b.close();
 process.exit(errs.length ? 1 : 0);
