@@ -67,6 +67,39 @@ p{margin:6px 0;line-height:1.45}
 .muted{color:var(--muted);font-size:13px}
 .hornok{font-family:var(--f-display);color:var(--rani);font-size:15px;letter-spacing:.04em;margin-top:2px}
 
+/* launch screen */
+.launch{max-width:420px;text-align:center;padding:30px 24px 22px}
+.launch .title{font-family:var(--f-display);font-weight:400;font-size:clamp(48px,13vw,64px);line-height:1;margin:6px 0 8px;color:var(--marigold);text-shadow:3px 3px 0 var(--rani)}
+.launch .tagline{font-size:17px;color:var(--muted);margin:0 0 26px}
+.launch h2{margin-bottom:16px}
+.streak{display:inline-block;font-weight:800;color:var(--marigold);font-size:13px;min-height:1px}
+.streak:not(:empty){background:rgba(255,184,28,.12);border-radius:999px;padding:3px 12px;margin-bottom:6px}
+.seg{display:flex;gap:4px;padding:4px;background:var(--asphalt-2);border-radius:12px;margin:0 auto 14px}
+.seg button{flex:1;font:inherit;font-weight:700;font-size:14px;padding:9px 8px;border:0;border-radius:9px;background:transparent;color:var(--muted);cursor:pointer;min-width:0}
+.seg button[aria-pressed="true"]{background:#3a3442;color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.4)}
+.vcards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.vcard{font:inherit;cursor:pointer;background:var(--asphalt-2);color:var(--ink);border:2px solid transparent;border-radius:16px;padding:16px 6px 12px;display:flex;flex-direction:column;align-items:center;gap:6px;min-width:0}
+.vcard .em{font-size:40px;line-height:1;height:44px;display:flex;align-items:center}
+.vcard .em img{width:60px;height:auto}
+.vcard b{font-size:13.5px;line-height:1.2}
+.vcard small{font-size:11px;color:var(--marigold);font-weight:800}
+.vcard[aria-pressed="true"]{border-color:var(--marigold);background:#332e3a}
+.vcard.locked{opacity:.5}
+.vcard:focus-visible,.seg button:focus-visible,.cta:focus-visible,.links button:focus-visible{outline:3px solid var(--teal);outline-offset:2px}
+.more{display:inline-block;margin:10px 0 0;font-size:13px}
+.cta{display:block;width:100%;margin:22px 0 0;font:inherit;font-weight:800;font-size:19px;padding:15px;border:0;border-radius:14px;background:var(--marigold);color:#1a1300;cursor:pointer;box-shadow:0 4px 0 #b37d00}
+.cta:active{transform:translateY(2px);box-shadow:0 2px 0 #b37d00}
+.cta[disabled]{background:#4a4452;color:var(--muted);box-shadow:none;cursor:not-allowed}
+.cta.alt{background:var(--asphalt-2);color:var(--ink);box-shadow:none}
+.links{display:flex;justify-content:center;flex-wrap:wrap;gap:4px 18px;margin-top:20px}
+.links button{font:inherit;font-size:13px;color:var(--muted);background:none;border:0;padding:4px 0;cursor:pointer}
+.links button:hover{color:var(--ink)}
+.lbl{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin:14px 0 6px;text-align:left}
+.note{font-size:13px;color:var(--muted);margin:2px 0 6px}
+.howto{list-style:none;padding:0;margin:0;text-align:left}
+.howto li{display:flex;justify-content:space-between;gap:12px;padding:10px 0;border-bottom:1px solid var(--line);font-size:14px}
+.howto span{color:var(--muted);text-align:right}
+#stage.menu-open .hudbtn{display:none}
 .regions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}
 .region{font:inherit;text-align:left;cursor:pointer;background:var(--asphalt-2);color:var(--ink);border:2px solid var(--line);border-radius:6px;padding:7px 9px;min-width:0}
 .region b{display:block;font-size:14px}
@@ -233,48 +266,54 @@ kbd{font-family:var(--f-body);background:#3a3442;border-radius:3px;padding:0 5px
 
     <!-- MENU -->
     <div class="overlay" id="menu">
-      <div class="panel">
-        <div class="eyebrow">Sadak ka survival game · Vyangya</div>
+      <div class="panel launch">
         <div class="streak" id="streak"></div>
-        <h1>हट जा भाई!<small>HAT JA BHAI · Bach ke chalo, sheher hai</small></h1>
-        <p class="lede">Race mein first nahi aana. Bas ghar <b>zinda</b> pahunchna hai.</p>
-        <div class="hornok">HORN NOT OK PLEASE</div>
+        <h1 class="title">हट जा भाई!</h1>
+        <p class="tagline">Race nahi jeetni. Bas ghar zinda pahunchna hai.</p>
 
-        <h3>1 · Kahan ho?</h3>
-        <div class="regions" id="regions" role="group" aria-label="Ilaaka chuno"></div>
+        <div class="seg" id="regions" role="radiogroup" aria-label="Kahan"></div>
+        <div class="vcards" id="chars" role="radiogroup" aria-label="Kaun"></div>
+        <button class="linkish more" type="button" id="reroll">🔀 Aur gaadiyan</button>
 
-        <h3>2 · Kaun ho?</h3>
-        <div class="chars" id="chars" role="group" aria-label="Kirdaar chuno"></div>
-        <p class="muted reroll"><button class="linkish" type="button" id="reroll">🔀 Doosri sadak, doosri gaadi</button> · har baar naye 2 ilaake aur 3 gaadiyan</p>
+        <button class="cta" type="button" id="play">Chalo</button>
 
-        <div class="mode" role="group" aria-label="Camera">
-          <button type="button" id="viewPov" aria-pressed="true">🚗 Driver ki seat</button>
-          <button type="button" id="viewTop" aria-pressed="false">🗺️ Upar se</button>
-        </div>
-        <div class="mode" role="group" aria-label="Sadak kaunsi?">
-          <button type="button" id="modeDaily" aria-pressed="true">📅 Aaj ki Sadak</button>
-          <button type="button" id="modeRandom" aria-pressed="false">🎲 Random Sadak</button>
-        </div>
-        <p class="muted" id="modeNote">Aaj ki Sadak sabke liye ek jaisi hai. Score doston se compare karo.</p>
+        <nav class="links" aria-label="More">
+          <button type="button" id="settingsLink">Settings</button>
+          <button type="button" id="helpLink">Kaise khelein</button>
+          <button type="button" class="tipBtn">Chai ☕</button>
+          <button type="button" id="aboutBtn">About</button>
+        </nav>
+      </div>
+    </div>
 
-        <div class="keys">
-          <b>Phone:</b> ungli se khiskao, upar = tez, neeche = dheere. Gol button: koodo / horn / khodo. Laal button: BRAKE.<br>
-          <b>Keyboard:</b> <kbd>←</kbd><kbd>→</kbd> side, <kbd>↑</kbd><kbd>↓</kbd> speed, <kbd>Shift</kbd>/<kbd>B</kbd> brake, <kbd>Space</kbd> action, <kbd>P</kbd> pause, <kbd>M</kbd> mute, <kbd>R</kbd> radio, <kbd>F</kbd> full screen.
+    <!-- SETTINGS + HOW TO PLAY -->
+    <div class="overlay" id="settings" hidden>
+      <div class="panel launch">
+        <h2 id="setTitle">Settings</h2>
+        <div id="setBody">
+          <p class="lbl">Camera</p>
+          <div class="seg" role="radiogroup" aria-label="Camera">
+            <button type="button" id="viewPov" aria-pressed="true">Driver ki seat</button>
+            <button type="button" id="viewTop" aria-pressed="false">Upar se</button>
+          </div>
+          <p class="lbl">Sadak</p>
+          <div class="seg" role="radiogroup" aria-label="Sadak">
+            <button type="button" id="modeDaily" aria-pressed="true">Aaj ki Sadak</button>
+            <button type="button" id="modeRandom" aria-pressed="false">Random</button>
+          </div>
+          <p class="note" id="modeNote">Aaj ki Sadak sabke liye ek jaisi hai.</p>
         </div>
-        <div class="crew">
-          <div><b>📲 Sadak Crew pe judo</b><span>Naye gaane, naye ilaake aur Aaj ki Sadak ke toppers, sabse pehle. WhatsApp pe, free.</span></div>
-          <span id="crewCta"></span>
+        <div id="helpBody" hidden>
+          <ul class="howto">
+            <li><b>Side badlo</b><span>← → · ya ungli se khiskao</span></li>
+            <li><b>Tez / dheere</b><span>↑ ↓ · ungli upar = tez</span></li>
+            <li><b>Brake</b><span>Shift / B · laal button</span></li>
+            <li><b>Koodo · Horn · Khodo</b><span>Space · gol button</span></li>
+            <li><b>Pause · Mute · Radio · Full screen</b><span>P · M · R · F</span></li>
+          </ul>
+          <p class="note">Gaddhe, khule manhole aur ulta traffic se bacho. Horn kam, dhyaan zyada. Ghar tak zinda pahuncho.</p>
         </div>
-        <div class="crew tipcard">
-          <div><b>☕ Chai pila do</b><span>Game free hai, ad-free rehna chahiye. Pasand aaya toh ek cutting chai, UPI se.</span></div>
-          <button type="button" class="tipBtn">₹ Chai</button>
-        </div>
-        <div class="disclaimer">
-          Vyangya (satire). Ultapur, Fisalgarh, Dhoolnagar aur Ulta Expressway kaalpanik jagah hain. Saare kirdaar, vibhaag, khabrein aur gaddhe kaalpanik hain; kisi asli gaddhe se samanta sirf sanyog hai.
-          <button class="linkish" type="button" id="aboutBtn">Ye kya hai?</button>
-          <br>Gaane YouTube ke official channels se chalte hain; saare haq labels, composers aur kalakaron ke paas. Kuch hatwana ho toh email karein, hata denge.
-          <div class="contact">Contact: <a href="mailto:gagandeep.sapra@gmail.com">gagandeep.sapra@gmail.com</a> · <span>hatjabhai.com</span></div>
-        </div>
+        <button class="cta alt" type="button" id="setClose">Ho gaya</button>
       </div>
     </div>
 
@@ -288,9 +327,15 @@ kbd{font-family:var(--f-body);background:#3a3442;border-radius:3px;padding:0 5px
         <p class="muted">Prerna: Rahgir ka gaana "Aadmi Chutiya Hai", jo hamein khud pe hasna sikhata hai, aur <a href="https://mantarjantar.com" target="_blank" rel="noopener">Jantar Mantar Chalo</a> jaisa sheher-wala vyangya game.</p>
         <p><b>Sadak pe khelna mana hai.</b> Ye game ghar pe, ruk ke khelo. Chalte hue ya gaadi chalate hue phone mat dekho.</p>
         <p class="muted"><b>Aapka data:</b> koi login nahi, koi location nahi, koi tracking nahi. Score aur unlocks sirf isi browser mein save hote hain. Gaane YouTube se chalte hain (privacy-enhanced YouTube player); fonts Google Fonts se aate hain.</p>
+        <div class="crew">
+          <div><b>📲 Sadak Crew</b><span>Naye gaane, naye ilaake aur Aaj ki Sadak ke toppers, WhatsApp pe. Free.</span></div>
+          <span id="crewCta"></span>
+        </div>
         <p class="muted" id="sachAlbum"></p>
         <p><button class="linkish tipBtn" type="button">☕ Chai pila do (UPI)</button> · <button class="linkish" type="button" id="resetData">Mera saara data saaf karo</button></p>
         <p class="muted">Saari jagah, naksha, vibhaag aur ticker ki khabrein kaalpanik hain. Koi asli vyakti, sanstha, sadak ya brand nahi dikhaya gaya hai. Radio ke gaane unke official YouTube channels se chalte hain; hum koi gaana host nahi karte.</p>
+        <p class="muted">Gaane YouTube ke official channels se chalte hain; saare haq labels, composers aur kalakaron ke paas. Kuch hatwana ho toh email karein, hata denge.</p>
+        <div class="contact">Contact: <a href="mailto:gagandeep.sapra@gmail.com">gagandeep.sapra@gmail.com</a> · hatjabhai.com</div>
         <div class="row"><button class="btn" type="button" id="aboutClose">Theek hai, khelte hain</button></div>
       </div>
     </div>
@@ -4116,8 +4161,8 @@ function drawDayMap(nextLeg){
 /* =====================================================================
    SCREENS
    ===================================================================== */
-const overlays = ['menu','about','dayclear','over','pause','tip'];
-function showOnly(id){ for (const o of overlays) $(o).hidden = o !== id; }
+const overlays = ['menu','about','dayclear','over','pause','tip','settings'];
+function showOnly(id){ for (const o of overlays) $(o).hidden = o !== id; stage.classList.toggle('menu-open', ['menu','settings','about','tip'].includes(id) && state !== 'over'); }
 function setGameButtons(on){
   $('actBtn').hidden = $('brkBtn').hidden = $('pauseBtn').hidden = !on;
   if (!on) keys.brake = false;
@@ -4228,24 +4273,42 @@ function buildMenu(){
   const pk = menuPicks();
   if (!pk.regions.includes(menuRegion)) menuRegion = pk.regions[0];
   $('regions').innerHTML = pk.regions.map(k => REGIONS[k]).map(r =>
-    `<button class="region" type="button" data-region="${r.key}" aria-pressed="${r.key===menuRegion}"><b>${r.emoji} ${r.name}</b><span>${r.kind} · ${r.blurb}</span></button>`).join('');
-  if (!pk.chars.some(isUnlocked)) pk.chars[2] = 'paidal';
-  const st = store.get('streak', 0); $('streak').textContent = st >= 2 && store.get('lastDay', '') ? '🔥 ' + st + ' din ki streak · roz khelo, streak bachao' : '';
+    `<button class="region" type="button" role="radio" data-region="${r.key}" aria-pressed="${r.key===menuRegion}" title="${r.kind} · ${r.blurb}">${r.emoji} ${r.name}</button>`).join('');
+  // at least two playable tiles; any locked one stays as a teaser
+  const free = Object.keys(CHARS).filter(k => isUnlocked(k) && !pk.chars.includes(k));
+  while (pk.chars.filter(isUnlocked).length < 2 && free.length){ const i = pk.chars.findIndex(k => !isUnlocked(k)); pk.chars[i] = free.splice(Math.floor(R0()*free.length), 1)[0]; }
+  const st = store.get('streak', 0); $('streak').textContent = st >= 2 && store.get('lastDay', '') ? '🔥 ' + st + ' din ki streak' : '';
+  if (!pk.chars.includes(menuChar) || !isUnlocked(menuChar)) menuChar = pk.chars.find(isUnlocked);
   $('chars').innerHTML = pk.chars.map(k => CHARS[k]).map(c =>
-    `<button class="char${isUnlocked(c.key) ? '' : ' locked'}" type="button" data-char="${c.key}"><span class="em">${c.sprite ? `<img src="${spriteURL(c.sprite)}" alt="" width="54" height="36">` : c.emoji}</span><b>${c.name}</b><span>${c.blurb}</span><i>${c.tag}</i><span class="st">📻 ${RADIO[STATION_FOR[c.key]].name}</span>${isUnlocked(c.key) ? '' : `<span class="lock">🔒 ${((UNLOCK_M[c.key] - store.get('xp', 0))/1000).toFixed(1)} km aur chalo</span>`}</button>`).join('');
+    `<button class="char vcard${isUnlocked(c.key) ? '' : ' locked'}" type="button" role="radio" data-char="${c.key}" aria-pressed="${c.key === menuChar}" title="${c.blurb} · 📻 ${RADIO[STATION_FOR[c.key]].name}"><span class="em">${c.sprite ? `<img src="${spriteURL(c.sprite)}" alt="">` : c.emoji}</span><b>${c.name}</b>${isUnlocked(c.key) ? '' : `<small>🔒 ${((UNLOCK_M[c.key] - store.get('xp', 0))/1000).toFixed(1)} km</small>`}</button>`).join('');
+  syncPlay();
   document.querySelectorAll('.region').forEach(b => b.addEventListener('click', () => {
     menuRegion = b.dataset.region; store.set('region', menuRegion);
     document.querySelectorAll('.region').forEach(x => x.setAttribute('aria-pressed', x === b));
     setTicker(menuRegion); ac(); Amb.start();
   }));
-  document.querySelectorAll('.char').forEach(b => b.addEventListener('click', () => { ac(); if (!isUnlocked(b.dataset.char)){ toast('🔒 Pehle ' + ((UNLOCK_M[b.dataset.char] - store.get('xp', 0))/1000).toFixed(1) + ' km aur chalo, phir ye milega'); return; } lastChar = b.dataset.char; newGame(lastChar, menuRegion); }));
+  document.querySelectorAll('.char').forEach(b => b.addEventListener('click', () => {
+    ac();
+    if (!isUnlocked(b.dataset.char)){ toast('🔒 Pehle ' + ((UNLOCK_M[b.dataset.char] - store.get('xp', 0))/1000).toFixed(1) + ' km aur chalo, phir ye milega'); return; }
+    if (menuChar === b.dataset.char){ startPlay(); return; }        // a second tap plays
+    menuChar = b.dataset.char; store.set('char', menuChar);
+    document.querySelectorAll('.char').forEach(x => x.setAttribute('aria-pressed', x === b));
+    syncPlay();
+  }));
 }
+let menuChar = store.get('char', 'paidal');
+function syncPlay(){ const c = CHARS[menuChar]; $('play').textContent = c ? 'Chalo · ' + c.name : 'Chalo'; $('play').disabled = !c; }
+function startPlay(){ if (!CHARS[menuChar]) return; ac(); lastChar = menuChar; newGame(lastChar, menuRegion); }
+$('play').onclick = startPlay;
+$('settingsLink').onclick = () => { $('setTitle').textContent = 'Settings'; $('setBody').hidden = false; $('helpBody').hidden = true; showOnly('settings'); };
+$('helpLink').onclick = () => { $('setTitle').textContent = 'Kaise khelein'; $('setBody').hidden = true; $('helpBody').hidden = false; showOnly('settings'); };
+$('setClose').onclick = () => showOnly('menu');
 function setMode(m){
   selectedMode = m;
   $('modeDaily').setAttribute('aria-pressed', m === 'daily');
   $('modeRandom').setAttribute('aria-pressed', m === 'random');
   menuSeed = 0; if ($('chars')) { buildMenu(); setTicker(menuRegion); }
-  $('modeNote').textContent = m === 'daily' ? 'Aaj ki Sadak sabke liye ek jaisi hai. Score doston se compare karo.' : 'Har baar nayi sadak. Practice ke liye.';
+  $('modeNote').textContent = m === 'daily' ? 'Aaj ki Sadak sabke liye ek jaisi hai.' : 'Har baar nayi sadak.';
 }
 function setView(v){
   VIEW = v; store.set('view', v);
@@ -4354,6 +4417,7 @@ document.addEventListener('visibilitychange', () => { if (document.hidden) pause
 /* input */
 const KEYMAP = { Shift:'brake', b:'brake', B:'brake', x:'brake', X:'brake', ArrowLeft:'left', a:'left', A:'left', ArrowRight:'right', d:'right', D:'right', ArrowUp:'up', w:'up', W:'up', ArrowDown:'down', s:'down', S:'down' };
 window.addEventListener('keydown', e => {
+  if (e.key === 'Enter' && state === 'menu' && !$('menu').hidden && document.activeElement && !document.activeElement.closest('.links')){ e.preventDefault(); startPlay(); return; }
   if (KEYMAP[e.key]){ keys[KEYMAP[e.key]] = true; if (state === 'play') e.preventDefault(); }
   if ((e.key === ' ' || e.key === 'h' || e.key === 'H') && state === 'play'){ e.preventDefault(); action(); }
   if (e.key === 'p' || e.key === 'P' || e.key === 'Escape'){ if (state === 'play') pauseGame(); else if (state === 'pause') resumeGame(); }
@@ -4405,6 +4469,7 @@ let mirFrame = 0;
 
 $('crewCta').innerHTML = WHATSAPP_URL ? `<a href="${WHATSAPP_URL}" target="_blank" rel="noopener">Join free</a>` : '<em>Jald aa raha hai</em>';
 if ('serviceWorker' in navigator && location.protocol.startsWith('http')) navigator.serviceWorker.register('sw.js').catch(() => {});
+stage.classList.add('menu-open');
 buildMenu();
 setView(store.get('view', 'pov'));
 setTicker(menuRegion);
