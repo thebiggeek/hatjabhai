@@ -295,35 +295,6 @@ kbd{font-family:var(--f-body);background:#3a3442;border-radius:3px;padding:0 5px
 @keyframes swing{0%,100%{transform:rotate(-9deg)}50%{transform:rotate(9deg)}}
 @media (prefers-reduced-motion:reduce){#mirror .charm{animation:none}}
 
-/* radio: a phone clipped to the dashboard; the video stays visible whenever music plays */
-#phone{position:absolute;left:max(10px,env(safe-area-inset-left,0px));bottom:12px;z-index:5;width:224px;padding:10px 8px 8px;border-radius:22px;
-  background:linear-gradient(160deg,#2c2c33,#0e0e11);box-shadow:0 10px 26px rgba(0,0,0,.65),inset 0 0 0 2px #3c3c44;font-size:11px;color:var(--ink)}
-#phone::before{content:"";display:block;width:54px;height:5px;margin:0 auto 6px;border-radius:3px;background:#0a0a0c}
-#ytWrap{width:200px;height:200px;margin:0 auto;border-radius:10px;overflow:hidden;background:#000}
-#phone .pdial{display:flex;align-items:center;gap:5px;margin-top:6px}
-#phone .dial{font-family:var(--f-display);color:var(--marigold);font-size:12.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1;min-width:0}
-#phone .now{display:block;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin:2px 0 5px}
-#phone .pctrl{display:flex;gap:4px}
-#phone .pctrl button,#phone .pctrl a,#phone .pdial button{flex:1;font:inherit;font-size:11px;font-weight:800;border:0;border-radius:5px;background:#33333b;color:var(--ink);padding:3px 0;cursor:pointer;text-align:center;text-decoration:none}
-#phone .pdial button{flex:0 0 auto;padding:2px 7px}
-@media (max-width:600px){
-  /* phones: a slim strip under the top buttons instead of a big dashboard phone */
-  #phone{top:calc(max(10px,env(safe-area-inset-top,0px)) + 44px);bottom:auto;width:auto;padding:6px;border-radius:14px;display:grid;grid-template-columns:200px 1fr;gap:4px 8px;align-items:start;right:auto}
-  #phone::before{display:none}
-  #phone #ytWrap{grid-row:1 / span 3;margin:0}
-  #phone .pdial{margin:0;grid-column:2}
-  #phone .now{grid-column:2;white-space:normal;max-width:96px;font-size:10px}
-  #phone .pctrl{grid-column:2;flex-wrap:wrap;max-width:96px}
-  #phone .pctrl button,#phone .pctrl a{flex:1 0 40%;padding:6px 0}
-}
-#dashcam{position:absolute;left:max(10px,env(safe-area-inset-left,0px));bottom:var(--dcBottom,12px);z-index:5;width:212px;background:#111;border:2px solid #333;border-radius:8px;padding:4px;box-shadow:0 8px 24px rgba(0,0,0,.6);font-size:10.5px;color:var(--muted)}
-#dashcam .dhead{display:flex;align-items:center;gap:5px;font-weight:800;color:var(--ink);margin-bottom:3px}
-#dashcam .rec{color:#ff3b30;animation:blink 1s steps(2) infinite}
-@keyframes blink{50%{opacity:.2}}
-#dashcam .dhead button{margin-left:auto;font:inherit;border:0;border-radius:3px;background:#333;color:var(--ink);cursor:pointer;padding:0 5px}
-#dcWrap{width:200px;height:200px;margin:0 auto;background:#000;overflow:hidden;border-radius:4px}
-#dashcam .dcredit{margin-top:3px;text-align:center}
-#dashcam a{color:var(--teal)}
 </style>
 </head>
 <body>
@@ -347,27 +318,6 @@ kbd{font-family:var(--f-body);background:#3a3442;border-radius:3px;padding:0 5px
         </div>
       </div>
       <div class="charm" aria-hidden="true">🍋<br>🌶️<br>🌶️</div>
-    </div>
-
-    <!-- DASHBOARD PHONE: radio video + controls -->
-    <div id="phone" hidden>
-      <div id="ytWrap"><div id="ytp"></div></div>
-      <div class="pdial"><span class="dial" id="rDial">Safar FM 104</span><button type="button" id="rClose" aria-label="Radio band karo">✕</button></div>
-      <span class="now" id="rNow" title="">Tune ho raha hai…</span>
-      <div class="pctrl">
-        <button type="button" id="rPrev" aria-label="Pichhla gaana">⏮</button>
-        <button type="button" id="rPlay" aria-label="Play/Pause">⏯</button>
-        <button type="button" id="rNext" aria-label="Agla gaana">⏭</button>
-        <button type="button" id="rSt" aria-label="Station badlo">FM⇄</button>
-        <a id="rLink" href="#" target="_blank" rel="noopener" aria-label="YouTube pe kholo">↗</a>
-      </div>
-    </div>
-
-    <!-- DASHCAM: real Delhi street audio from a walking-tour video, credited -->
-    <div id="dashcam" hidden>
-      <div class="dhead"><span class="rec">● REC</span> DASHCAM · asli sadak ki awaaz <button type="button" id="dcClose" aria-label="Dashcam band karo">✕</button></div>
-      <div id="dcWrap"><div id="dcp"></div></div>
-      <div class="dcredit">Awaaz: <a href="https://www.youtube.com/@DelhiTrackandTraffic" target="_blank" rel="noopener">Delhi Track and Traffic ↗</a></div>
     </div>
 
     <!-- MENU -->
@@ -485,10 +435,9 @@ kbd{font-family:var(--f-body);background:#3a3442;border-radius:3px;padding:0 5px
         <div class="eyebrow">Zaroori baatein</div>
         <h2>Disclaimers</h2>
         <p><b>Sadak pe khelna mana hai.</b> Ye game ghar pe, ruk ke khelo. Chalte hue ya gaadi chalate hue phone mat dekho.</p>
-        <p class="muted"><b>Aapka data:</b> koi login nahi, koi location nahi, koi tracking nahi. Sirf anonymous ginti hoti hai (kitne log khel rahe hain, kaunsa level paar hua) jo sabke liye <a href="/stats/" target="_blank" rel="noopener">hatjabhai.com/stats</a> pe khuli hai. Score aur unlocks sirf isi browser mein save hote hain. Gaane YouTube se chalte hain (privacy-enhanced YouTube player); fonts Google Fonts se aate hain.</p>
+        <p class="muted"><b>Aapka data:</b> koi login nahi, koi location nahi, koi tracking nahi. Sirf anonymous ginti hoti hai (kitne log khel rahe hain, kaunsa level paar hua) jo sabke liye <a href="/stats/" target="_blank" rel="noopener">hatjabhai.com/stats</a> pe khuli hai. Score aur unlocks sirf isi browser mein save hote hain. Music isi game mein banta hai, koi bahar ka player nahi; fonts Google Fonts se aate hain.</p>
         <p class="muted" id="sachAlbum"></p>
-        <p class="muted">Saari jagah, naksha, vibhaag aur ticker ki khabrein kaalpanik hain. Koi asli vyakti, sanstha, sadak ya brand nahi dikhaya gaya hai. Radio ke gaane unke official YouTube channels se chalte hain; hum koi gaana host nahi karte.</p>
-        <p class="muted">Gaane YouTube ke official channels se chalte hain; saare haq labels, composers aur kalakaron ke paas. Kuch hatwana ho toh email karein, hata denge.</p>
+        <p class="muted">Saari jagah, naksha, vibhaag aur ticker ki khabrein kaalpanik hain. Koi asli vyakti, sanstha, sadak ya brand nahi dikhaya gaya hai.</p>
         <div class="row"><button class="btn" type="button" id="discClose">Wapas</button></div>
       </div>
     </div>
@@ -570,11 +519,8 @@ kbd{font-family:var(--f-body);background:#3a3442;border-radius:3px;padding:0 5px
         <div class="toggles">
           <button type="button" id="muteBtn">🔊 Awaaz</button>
           <button type="button" id="musicBtn2">♪ Music</button>
-          <button type="button" id="radioBtn">📻 Asli gaane</button>
-          <button type="button" id="camBtn">📹 Dashcam</button>
           <button type="button" id="fsBtn">⛶ Full screen</button>
         </div>
-        <p class="note">Asli gaane aur Dashcam YouTube se chalte hain, isliye ek chhoti video window dikhti hai.</p>
         <div class="row">
           <button class="btn" type="button" id="resumeBtn">Wapas sadak pe</button>
           <button class="btn alt" type="button" id="quitBtn">Menu</button>
@@ -847,79 +793,6 @@ const NEWS = {
   ],
 };
 
-const RADIO = {
-  retro: { name:'Retro FM 98.4', tracks:[
-    ['KeyfUuXPOcY','Dheere Dheere Se Meri Zindagi Mein Aana','Aashiqui'],
-    ['mzxHflxI-es','Zindagi Ek Safar Hai Suhana','Andaz'],
-    ['IVeGCYxT_IU','Dil Hai Ke Manta Nahin','Dil Hai Ke Manta Nahin'],
-    ['Iv3K0sVXmIg','Tumsa Koi Pyaara','Khuddar'],
-    ['QKfGl39ZJWI','Pardesi Pardesi','Raja Hindustani'],
-    ['BtlnpBb4O8E','Tip Tip Barsa Paani','Mohra'],
-    ['cNV5hLSa9H8','Tujhe Dekha Toh','DDLJ'],
-    ['AnRrg0oePpc','Ole Ole','Yeh Dillagi'],
-    ['htMvfOfixuM','Ek Ladki Ko Dekha','1942: A Love Story'],
-    ['FsNc7I33w60','Mera Dil Bhi Kitna Pagal Hai','Saajan'],
-    ['XORxoZS8FtA','Humko Sirf Tumse Pyaar Hai','Barsaat'],
-    ['SuQKUY_QMrY','Saat Samundar Paar','Vishwatma'],
-    ['6Na7GSV9bVY','Chura Ke Dil Mera (Jhankar)','Main Khiladi Tu Anari'],
-  ]},
-  safar: { name:'Safar FM 104', tracks:[
-    ['HoDgYV1NzAI','Dil Chahta Hai','Dil Chahta Hai'],
-    ['eEeX2QMlSlo','Yun Hi Chala Chal','Swades'],
-    ['2__nNm0NK4A','Journey Song','Piku'],
-    ['R0XjwtP_iTY','Khaabon Ke Parinday','Zindagi Na Milegi Dobara'],
-    ['7mTDBsdfw88','Safarnama','Tamasha'],
-    ['Mo5tQDcs__g','Aao Milo Chalen','Jab We Met'],
-    ['LijcpDrSNVI','Patakha Guddi','Highway'],
-    ['2mWaqsC3U7k','Phir Se Ud Chala','Rockstar'],
-    ['TDF_KVcC4Qg','Kar Har Maidaan Fateh','Sanju'],
-    ['udra3Mfw2oo','London Thumakda','Queen'],
-    ['jCEdTq3j-0U','Gallan Goodiyaan','Dil Dhadakne Do'],
-  ]},
-};
-Object.assign(RADIO, {
-  south:    { name:'Dakshin Express FM', tracks:[
-    ['79IEesucPo8','Naatu Naatu','RRR'], ['YR12Z8f1Dh8','Why This Kolaveri Di','3'], ['x6Q7c9RyMzk','Rowdy Baby','Maari 2'],
-    ['2mDCVzruYzQ','Butta Bomma','Ala Vaikunthapurramuloo'], ['KUN5Uf9mObQ','Arabic Kuthu','Beast'], ['fRD_3vJagxk','Vaathi Coming','Master'],
-    ['lM8h5Mm6ODo','Kaavaalaa','Jailer'], ['BIC0ihKRzl8','Jimikki Kammal','Velipadinte Pusthakam'], ['x5OfM36VAHI','Oo Antava','Pushpa'] ]},
-  ragini:   { name:'Ragini Radio 4x4', tracks:[
-    ['n2AbvRPPih0','Aaja Meri Gadi Mein','Rajbala, Nardev'], ['YJFu39AXMwU','Kuve Pe Lugaiya Dhore','Haryanvi Ragni'], ['4M3NOMDWNOQ','Rajbala & Nardev Ragni','Ginnaura'],
-    ['606HOwfyPTU','Kissa Anjana Pawan','Haryanvi Ragni'], ['EkVIm8E4-Ww','Pair Pakad Ke Baith Gai','Haryanvi Kissa'], ['n-_dleVawdE','Teen Vachan Bhar Le','Master Satbir'] ]},
-  haryanvi: { name:'Haryanvi Bass FM', tracks:[
-    ['CZt-rVn2BJs','52 Gaj Ka Daman','Renuka Panwar'], ['GftlBD-Apu8','Teri Aakhya Ka Yo Kajal','Sapna Choudhary'], ['Mlj0hdOG4QQ','Bahu Kale Ki','Ajay Hooda'],
-    ['rrZKWephkLc','Matak Chalungi','Sapna Choudhary'], ['LAH6s03RDgc','Chora Jaat Ka','Rohit Tehlan'] ]},
-  punjabi:  { name:'Punjabi Bass FM', tracks:[
-    ['RKioDWlajvo','Lehanga','Jass Manak'], ['VNs_cCtdbPc','Brown Munde','AP Dhillon'], ['hjWf8A0YNSE','High Rated Gabru','Guru Randhawa'],
-    ['YmXJp4RtBCM','Proper Patola','Diljit Dosanjh, Badshah'], ['5X7WWVTrBvM','Lamberghini','The Doorbeen'], ['YpkJO_GrCo0','Laung Laachi','Mannat Noor'], ['88LgZ-cf_P4','Suit Suit','Guru Randhawa'] ]},
-  seventies:{ name:'Purani Yaadein FM 70s', tracks:[
-    ['g_O5lttb5ww','Kabhi Kabhie Mere Dil Mein','Mukesh'], ['QkGqpVYjLUw','Main Pal Do Pal Ka Shayar Hoon','Mukesh'], ['H2BTCPW3Hw8','Ek Pyar Ka Nagma Hai','Lata, Mukesh'],
-    ['ALcunSNj794','Kahin Door Jab Din Dhal Jaye','Mukesh'], ['iulF7-i_LuY','Chalte Chalte Yun Hi Koi','Lata Mangeshkar'], ['1T8G_d5o5Gs','Yeh Dosti Hum Nahi Todenge','Sholay'], ['mzxHflxI-es','Zindagi Ek Safar Hai Suhana','Andaz'] ]},
-  eighties: { name:'Disco 80s FM', tracks:[
-    ['fRSLPx0HSvw','Jimmy Jimmy Aaja','Disco Dancer'], ['d89cCzUIxpQ','I Am A Disco Dancer','Disco Dancer'], ['dx57HiK1wUg','Ek Do Teen','Tezaab'],
-    ['IgKdXLfxgQQ','Hawa Hawai','Mr. India'], ['0pU7hdlZvhQ','Pyar Hamen Kis Mod Pe','Satte Pe Satta'], ['eYl9i8mH1lI','Tirchi Topiwale','Tridev'], ['V3Ibwu-CSmQ','Mere Angne Mein (Jhankar)','Laawaris'] ]},
-  pendrive: { name:'Conductor ki Pen-drive', tracks:[
-    ['larh_jKFdW8','Sadabahar Jhankar Songs','Jhankar Beats'], ['oYH4MBtxC6k','90s Unforgettable Hits','Jhankar Beats'], ['ssqZfnEYBO4','Superhit Romantic','Jhankar Beats'],
-    ['6Na7GSV9bVY','Chura Ke Dil Mera (Jhankar)','Main Khiladi Tu Anari'], ['kH_wJOH1CS0','Saiyaan Dil Main Aana Re (Remix)','Remix'], ['LBmX4Y3lWGg','Ek Garam Chai Ki Pyali (Remix)','Har Dil Jo Pyar Karega'] ]},
-  aashiqui: { name:'Aashiqui + Anu Malik FM', tracks:[
-    ['KeyfUuXPOcY','Dheere Dheere Se Meri Zindagi Mein Aana','Aashiqui'], ['uNt18l9UfjE','Nazar Ke Saamne','Aashiqui'], ['rTatsmUgmiA','Ab Tere Bin Jee Lenge Hum','Aashiqui'],
-    ['SOXigA5cSQ0','Mera Dil Tere Liye','Aashiqui'], ['IhKXq5dhTag','Yeh Kaali Kaali Aankhen','Baazigar'], ['EjOrKketwTo','Ek Garam Chai Ki Pyali','Har Dil Jo Pyar Karega'], ['h30wUfOeKcY','Baazigar O Baazigar','Baazigar'] ]},
-  earphone: { name:'Earphone FM (5% battery)', tracks:[
-    ['Umqb9KENgmk','Tum Hi Ho','Aashiqui 2'], ['284Ov7ysmfA','Channa Mereya','Ae Dil Hai Mushkil'], ['xRb8hxwN5zc','Agar Tum Saath Ho','Tamasha'],
-    ['_iktURk0X-A','Phir Bhi Tumko Chaahunga','Half Girlfriend'], ['hoNb6HuNmU0','Khairiyat','Chhichhore'], ['MJyKN-8UncM','Shayad','Love Aaj Kal'] ]},
-});
-RADIO.jazz = { name:'Paidal Jazz Club', tracks:[
-  ['-DHuW1h1wHw','Take Five','Dave Brubeck'], ['zqNTltOGh5c','So What','Miles Davis'], ['otFVFLtRF_s','Cantaloupe Island','Herbie Hancock'],
-  ['JQvc-Gkwhow','My Favorite Things','John Coltrane'], ['fsJ3JjpZyoA',"Moanin'",'Art Blakey'], ['CpB7-8SGlJ0','Autumn Leaves','Cannonball Adderley'],
-  ["IrAfjW5qiyo","'Round Midnight",'Thelonious Monk'], ['I5l0jkC71Yk','Almost Blue','Chet Baker'] ]};
-const STATION_FOR = { paidal:'jazz', cycle:'seventies', scooty:'eighties', car:'punjabi', thar:'ragini', suv:'haryanvi', truck:'south', bus:'pendrive', jcb:'aashiqui' };
-
-const RJ = [
-  'RJ Pappu: "Agla gaana un sab ke liye jo 2 ghante se Jam Chowk pe phase hain."',
-  'RJ Pappu: "Ye gaana sheher ke har gaddhe ko samarpit."',
-  'RJ Pappu: "Traffic update: sab jagah jam hai. Gaana suno, horn mat bajao."',
-  'RJ Pappu: "Agar aap ye gaana sun rahe hain, toh zinda hain. Badhai ho!"',
-  'RJ Pappu: "Ambulance ko rasta do, gaana wahin se continue hoga."',
-];
 
 const SHOUTS = ['PEEP PEEP!','POOOON!','PAAAN PAAAN!','Bhaiya side ho jao!','Hato na!','Oye, dikhta nahi?','Abey hatt!','Bhai sahab, side!','Chal hat!','Side de de bhai!'];
 
@@ -1137,16 +1010,16 @@ const Music = {
     }
   },
   toggle(){ ac(); if (this.on && performance.now() - this.t0 < 400) return;   // this very tap just started it
-    if (radioOpen()){ Radio.close(); store.set('music', true); this.start(); return; } store.set('music', !this.wanted()); if (this.wanted()) this.start(); else this.stop(); },
+    store.set('music', !this.wanted()); if (this.wanted()) this.start(); else this.stop(); },
   label(){
     const b = $('musicBtn'); if (!b) return;
-    const name = this.on && this.g ? this.g.name : radioOpen() ? '📻 ' + RADIO[Radio.station].name : 'Music band';
+    const name = this.on && this.g ? this.g.name : 'Music band';
     b.textContent = '♪ ' + name;
     b.setAttribute('aria-pressed', this.on || radioOpen());
   },
 };
 const Tape = Music;
-const radioOpen = () => !$('phone').hidden;
+const radioOpen = () => false;
 
 // Street ambience: traffic rumble bed + random far-off horns, bells, barks, bus roars.
 const Amb = {
@@ -1190,101 +1063,9 @@ function setMuted(m){
   $('muteBtn').textContent = muted ? '🔇 Awaaz band' : '🔊 Awaaz'; $('muteBtn').setAttribute('aria-pressed', !muted);
 }
 
-/* =====================================================================
-   RADIO (YouTube IFrame API; songs stream from official channels)
-   ===================================================================== */
-const ytWaiters = [];
-function withYT(cb){
-  if (window.YT && YT.Player) return cb();
-  ytWaiters.push(cb);
-  if (ytWaiters.length > 1) return;
-  window.onYouTubeIframeAPIReady = () => ytWaiters.splice(0).forEach(f => f());
-  const sc = document.createElement('script'); sc.src = 'https://www.youtube.com/iframe_api';
-  sc.onerror = () => { $('rNow').textContent = 'Radio signal nahi aa raha (internet check karo).'; };
-  document.head.appendChild(sc);
-}
-
-const Radio = {
-  player:null, ready:false, station:'safar', order:[], i:0, playing:false, loading:false,
-  userClosed:false,
-  open(){
-    this.userClosed = false; $('phone').hidden = false; layoutCorner(); store.set('radio', true); Music.stop();
-    if (!this.player) this.load(); else if (!this.playing) this.player.playVideo();
-  },
-  own:'safar',
-  autostart(st){
-    this.own = st || 'safar';
-    if (this.userClosed) return;
-    if (this.player && this.ready){ $('phone').hidden = false; layoutCorner(); if (this.station !== this.own) this.setStation(this.own); else if (!this.playing) this.player.playVideo(); return; }
-    this.station = this.own;
-    this.open();
-  },
-  load(){
-    if (this.loading) return; this.loading = true;
-    this.shuffle();
-    withYT(() => this.make());
-  },
-  shuffle(){ const n = RADIO[this.station].tracks.length; this.order = [...Array(n).keys()].sort(() => Math.random()-0.5); this.i = 0; },
-  cur(){ return RADIO[this.station].tracks[this.order[this.i]]; },
-  make(){
-    const t = this.cur();
-    this.player = new YT.Player('ytp', { host:'https://www.youtube-nocookie.com', width:200, height:200, videoId:t[0],
-      playerVars:{ playsinline:1, rel:0, modestbranding:1 },
-      events:{
-        onReady: e => { this.ready = true; e.target.playVideo(); this.show(); },
-        onStateChange: e => { this.playing = e.data === 1; if (this.playing) Music.stop(); else if (e.data === 2 && state === 'play') Music.start(); Music.label(); if (e.data === 0) this.next(); },
-        onError: () => this.next(),
-      }});
-  },
-  show(){
-    const t = this.cur(), rj = pick(R0, RJ);
-    $('rDial').textContent = RADIO[this.station].name;
-    $('rNow').textContent = '♪ ' + t[1] + ' · ' + t[2];
-    $('rNow').title = rj;
-    $('rLink').href = 'https://www.youtube.com/watch?v=' + t[0];
-    if (G && state === 'play') say(W/2, H*0.35, rj, '#cfe3ff', 12, 2.4);
-  },
-  play(){ if (this.ready){ this.player.loadVideoById(this.cur()[0]); this.show(); } },
-  next(){ this.i = (this.i + 1) % this.order.length; this.play(); },
-  prev(){ this.i = (this.i - 1 + this.order.length) % this.order.length; this.play(); },
-  toggle(){ if (!this.ready) return; this.playing ? this.player.pauseVideo() : this.player.playVideo(); },
-  setStation(st){ this.station = st; this.shuffle(); this.play(); this.show(); },
-  close(){ this.userClosed = true; this.playing = false; store.set('radio', false); if (this.ready) this.player.pauseVideo(); $('phone').hidden = true; layoutCorner(); if (state === 'play') Music.start(); else Music.label(); },
-};
-
-const STREET = {
-  city:   ['BBvAJur7rO0','sEnRmPV3EbQ','PlRxKbNhgcY','YeXWG0ylPac','WRaLx7Lm7D8','W-Lf5QQzaTI','R3tDixfiKAA','xurHfEEIAGs'],
-  town:   ['PjWZdWWtAQE','ft7_0RswkuI','WRaLx7Lm7D8','BBvAJur7rO0'],
-  highway:['ALaFmpn_iKE','U1ZH_yZF9oc','_nst75k7ghg','xWAUZaJhQdg'],
-  hills:  ['xWAUZaJhQdg','ALaFmpn_iKE'],
-  bus:    ['6Q5tzp_ze9s','PlRxKbNhgcY'],
-};
-const Dashcam = {
-  player:null, ready:false, playing:false, userClosed:false, list:STREET.city, i:0,
-  pickList(){ const l = G && G.c.key === 'bus' ? STREET.bus : STREET[G ? G.regionKey : 'city']; this.list = l; this.i = Math.floor(Math.random()*l.length); },
-  cue(){ if (this.ready) this.player.loadVideoById({ videoId:this.list[this.i], startSeconds: 5 + Math.floor(Math.random()*60) }); },
-  autostart(){
-    const prev = this.list; this.pickList();
-    if (this.player && this.ready && prev !== this.list){ this.cue(); return; }
-    // opt-in only (📹): YouTube needs the video visible, so it never starts by itself
-  },
-  open(){
-    this.userClosed = false; $('dashcam').hidden = false;
-    if (this.player){ if (this.ready) this.player.playVideo(); return; }
-    withYT(() => {
-      this.player = new YT.Player('dcp', { host:'https://www.youtube-nocookie.com', width:200, height:200, videoId:this.list[this.i],
-        playerVars:{ playsinline:1, rel:0, modestbranding:1, start: 5 + Math.floor(Math.random()*60) },
-        events:{
-          onReady: e => { this.ready = true; e.target.setVolume(45); e.target.playVideo(); },
-          onStateChange: e => { this.playing = e.data === 1; if (e.data === 0){ this.i = (this.i + 1) % this.list.length; this.cue(); } },
-          onError: () => { this.i = (this.i + 1) % this.list.length; this.cue(); },
-        }});
-    });
-  },
-  close(){ this.userClosed = true; if (this.ready) this.player.pauseVideo(); $('dashcam').hidden = true; },
-  toggle(){ ac(); $('dashcam').hidden ? this.open() : this.close(); },
-};
-$('camBtn').onclick = () => { Dashcam.toggle(); if (typeof syncPauseToggles === 'function') syncPauseToggles(); };
+// Music is built in (see Music above): no YouTube player is ever opened.
+const Radio = { playing:false };
+const Dashcam = { playing:false };
 function toggleFull(){
   if (document.fullscreenElement) document.exitFullscreen().catch(() => {});
   else if (document.documentElement.requestFullscreen) document.documentElement.requestFullscreen().catch(() => toast('Full screen yahan nahi chalega'));
@@ -1292,7 +1073,6 @@ function toggleFull(){
 $('fsBtn').onclick = toggleFull;
 if (!document.fullscreenEnabled) $('fsBtn').hidden = true;
 document.addEventListener('fullscreenchange', () => { $('fsBtn').textContent = document.fullscreenElement ? '🗗 Chhota karo' : '⛶ Full screen'; setTimeout(() => { resize(); positionMirror(); }, 60); });
-$('dcClose').onclick = () => Dashcam.close();
 
 function updateMirror(){
   const show = VIEW === 'top' && !!G && (state === 'play') && stage.getBoundingClientRect().width >= 600;
@@ -1300,11 +1080,6 @@ function updateMirror(){
   $('mirror').hidden = !show;
   if (!show) mirBottomY = 0;
   positionMirror();
-}
-function layoutCorner(){
-  // dashcam stacks above the phone when both are out
-  const ph = $('phone');
-  stage.style.setProperty('--dcBottom', (ph.hidden ? 12 : ph.offsetHeight + 22) + 'px');
 }
 let mirBottomY = 0;                         // mirror's lower edge in world (canvas) units
 function annY(){ return Math.max(100, mirBottomY + 18); }
@@ -1534,9 +1309,7 @@ function newGame(charKey, regionKey, L = null){
     [[1.6, '← → ya ungli se: side badlo'], [5, '↑ tez · ↓ dheere · Shift / laal button: BRAKE'], [8.5, 'Space / gol button: ' + act], [12, 'Gaddhe, khule manhole aur ulta traffic se bacho. Ghar tak zinda pahuncho!']]
       .forEach(([t, msg]) => later(t, () => say(W/2, G.p.y - 330, msg, '#fff4dc', 15, 3.2)));
   }
-  if (store.get('radio', false) && stage.getBoundingClientRect().width >= 900) Radio.autostart(STATION_FOR[c.key]);
   updateMirror();
-  Dashcam.autostart();
   Stats.send('play', { lv: L ? L.id : '', veh: charKey });
   if (outside) outside.gain.setTargetAtTime(c.key === 'suv' ? 0.1 : 1, AC.currentTime, 0.3);
   if (c.key === 'suv') say(W/2, H*0.5, 'Sheesha band, AC on. Sheher ki awaaz sirf 10% 🤫', '#cfe3ff', 13, 2.6);
@@ -3720,7 +3493,7 @@ function drawSidePanels(){
   }
   if (!wide) { ctx.textAlign = 'center'; return; }
   // live feed, bottom-left
-  const fy = $('phone').hidden ? SH - 24 : SH - $('phone').offsetHeight/scale - 40;
+  const fy = SH - 24;
   G.feed.forEach((f, i) => {
     const age = G.time - f.t; if (age > 12) return;
     ctx.globalAlpha = clamp(1.4 - age/9, 0, 1);
@@ -4683,7 +4456,7 @@ function buildMenu(){
   const st = store.get('streak', 0); $('streak').textContent = st >= 2 && store.get('lastDay', '') ? '🔥 ' + st + ' din ki streak' : '';
   if (!pk.chars.includes(menuChar) || !isUnlocked(menuChar)) menuChar = pk.chars.find(isUnlocked);
   $('chars').innerHTML = pk.chars.map(k => CHARS[k]).map(c =>
-    `<button class="char vcard${isUnlocked(c.key) ? '' : ' locked'}" type="button" role="radio" data-char="${c.key}" aria-pressed="${c.key === menuChar}" title="${c.blurb} · 📻 ${RADIO[STATION_FOR[c.key]].name}"><span class="em">${c.sprite ? `<img src="${spriteURL(c.sprite)}" alt="">` : c.emoji}</span><b>${c.name}</b>${isUnlocked(c.key) ? '' : `<small>🔒 ${((UNLOCK_M[c.key] - store.get('xp', 0))/1000).toFixed(1)} km</small>`}</button>`).join('');
+    `<button class="char vcard${isUnlocked(c.key) ? '' : ' locked'}" type="button" role="radio" data-char="${c.key}" aria-pressed="${c.key === menuChar}" title="${c.blurb} · ♪ ${GROOVES[GROOVE_FOR[c.key]].name}"><span class="em">${c.sprite ? `<img src="${spriteURL(c.sprite)}" alt="">` : c.emoji}</span><b>${c.name}</b>${isUnlocked(c.key) ? '' : `<small>🔒 ${((UNLOCK_M[c.key] - store.get('xp', 0))/1000).toFixed(1)} km</small>`}</button>`).join('');
   syncPlay();
   document.querySelectorAll('.region').forEach(b => b.addEventListener('click', () => {
     menuRegion = b.dataset.region; store.set('region', menuRegion);
@@ -4916,21 +4689,12 @@ $('pauseBtn').onclick = () => pauseGame();
 $('resumeBtn').onclick = () => resumeGame();
 $('quitBtn').onclick = () => { state = 'menu'; setGameButtons(false); showOnly('menu'); Music.start(); };
 $('muteBtn').onclick = () => { ac(); setMuted(!muted); };
-function toggleMirror(){ ac(); if ($('phone').hidden) Radio.open(); else Radio.close(); }
-$('radioBtn').onclick = () => { toggleMirror(); syncPauseToggles(); };
 $('musicBtn').onclick = () => Music.toggle();
 $('musicBtn2').onclick = () => { Music.toggle(); if (state !== 'play') Music.stop(); syncPauseToggles(); };
 function syncPauseToggles(){
   $('musicBtn2').setAttribute('aria-pressed', Music.wanted() && !radioOpen());
   $('musicBtn2').textContent = Music.wanted() ? '♪ Music' : '♪ Music band';
-  $('radioBtn').setAttribute('aria-pressed', !$('phone').hidden);
-  $('camBtn').setAttribute('aria-pressed', !$('dashcam').hidden);
 }
-$('rSt').onclick = () => Radio.setStation(Radio.station === 'safar' ? Radio.own : 'safar');
-$('rClose').onclick = () => Radio.close();
-$('rNext').onclick = () => Radio.next();
-$('rPrev').onclick = () => Radio.prev();
-$('rPlay').onclick = () => Radio.toggle();
 
 function pauseGame(){ if (state !== 'play') return; state = 'pause'; showOnly('pause'); setGameButtons(false); Music.stop(); syncPauseToggles(); }
 function resumeGame(){ if (state !== 'pause') return; state = 'play'; showOnly(null); setGameButtons(true); Music.start(); }
@@ -4944,7 +4708,6 @@ window.addEventListener('keydown', e => {
   if ((e.key === ' ' || e.key === 'h' || e.key === 'H') && state === 'play'){ e.preventDefault(); action(); }
   if (e.key === 'p' || e.key === 'P' || e.key === 'Escape'){ if (state === 'play') pauseGame(); else if (state === 'pause') resumeGame(); }
   if (e.key === 'm' || e.key === 'M'){ ac(); setMuted(!muted); }
-  if (e.key === 'r' || e.key === 'R') toggleMirror();
   if (e.key === 'f' || e.key === 'F') toggleFull();
 });
 window.addEventListener('keyup', e => { if (KEYMAP[e.key]) keys[KEYMAP[e.key]] = false; });
