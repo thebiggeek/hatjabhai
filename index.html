@@ -94,6 +94,9 @@ p{margin:6px 0;line-height:1.45}
 .links{display:flex;justify-content:center;flex-wrap:wrap;gap:4px 18px;margin-top:20px}
 .links button{font:inherit;font-size:13px;color:var(--muted);background:none;border:0;padding:4px 0;cursor:pointer}
 .links button:hover{color:var(--ink)}
+#ldCrew{flex-basis:100%;margin-top:10px;font-size:14px;font-weight:700;color:#25d366;text-decoration:none}
+#ldCrew:hover{text-decoration:underline}
+#ldCrew[hidden]{display:none}
 .lbl{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin:14px 0 6px;text-align:left}
 .note{font-size:13px;color:var(--muted);margin:2px 0 6px}
 .howto{list-style:none;padding:0;margin:0;text-align:left}
@@ -400,7 +403,7 @@ kbd{font-family:var(--f-body);background:#3a3442;border-radius:3px;padding:0 5px
         <ul class="goals" id="ldGoals"></ul>
         <p class="unlock" id="ldUnlock" hidden></p>
         <button class="cta" type="button" id="ldNext">Agla level →</button>
-        <nav class="links"><button type="button" id="ldRetry">Phir se</button><button type="button" id="ldMap">Map</button></nav>
+        <nav class="links"><button type="button" id="ldRetry">Phir se</button><button type="button" id="ldMap">Map</button><a id="ldCrew" href="#" target="_blank" rel="noopener" hidden>📲 Sadak Crew join karo</a></nav>
       </div>
     </div>
 
@@ -4758,6 +4761,7 @@ function frame(t){
 }
 let mirFrame = 0;
 
+if (WHATSAPP_URL){ $('ldCrew').href = WHATSAPP_URL; $('ldCrew').hidden = false; }
 $('crewCta').innerHTML = WHATSAPP_URL ? `<a href="${WHATSAPP_URL}" target="_blank" rel="noopener">Join free</a>` : '<em>Jald aa raha hai</em>';
 if ('serviceWorker' in navigator && location.protocol.startsWith('http')) navigator.serviceWorker.register('sw.js').catch(() => {});
 stage.classList.add('menu-open');
