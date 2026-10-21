@@ -361,6 +361,7 @@ kbd{font-family:var(--f-body);background:#3a3442;border-radius:3px;padding:0 5px
           <button type="button" id="helpLink">Kaise khelein</button>
           <button type="button" class="tipBtn">Chai ☕</button>
           <button type="button" id="aboutBtn">About</button>
+          <button type="button" id="discLink">Disclaimers</button>
         </nav>
       </div>
     </div>
@@ -441,19 +442,28 @@ kbd{font-family:var(--f-body);background:#3a3442;border-radius:3px;padding:0 5px
         <h2>Har roz ka survival game</h2>
         <p>Pahad ho ya maidaan, metro ho ya qasba, civic infra ki kahani ek si hai. Sadak bani, sadak khudi, naali khuli, bijli gayi, ambulance jam mein, aur horn sab ka.</p>
         <p>Ye game kisi ek vibhaag ya neta pe ungli nahi uthata. Gaddhe banane mein sab ka haath hai: footpath pe parking karne wale, ulta chalane wale, kachra phenkne wale. Yaani <b>hum</b>.</p>
-        <p class="muted">Prerna: Rahgir ka gaana "Aadmi Chutiya Hai", jo hamein khud pe hasna sikhata hai, aur <a href="https://mantarjantar.com" target="_blank" rel="noopener">Jantar Mantar Chalo</a> jaisa sheher-wala vyangya game.</p>
-        <p><b>Sadak pe khelna mana hai.</b> Ye game ghar pe, ruk ke khelo. Chalte hue ya gaadi chalate hue phone mat dekho.</p>
-        <p class="muted"><b>Aapka data:</b> koi login nahi, koi location nahi, koi tracking nahi. Score aur unlocks sirf isi browser mein save hote hain. Gaane YouTube se chalte hain (privacy-enhanced YouTube player); fonts Google Fonts se aate hain.</p>
         <div class="crew">
           <div><b>📲 Sadak Crew</b><span>Naye gaane, naye ilaake aur Aaj ki Sadak ke toppers, WhatsApp pe. Free.</span></div>
           <span id="crewCta"></span>
         </div>
-        <p class="muted" id="sachAlbum"></p>
         <p><button class="linkish tipBtn" type="button">☕ Chai pila do (UPI)</button> · <button class="linkish" type="button" id="resetData">Mera saara data saaf karo</button></p>
+        <div class="contact">Contact: <a href="mailto:gagandeep.sapra@gmail.com">gagandeep.sapra@gmail.com</a> · hatjabhai.com</div>
+        <p><button class="linkish" type="button" id="discLink2">Disclaimers aur privacy</button></p>
+        <div class="row"><button class="btn" type="button" id="aboutClose">Theek hai, khelte hain</button></div>
+      </div>
+    </div>
+
+    <!-- DISCLAIMERS -->
+    <div class="overlay" id="disc" hidden>
+      <div class="panel">
+        <div class="eyebrow">Zaroori baatein</div>
+        <h2>Disclaimers</h2>
+        <p><b>Sadak pe khelna mana hai.</b> Ye game ghar pe, ruk ke khelo. Chalte hue ya gaadi chalate hue phone mat dekho.</p>
+        <p class="muted"><b>Aapka data:</b> koi login nahi, koi location nahi, koi tracking nahi. Score aur unlocks sirf isi browser mein save hote hain. Gaane YouTube se chalte hain (privacy-enhanced YouTube player); fonts Google Fonts se aate hain.</p>
+        <p class="muted" id="sachAlbum"></p>
         <p class="muted">Saari jagah, naksha, vibhaag aur ticker ki khabrein kaalpanik hain. Koi asli vyakti, sanstha, sadak ya brand nahi dikhaya gaya hai. Radio ke gaane unke official YouTube channels se chalte hain; hum koi gaana host nahi karte.</p>
         <p class="muted">Gaane YouTube ke official channels se chalte hain; saare haq labels, composers aur kalakaron ke paas. Kuch hatwana ho toh email karein, hata denge.</p>
-        <div class="contact">Contact: <a href="mailto:gagandeep.sapra@gmail.com">gagandeep.sapra@gmail.com</a> · hatjabhai.com</div>
-        <div class="row"><button class="btn" type="button" id="aboutClose">Theek hai, khelte hain</button></div>
+        <div class="row"><button class="btn" type="button" id="discClose">Wapas</button></div>
       </div>
     </div>
 
@@ -4342,8 +4352,8 @@ function drawDayMap(nextLeg){
 /* =====================================================================
    SCREENS
    ===================================================================== */
-const overlays = ['menu','about','dayclear','over','pause','tip','settings','levels','endless','lvdone'];
-function showOnly(id){ for (const o of overlays) $(o).hidden = o !== id; stage.classList.toggle('menu-open', ['menu','settings','about','tip','levels','endless'].includes(id) && state !== 'over'); }
+const overlays = ['menu','about','disc','dayclear','over','pause','tip','settings','levels','endless','lvdone'];
+function showOnly(id){ for (const o of overlays) $(o).hidden = o !== id; stage.classList.toggle('menu-open', ['menu','settings','about','disc','tip','levels','endless'].includes(id) && state !== 'over'); }
 function setGameButtons(on){
   $('actBtn').hidden = $('brkBtn').hidden = $('pauseBtn').hidden = !on;
   if (!on) keys.brake = false;
@@ -4602,11 +4612,11 @@ $('upiText').textContent = UPI_ID;
 document.querySelectorAll('.tipBtn').forEach(b => b.addEventListener('click', () => { tipBack = overlays.find(o => !$(o).hidden) || 'menu'; showOnly('tip'); }));
 $('tipClose').onclick = () => showOnly(tipBack);
 $('upiCopy').onclick = () => { if (navigator.clipboard) navigator.clipboard.writeText(UPI_ID).then(() => toast('UPI ID copy ho gaya'), () => toast(UPI_ID)); else toast(UPI_ID); };
-$('aboutBtn').onclick = () => {
+function fillSach(){
   const got = store.get('sach', []);
   $('sachAlbum').innerHTML = '<b>📚 Sadak ka Sach (' + got.length + '/' + Object.keys(SACH).length + '):</b> ' + (got.length ? got.map(k => SACH[k]).join(' · ') : 'abhi koi nahi. Khelte raho, sadak sikhayegi.');
-  showOnly('about');
-};
+}
+$('aboutBtn').onclick = () => showOnly('about');
 $('resetData').onclick = () => {
   const b = $('resetData');
   if (!b.dataset.sure){ b.dataset.sure = '1'; b.textContent = 'Pakka? Score, unlocks sab jayega. Dobara dabao.'; return; }
@@ -4614,6 +4624,11 @@ $('resetData').onclick = () => {
   b.dataset.sure = ''; b.textContent = 'Saaf ho gaya ✓'; buildMenu();
 };
 $('aboutClose').onclick = () => showOnly('menu');
+let discFrom = 'menu';
+function openDisc(from){ discFrom = from; fillSach(); showOnly('disc'); }
+$('discLink').onclick = () => openDisc('menu');
+$('discLink2').onclick = () => openDisc('about');
+$('discClose').onclick = () => showOnly(discFrom);
 $('dcGo').onclick = nextDay;
 function revive(){
   store.set('revive', todayStr()); G.revived = true;
