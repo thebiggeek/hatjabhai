@@ -43,6 +43,8 @@ if (await pg.locator('#ovRevive:not([hidden])').count()){ await pg.click('#ovRev
 await pg.evaluate(() => { localStorage.removeItem('bkc_lv'); localStorage.removeItem('bkc_lvUnlocks'); state = undefined; });
 await pg.evaluate(() => window.__bkc.openLevels()); await pg.waitForTimeout(200);
 if ((await pg.locator('.lvcard').count()) !== 20) fail('levels should show 20 cards');
+const centred = await pg.evaluate(() => { const car = document.querySelector('#lvCar'), r = car.getBoundingClientRect(), mid = r.left + r.width/2; const c = [...car.children].find(x => { const b = x.getBoundingClientRect(); return b.left <= mid && b.right >= mid; }); return c && !c.classList.contains('locked'); });
+if (!centred) fail('levels should open on a playable card');
 await pg.evaluate(() => window.__bkc.startLevel(0)); await pg.waitForTimeout(1500);
 await pg.evaluate(() => { const G = window.__bkc.G; G.coins = G.coinsTotal; G.dayDist = G.dayTarget - 2; });
 await pg.waitForTimeout(800);

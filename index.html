@@ -4536,7 +4536,8 @@ function openLevels(focus){
 function goCard(i, instant){
   i = clamp(i, 0, LEVELS.length - 1);
   const card = $('lvCar').children[i]; if (!card) return;
-  $('lvCar').scrollTo({ left: card.offsetLeft - ($('lvCar').clientWidth - card.offsetWidth)/2, behavior: instant ? 'auto' : 'smooth' });
+  const car = $('lvCar'), cr = car.getBoundingClientRect(), kr = card.getBoundingClientRect();
+  car.scrollTo({ left: car.scrollLeft + (kr.left + kr.width/2) - (cr.left + cr.width/2), behavior: instant ? 'auto' : 'smooth' });
   markCard(i);
 }
 function markCard(i){
@@ -4547,9 +4548,9 @@ function markCard(i){
 $('lvCar').addEventListener('scroll', () => {
   clearTimeout(markCard._t);
   markCard._t = setTimeout(() => {
-    const car = $('lvCar'), mid = car.scrollLeft + car.clientWidth/2;
+    const car = $('lvCar'), cr = car.getBoundingClientRect(), mid = cr.left + cr.width/2;
     let best = 0, bd = 1e9;
-    [...car.children].forEach((c, j) => { const d = Math.abs(c.offsetLeft + c.offsetWidth/2 - mid); if (d < bd){ bd = d; best = j; } });
+    [...car.children].forEach((c, j) => { const r = c.getBoundingClientRect(), d = Math.abs(r.left + r.width/2 - mid); if (d < bd){ bd = d; best = j; } });
     markCard(best);
   }, 60);
 });
