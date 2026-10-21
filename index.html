@@ -860,7 +860,7 @@ function ac(){
   }
   // iPhones on silent mode mute web audio unless the page asks for the 'playback' session
   try { if (navigator.audioSession && navigator.audioSession.type !== 'playback') navigator.audioSession.type = 'playback'; } catch (e) {}
-  if (AC.state === 'suspended') AC.resume();
+  if (AC.state === 'suspended' && AC.resume && !(AC instanceof OfflineAudioContext)) AC.resume();
   return AC;
 }
 // Phones only allow sound inside a tap. iOS counts touchend/click (not pointerdown), and on silent mode
@@ -986,38 +986,76 @@ const GROOVES = {
     if (beat % 2 === 0){ tone(N(roots), .14, 'sawtooth', .04, 0, t, 0, b); tone(N(roots + 7), .14, 'sawtooth', .03, 0, t, 0, b); }
   }},
 };
-const GROOVE_FOR = { paidal:'jazz', cycle:'retro', scooty:'retro', car:'dhol', thar:'dhol', suv:'rock', truck:'dhol', bus:'dhol', jcb:'retro' };
+GROOVES.drill = { name:'Khudai Drill', bpm:142, steps:64, play(st, t, b){
+  // Punjabi drill: sliding 808, skippy hats with rolls, tumbi hook, a dhol hit on the turn
+  const bar = (st/16 | 0) % 4, beat = st % 16;
+  const kicks = [0, 7, 10], roll = bar === 3 && beat >= 12;
+  if (kicks.includes(beat)) tone(N([38, 38, 41, 36][bar]), .55, 'sine', .34, beat === 10 ? -12 : -4, t, 0, b);
+  if (beat === 8) { noise(.16, .24, 1800, 'bandpass', t, 0, b); tone(190, .09, 'triangle', .08, -60, t, 0, b); }
+  if (roll || beat % 2 === 0 || beat === 3 || beat === 11) noise(roll ? .02 : .035, roll ? .045 : .06, 8500, 'highpass', t, 0, b);
+  if (roll) noise(.02, .04, 8500, 'highpass', t + 60/142/8, 0, b);
+  const hook = [74, 0, 77, 74, 0, 72, 74, 0, 79, 77, 74, 0, 72, 0, 70, 0], f = hook[beat];
+  if (f && bar % 2 === 0) tone(N(f), .1, 'square', .045, -14, t, 0, b);
+  if (bar === 3 && beat === 14) tone(85, .25, 'sine', .3, -40, t, 0, b);
+}};
+const GROOVE_FOR = { paidal:'jazz', cycle:'retro', scooty:'retro', car:'dhol', thar:'dhol', suv:'rock', truck:'dhol', bus:'dhol', jcb:'drill' };
+// Each groove is rendered once into a short loop and played by a plain <audio> element. Browsers let a
+// media element start on page load when they allow it (Chrome for sites you return to, or with sound
+// allowed in site settings), and on iPhones it plays even in silent mode. Otherwise it starts on the first tap.
+const MUSIC_VOL = 0.55;
 const Music = {
-  on:false, timer:null, step:0, next:0, g:null, bus:'music',
+  on:false, g:null, key:null, el:null, urls:{}, t0:0, want:null,
   wanted(){ return store.get('music', true); },
+  player(){
+    if (!this.el){ this.el = new Audio(); this.el.loop = true; this.el.preload = 'auto'; this.el.volume = MUSIC_VOL; this.el.setAttribute('playsinline', ''); }
+    return this.el;
+  },
+  async render(key){
+    if (this.urls[key]) return this.urls[key];
+    const g = GROOVES[key], spb = 60/g.bpm/4, dur = g.steps*spb, sr = 32000;
+    const off = new OfflineAudioContext(1, Math.ceil(dur*sr), sr);
+    const lp = off.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 5200; lp.connect(off.destination);
+    const bus = off.createGain(); bus.connect(lp);
+    // borrow the live synth helpers: point them at the offline context for this one pass
+    const keepAC = AC, keepBus = musicBus;
+    AC = off; musicBus = bus;
+    try { for (let st = 0; st < g.steps; st++) g.play(st, st*spb, 'music'); }
+    finally { AC = keepAC; musicBus = keepBus; }
+    const buf = await off.startRendering();
+    return (this.urls[key] = URL.createObjectURL(wavBlob(buf.getChannelData(0), sr)));
+  },
   start(){
-    const a = ac(); if (!a) return;
-    if (!this.wanted() || Radio.playing){ this.stop(); this.label(); return; }
+    if (!this.wanted()){ this.stop(); return; }
     const inGame = G && state !== 'menu', key = GROOVE_FOR[inGame ? G.c.key : 'car'] || 'dhol';
-    this.bus = inGame && (G.c.key === 'truck' || G.c.key === 'bus') ? 'tape' : 'music';
-    if (this.on && this.g === GROOVES[key]) return;
-    this.stop(); this.g = GROOVES[key]; this.on = true; this.t0 = performance.now(); this.step = 0; this.next = a.currentTime + 0.08;
-    this.timer = setInterval(() => this.sched(), 50);
-    this.label();
+    this.want = key;
+    if (this.on && this.key === key) return;
+    this.t0 = performance.now();
+    this.render(key).then(url => {
+      if (this.want !== key || !this.wanted()) return;
+      const el = this.player();
+      if (this.key !== key){ el.src = url; this.key = key; this.g = GROOVES[key]; }
+      el.play().then(() => { this.on = true; this.label(); }).catch(() => { this.on = false; this.label(); });   // blocked: the first tap retries
+    }).catch(() => {});
   },
-  stop(){ this.on = false; clearInterval(this.timer); this.label(); },
-  sched(){
-    if (!AC || !this.on) return;
-    const spb = 60/this.g.bpm/4;
-    while (this.next < AC.currentTime + 0.15){
-      this.g.play(this.step % this.g.steps, this.next - AC.currentTime, this.bus);
-      this.step++; this.next += spb;
-    }
-  },
-  toggle(){ ac(); if (this.on && performance.now() - this.t0 < 400) return;   // this very tap just started it
+  stop(){ this.want = null; this.on = false; if (this.el) this.el.pause(); this.label(); },
+  toggle(){ if (this.on && performance.now() - this.t0 < 600) return;   // this very tap just started it
     store.set('music', !this.wanted()); if (this.wanted()) this.start(); else this.stop(); },
   label(){
     const b = $('musicBtn'); if (!b) return;
-    const name = this.on && this.g ? this.g.name : 'Music band';
-    b.textContent = '♪ ' + name;
-    b.setAttribute('aria-pressed', this.on || radioOpen());
+    b.textContent = '♪ ' + (this.on && this.g ? this.g.name : this.wanted() ? 'Music chalu karo' : 'Music band');
+    b.setAttribute('aria-pressed', this.on);
   },
 };
+function wavBlob(data, sr){
+  const n = data.length, v = new DataView(new ArrayBuffer(44 + n*2)), w = (o, t) => { for (let k = 0; k < t.length; k++) v.setUint8(o + k, t.charCodeAt(k)); };
+  w(0, 'RIFF'); v.setUint32(4, 36 + n*2, true); w(8, 'WAVE'); w(12, 'fmt '); v.setUint32(16, 16, true); v.setUint16(20, 1, true); v.setUint16(22, 1, true);
+  v.setUint32(24, sr, true); v.setUint32(28, sr*2, true); v.setUint16(32, 2, true); v.setUint16(34, 16, true); w(36, 'data'); v.setUint32(40, n*2, true);
+  // level-match the grooves: same average loudness, never clipping
+  let sq = 0, pk = 0; for (let k = 0; k < n; k++){ sq += data[k]*data[k]; pk = Math.max(pk, Math.abs(data[k])); }
+  const gain = Math.min(0.09/Math.max(1e-4, Math.sqrt(sq/n)), 0.95/Math.max(1e-4, pk));
+  for (let k = 0; k < n; k++) v.setInt16(44 + k*2, Math.max(-1, Math.min(1, data[k]*gain))*32767, true);
+  return new Blob([v], { type:'audio/wav' });
+}
 const Tape = Music;
 const radioOpen = () => false;
 
@@ -1312,6 +1350,7 @@ function newGame(charKey, regionKey, L = null){
   updateMirror();
   Stats.send('play', { lv: L ? L.id : '', veh: charKey });
   if (outside) outside.gain.setTargetAtTime(c.key === 'suv' ? 0.1 : 1, AC.currentTime, 0.3);
+  if (c.key === 'jcb') say(W/2, H*0.5, '♪ Khudai Drill: bass full, khudai full 🚜', '#ffb81c', 13, 2.6);
   if (c.key === 'suv') say(W/2, H*0.5, 'Sheesha band, AC on. Sheher ki awaaz sirf 10% 🤫', '#cfe3ff', 13, 2.6);
   Music.start();
   if (c.key === 'truck' || c.key === 'bus') say(W/2, H*0.55, (c.key === 'truck' ? 'Truck' : 'Bus') + ' ka tape chalu: full volume 🔊🥁', '#ffb81c', 13, 2.6);
@@ -4760,12 +4799,15 @@ if ('serviceWorker' in navigator && location.protocol.startsWith('http')) naviga
 stage.classList.add('menu-open');
 buildMenu();
 syncLaunch();
+// render every groove up front (no sound needed for that), then try to start the home-screen music right away
+Promise.all(Object.keys(GROOVES).map(k => Music.render(k).catch(() => {}))).then(() => { if (state === 'menu') Music.start(); });
+document.addEventListener('visibilitychange', () => { if (document.hidden){ if (Music.el) Music.el.pause(); } else if (Music.on && Music.el) Music.el.play().catch(() => {}); });
 setView(store.get('view', 'pov'));
 setTicker(menuRegion);
 setMuted(muted);
 resize();
 requestAnimationFrame(frame);
-window.__bkc = { get G(){ return G; }, get state(){ return state; }, get audio(){ return AC ? AC.state : "none"; }, get music(){ return Music.on; }, newGame, REGIONS, CHARS, SPECIAL, LEVELS, startLevel, openLevels };
+window.__bkc = { get G(){ return G; }, get state(){ return state; }, get audio(){ return AC ? AC.state : "none"; }, get music(){ return Music.on; }, get musicUrls(){ return Music.urls; }, newGame, REGIONS, CHARS, SPECIAL, LEVELS, startLevel, openLevels };
 })();
 </script>
 </body>
