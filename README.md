@@ -40,7 +40,7 @@ CI runs the same suite on every push (`.github/workflows/test.yml`).
 Every push to `main` redeploys automatically.
 
 ## Config
-- `WHATSAPP_URL` in `index.html`: paste the WhatsApp channel invite to switch on the "Sadak Crew" button.
+- `WHATSAPP_URL` in `index.html`: the Sadak Crew WhatsApp channel (https://whatsapp.com/channel/0029Vb9VzGZ6WaKldSHpUH3s).
 - Contact and takedown: gagandeep.sapra@gmail.com
 
 ## Credits
