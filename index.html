@@ -253,8 +253,13 @@ kbd{font-family:var(--f-body);background:#3a3442;border-radius:3px;padding:0 5px
 .hudbtn{position:absolute;top:max(10px,env(safe-area-inset-top,0px));width:36px;height:36px;border-radius:6px;background:rgba(255,244,220,.92);
   font:inherit;font-weight:800;font-size:16px;cursor:pointer;border:0;color:#1a1300;z-index:6}
 #pauseBtn{left:max(10px,env(safe-area-inset-left,0px))}
-#muteBtn{left:calc(max(10px,env(safe-area-inset-left,0px)) + 42px)}
-#radioBtn{left:calc(max(10px,env(safe-area-inset-left,0px)) + 84px)}
+#musicBtn{left:calc(max(10px,env(safe-area-inset-left,0px)) + 44px);width:auto;max-width:46vw;padding:0 12px;font-size:12px;border-radius:18px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;background:rgba(20,18,24,.72);color:var(--ink);box-shadow:inset 0 0 0 1px rgba(255,244,220,.25)}
+#musicBtn[aria-pressed="true"]{color:var(--marigold)}
+#pauseBtn{border-radius:18px}
+.toggles{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin:14px 0 4px}
+.toggles button{font:inherit;font-weight:700;font-size:14px;padding:10px 8px;border-radius:12px;border:2px solid transparent;background:var(--asphalt-2);color:var(--ink);cursor:pointer;text-align:left}
+.toggles button[aria-pressed="true"]{border-color:var(--teal)}
+.toggles button[hidden]{display:none}
 #actBtn{position:absolute;right:max(14px,env(safe-area-inset-right,0px));bottom:14px;width:80px;height:80px;border-radius:50%;background:var(--marigold);
   box-shadow:0 4px 0 #b37d00,0 6px 20px rgba(0,0,0,.4);font:inherit;font-weight:800;font-size:14px;line-height:1.05;border:0;color:#1a1300;cursor:pointer;
   user-select:none;-webkit-user-select:none;touch-action:none;z-index:3}
@@ -289,6 +294,16 @@ kbd{font-family:var(--f-body);background:#3a3442;border-radius:3px;padding:0 5px
 #phone .pctrl{display:flex;gap:4px}
 #phone .pctrl button,#phone .pctrl a,#phone .pdial button{flex:1;font:inherit;font-size:11px;font-weight:800;border:0;border-radius:5px;background:#33333b;color:var(--ink);padding:3px 0;cursor:pointer;text-align:center;text-decoration:none}
 #phone .pdial button{flex:0 0 auto;padding:2px 7px}
+@media (max-width:600px){
+  /* phones: a slim strip under the top buttons instead of a big dashboard phone */
+  #phone{top:calc(max(10px,env(safe-area-inset-top,0px)) + 44px);bottom:auto;width:auto;padding:6px;border-radius:14px;display:grid;grid-template-columns:200px 1fr;gap:4px 8px;align-items:start;right:auto}
+  #phone::before{display:none}
+  #phone #ytWrap{grid-row:1 / span 3;margin:0}
+  #phone .pdial{margin:0;grid-column:2}
+  #phone .now{grid-column:2;white-space:normal;max-width:96px;font-size:10px}
+  #phone .pctrl{grid-column:2;flex-wrap:wrap;max-width:96px}
+  #phone .pctrl button,#phone .pctrl a{flex:1 0 40%;padding:6px 0}
+}
 #dashcam{position:absolute;left:max(10px,env(safe-area-inset-left,0px));bottom:var(--dcBottom,12px);z-index:5;width:212px;background:#111;border:2px solid #333;border-radius:8px;padding:4px;box-shadow:0 8px 24px rgba(0,0,0,.6);font-size:10.5px;color:var(--muted)}
 #dashcam .dhead{display:flex;align-items:center;gap:5px;font-weight:800;color:var(--ink);margin-bottom:3px}
 #dashcam .rec{color:#ff3b30;animation:blink 1s steps(2) infinite}
@@ -297,8 +312,6 @@ kbd{font-family:var(--f-body);background:#3a3442;border-radius:3px;padding:0 5px
 #dcWrap{width:200px;height:200px;margin:0 auto;background:#000;overflow:hidden;border-radius:4px}
 #dashcam .dcredit{margin-top:3px;text-align:center}
 #dashcam a{color:var(--teal)}
-#camBtn{left:calc(max(10px,env(safe-area-inset-left,0px)) + 126px)}
-#fsBtn{left:calc(max(10px,env(safe-area-inset-left,0px)) + 168px)}
 </style>
 </head>
 <body>
@@ -307,10 +320,7 @@ kbd{font-family:var(--f-body);background:#3a3442;border-radius:3px;padding:0 5px
     <canvas id="game" aria-label="Bach Ke Chalo game ka maidaan"></canvas>
 
     <button class="hudbtn" id="pauseBtn" type="button" aria-label="Pause" hidden>II</button>
-    <button class="hudbtn" id="muteBtn" type="button" aria-label="Awaaz band/chalu">🔊</button>
-    <button class="hudbtn" id="radioBtn" type="button" aria-label="Radio">📻</button>
-    <button class="hudbtn" id="camBtn" type="button" aria-label="Dashcam: asli Dilli ki awaaz">📹</button>
-    <button class="hudbtn" id="fsBtn" type="button" aria-label="Full screen">⛶</button>
+    <button class="hudbtn" id="musicBtn" type="button" aria-label="Music chalu/band">♪ Music</button>
     <button id="actBtn" type="button" aria-label="Action" hidden>KOODO<br>⤴</button>
     <button id="brkBtn" type="button" aria-label="Brake" hidden>BRAKE</button>
 
@@ -415,6 +425,7 @@ kbd{font-family:var(--f-body);background:#3a3442;border-radius:3px;padding:0 5px
           <p class="lbl">Camera</p>
           <div class="seg" role="radiogroup" aria-label="Camera">
             <button type="button" id="viewPov" aria-pressed="true">Driver ki seat</button>
+            <button type="button" id="viewChase" aria-pressed="false">Peeche se</button>
             <button type="button" id="viewTop" aria-pressed="false">Upar se</button>
           </div>
           <p class="lbl">Sadak</p>
@@ -544,6 +555,14 @@ kbd{font-family:var(--f-body);background:#3a3442;border-radius:3px;padding:0 5px
         <div class="eyebrow">Ruke hue ho</div>
         <h2>Chai break ☕</h2>
         <p class="muted">Sadak kahin nahi jaa rahi. Gaddhe bhi nahi.</p>
+        <div class="toggles">
+          <button type="button" id="muteBtn">🔊 Awaaz</button>
+          <button type="button" id="musicBtn2">♪ Music</button>
+          <button type="button" id="radioBtn">📻 Asli gaane</button>
+          <button type="button" id="camBtn">📹 Dashcam</button>
+          <button type="button" id="fsBtn">⛶ Full screen</button>
+        </div>
+        <p class="note">Asli gaane aur Dashcam YouTube se chalte hain, isliye ek chhoti video window dikhti hai.</p>
         <div class="row">
           <button class="btn" type="button" id="resumeBtn">Wapas sadak pe</button>
           <button class="btn alt" type="button" id="quitBtn">Menu</button>
@@ -925,7 +944,7 @@ const Stats = (() => {
 /* =====================================================================
    AUDIO: synthesised SFX + street ambience
    ===================================================================== */
-let AC = null, master = null, outside = null, tapeBus = null, ambBus = null, hornFx = null, ambHornFx = null, muted = store.get('muted', false);
+let AC = null, master = null, outside = null, tapeBus = null, musicBus = null, ambBus = null, hornFx = null, ambHornFx = null, muted = store.get('muted', false);
 function ac(){
   if (!AC){
     try { AC = new (window.AudioContext||window.webkitAudioContext)(); } catch(e){ return null; }
@@ -942,6 +961,10 @@ function ac(){
     const thp = AC.createBiquadFilter(); thp.type = 'highpass'; thp.frequency.value = 180;
     const tlp = AC.createBiquadFilter(); tlp.type = 'lowpass'; tlp.frequency.value = 3600;
     tapeBus.connect(thp).connect(tlp).connect(master);
+    // built-in background music: warm, a little below the street so horns still cut through
+    musicBus = AC.createGain(); musicBus.gain.value = 0.55;
+    const mlp = AC.createBiquadFilter(); mlp.type = 'lowpass'; mlp.frequency.value = 5200;
+    musicBus.connect(mlp).connect(master);
     // horns run through a soft-clip distortion: the cheap-speaker blare of a real pressure horn
     const curve = new Float32Array(1024);
     for (let i=0;i<1024;i++){ const x = i/512 - 1; curve[i] = Math.tanh(x*3.2); }
@@ -949,11 +972,15 @@ function ac(){
     hornFx = mkFx(outside);
     ambHornFx = mkFx(ambBus);
   }
+  // iPhones on silent mode mute web audio unless the page asks for the 'playback' session
+  try { if (navigator.audioSession && navigator.audioSession.type !== 'playback') navigator.audioSession.type = 'playback'; } catch (e) {}
   if (AC.state === 'suspended') AC.resume();
   return AC;
 }
+// phones only allow sound after a touch: unlock on the very first one
+for (const ev of ['pointerdown', 'keydown']) window.addEventListener(ev, () => ac(), { once: true, capture: true });
 function out(pan, bus){
-  const a = AC, dest = bus === 'in' ? master : bus === 'tape' ? tapeBus : (bus || outside);
+  const a = AC, dest = bus === 'in' ? master : bus === 'tape' ? tapeBus : bus === 'music' ? musicBus : (bus || outside);
   if (pan && a.createStereoPanner){ const p = a.createStereoPanner(); p.pan.value = clamp(pan,-1,1); p.connect(dest); return p; }
   return dest;
 }
@@ -1020,24 +1047,74 @@ const SFX = {
 };
 
 // Truck/bus tape deck: dhol + tumbi loop playing over whatever the radio is doing
-const Tape = {
-  on:false, timer:null, step:0, next:0,
-  start(){ const a = ac(); if (!a || this.on) return; this.on = true; this.step = 0; this.next = a.currentTime + 0.05; this.timer = setInterval(() => this.sched(), 50); },
-  stop(){ this.on = false; clearInterval(this.timer); },
+// Built-in music: synthesised in the browser, so it starts with the first tap on any phone and
+// needs no video window. Each vehicle gets its own groove; truck and bus play it through a tinny tape deck.
+const N = m => 440*Math.pow(2, (m - 69)/12);
+const GROOVES = {
+  dhol:  { name:'Dhol Express', bpm:150, steps:32, play(st, t, b){
+    if ([0,6,10,16,22,26,29].includes(st)) tone(92, .2, 'sine', .3, -45, t, 0, b);
+    if ([4,12,20,28].includes(st)) noise(.09, .26, 1700, 'bandpass', t, 0, b);
+    if (st % 2) noise(.03, .07, 7000, 'highpass', t, 0, b);
+    const riff = [76,0,79,76, 0,74,76,0, 81,0,79,76, 0,74,72,0], f = riff[st % 16];
+    if (f && st < 24) tone(N(f), .11, 'square', .05, -10, t, 0, b);
+  }},
+  jazz:  { name:'Footpath Jazz', bpm:112, steps:64, play(st, t, b){
+    const bar = (st/16 | 0) % 4, beat = st % 16, roots = [50, 43, 48, 45];        // Dm7 G7 Cmaj7 A7
+    const walk = [[50,53,57,55],[43,47,50,52],[48,52,55,57],[45,49,52,48]][bar];
+    if (beat % 4 === 0) tone(N(walk[beat/4] - 12 + 12), .32, 'triangle', .2, 0, t, 0, b);
+    if (beat % 4 === 0 || beat === 7 || beat === 15) noise(.12, beat % 4 ? .035 : .05, 9000, 'highpass', t + (beat % 4 ? .03 : 0), 0, b);
+    if (beat === 6 || beat === 14){ const r = roots[bar] + 12; [0, 3 + (bar === 2 ? 1 : 0), 7, 10 + (bar === 2 ? 1 : 0)].forEach(i => tone(N(r + i), .3, 'sine', .035, 0, t + .03, 0, b)); }
+  }},
+  retro: { name:'Retro Rickshaw', bpm:118, steps:64, play(st, t, b){
+    const bar = (st/16 | 0) % 4, beat = st % 16, roots = [57, 53, 48, 55];        // Am F C G
+    if (beat % 4 === 0) tone(60, .14, 'sine', .32, -30, t, 0, b);
+    if (beat === 4 || beat === 12) noise(.12, .18, 2200, 'bandpass', t, 0, b);
+    if (beat % 4 === 2) noise(.08, .07, 8000, 'highpass', t, 0, b);
+    if (beat % 2 === 0) tone(N(roots[bar] - 24 + (beat % 4 ? 12 : 0)), .13, 'square', .05, 0, t, 0, b);
+    const arp = [0, 4, 7, 12, 7, 4][st % 6] + (bar === 0 ? -1 : 0);
+    if (beat % 2 === 1) tone(N(roots[bar] + 12 + arp + (bar === 0 || bar === 3 ? 0 : 0)), .09, 'triangle', .035, 0, t, 0, b);
+  }},
+  rock:  { name:'AC Cabin Rock', bpm:128, steps:32, play(st, t, b){
+    const beat = st % 16, roots = [40, 40, 43, 45][(st/8 | 0) % 4];
+    if (beat === 0 || beat === 8 || beat === 10) tone(58, .16, 'sine', .34, -28, t, 0, b);
+    if (beat === 4 || beat === 12) noise(.14, .22, 1800, 'bandpass', t, 0, b);
+    if (beat % 2 === 0) noise(.04, .05, 9000, 'highpass', t, 0, b);
+    if (beat % 2 === 0){ tone(N(roots), .14, 'sawtooth', .04, 0, t, 0, b); tone(N(roots + 7), .14, 'sawtooth', .03, 0, t, 0, b); }
+  }},
+};
+const GROOVE_FOR = { paidal:'jazz', cycle:'retro', scooty:'retro', car:'dhol', thar:'dhol', suv:'rock', truck:'dhol', bus:'dhol', jcb:'retro' };
+const Music = {
+  on:false, timer:null, step:0, next:0, g:null, bus:'music',
+  wanted(){ return store.get('music', true); },
+  start(){
+    const a = ac(); if (!a) return;
+    if (!this.wanted() || radioOpen()){ this.stop(); this.label(); return; }
+    const key = GROOVE_FOR[G ? G.c.key : 'car'] || 'dhol';
+    this.bus = G && (G.c.key === 'truck' || G.c.key === 'bus') ? 'tape' : 'music';
+    if (this.on && this.g === GROOVES[key]) return;
+    this.stop(); this.g = GROOVES[key]; this.on = true; this.step = 0; this.next = a.currentTime + 0.08;
+    this.timer = setInterval(() => this.sched(), 50);
+    this.label();
+  },
+  stop(){ this.on = false; clearInterval(this.timer); this.label(); },
   sched(){
     if (!AC || !this.on) return;
-    const spb = 60/150/4;
-    const riff = [659,0,784,659, 0,587,659,0, 880,0,784,659, 0,587,523,0];
+    const spb = 60/this.g.bpm/4;
     while (this.next < AC.currentTime + 0.15){
-      const st = this.step % 32, t = this.next - AC.currentTime;
-      if ([0,6,10,16,22,26,29].includes(st)) tone(92, .2, 'sine', .3, -45, t, 0, 'tape');            // dhol dha
-      if ([4,12,20,28].includes(st)) noise(.09, .3, 1700, 'bandpass', t, 0, 'tape');                     // ta
-      if (st % 2) noise(.03, .09, 7000, 'highpass', t, 0, 'tape');                                     // chik
-      const f = riff[st % 16]; if (f && st < 24) tone(f, .11, 'square', .07, -10, t, 0, 'tape');      // tumbi
+      this.g.play(this.step % this.g.steps, this.next - AC.currentTime, this.bus);
       this.step++; this.next += spb;
     }
   },
+  toggle(){ ac(); if (radioOpen()){ Radio.close(); store.set('music', true); this.start(); return; } store.set('music', !this.wanted()); if (this.wanted()) this.start(); else this.stop(); },
+  label(){
+    const b = $('musicBtn'); if (!b) return;
+    const name = this.on && this.g ? this.g.name : radioOpen() ? '📻 ' + RADIO[Radio.station].name : 'Music band';
+    b.textContent = '♪ ' + name;
+    b.setAttribute('aria-pressed', this.on || radioOpen());
+  },
 };
+const Tape = Music;
+const radioOpen = () => !$('phone').hidden;
 
 // Street ambience: traffic rumble bed + random far-off horns, bells, barks, bus roars.
 const Amb = {
@@ -1078,7 +1155,7 @@ const Amb = {
 function setMuted(m){
   muted = m; store.set('muted', muted);
   if (master) master.gain.value = muted ? 0 : 1;
-  $('muteBtn').textContent = muted ? '🔇' : '🔊';
+  $('muteBtn').textContent = muted ? '🔇 Awaaz band' : '🔊 Awaaz'; $('muteBtn').setAttribute('aria-pressed', !muted);
 }
 
 /* =====================================================================
@@ -1099,14 +1176,13 @@ const Radio = {
   player:null, ready:false, station:'safar', order:[], i:0, playing:false, loading:false,
   userClosed:false,
   open(){
-    this.userClosed = false; $('phone').hidden = false; layoutCorner();
+    this.userClosed = false; $('phone').hidden = false; layoutCorner(); store.set('radio', true); Music.stop();
     if (!this.player) this.load(); else if (!this.playing) this.player.playVideo();
   },
   own:'safar',
   autostart(st){
     this.own = st || 'safar';
     if (this.userClosed) return;
-    if (!this.player && stage.getBoundingClientRect().width < 900) return;   // phones: radio is opt-in (📻)
     if (this.player && this.ready){ $('phone').hidden = false; layoutCorner(); if (this.station !== this.own) this.setStation(this.own); else if (!this.playing) this.player.playVideo(); return; }
     this.station = this.own;
     this.open();
@@ -1124,7 +1200,7 @@ const Radio = {
       playerVars:{ playsinline:1, rel:0, modestbranding:1 },
       events:{
         onReady: e => { this.ready = true; e.target.playVideo(); this.show(); },
-        onStateChange: e => { this.playing = e.data === 1; if (e.data === 0) this.next(); },
+        onStateChange: e => { this.playing = e.data === 1; Music.label(); if (e.data === 0) this.next(); },
         onError: () => this.next(),
       }});
   },
@@ -1141,7 +1217,7 @@ const Radio = {
   prev(){ this.i = (this.i - 1 + this.order.length) % this.order.length; this.play(); },
   toggle(){ if (!this.ready) return; this.playing ? this.player.pauseVideo() : this.player.playVideo(); },
   setStation(st){ this.station = st; this.shuffle(); this.play(); this.show(); },
-  close(){ this.userClosed = true; if (this.ready) this.player.pauseVideo(); $('phone').hidden = true; layoutCorner(); },
+  close(){ this.userClosed = true; this.playing = false; store.set('radio', false); if (this.ready) this.player.pauseVideo(); $('phone').hidden = true; layoutCorner(); if (state === 'play') Music.start(); else Music.label(); },
 };
 
 const STREET = {
@@ -1176,14 +1252,14 @@ const Dashcam = {
   close(){ this.userClosed = true; if (this.ready) this.player.pauseVideo(); $('dashcam').hidden = true; },
   toggle(){ ac(); $('dashcam').hidden ? this.open() : this.close(); },
 };
-$('camBtn').onclick = () => Dashcam.toggle();
+$('camBtn').onclick = () => { Dashcam.toggle(); if (typeof syncPauseToggles === 'function') syncPauseToggles(); };
 function toggleFull(){
   if (document.fullscreenElement) document.exitFullscreen().catch(() => {});
   else if (document.documentElement.requestFullscreen) document.documentElement.requestFullscreen().catch(() => toast('Full screen yahan nahi chalega'));
 }
 $('fsBtn').onclick = toggleFull;
 if (!document.fullscreenEnabled) $('fsBtn').hidden = true;
-document.addEventListener('fullscreenchange', () => { $('fsBtn').textContent = document.fullscreenElement ? '🗗' : '⛶'; setTimeout(() => { resize(); positionMirror(); }, 60); });
+document.addEventListener('fullscreenchange', () => { $('fsBtn').textContent = document.fullscreenElement ? '🗗 Chhota karo' : '⛶ Full screen'; setTimeout(() => { resize(); positionMirror(); }, 60); });
 $('dcClose').onclick = () => Dashcam.close();
 
 function updateMirror(){
@@ -1350,16 +1426,18 @@ function buildMap(kind){
 const stage = $('stage'), cv = $('game'), ctx = cv.getContext('2d');
 const dark = document.createElement('canvas'), dctx = dark.getContext('2d');
 let scale = 1, dpr = 1;
+// phones get a slightly softer canvas; it is the cheapest way to hold 60 fps
+const DPR_CAP = (window.__dprCap) || (Math.min(screen.width, screen.height) < 600 ? 1.5 : 2);
 const bandTop = () => H*0.42, bandBot = () => H*0.88;
 function resize(){
   const r = stage.getBoundingClientRect();
-  if (VIEW === 'pov'){
+  if (VIEW !== 'top'){
     SH = 720;
     VW = Math.max(400, Math.round(r.width / Math.max(1, r.height) * SH));
     OX = Math.max(60, Math.round((VW - W)/2));
     H = 2400;
     scale = Math.min(r.width / VW, r.height / SH);
-    dpr = Math.min(2, window.devicePixelRatio || 1);
+    dpr = Math.min(DPR_CAP, window.devicePixelRatio || 1);
     cv.style.width = Math.floor(VW*scale)+'px'; cv.style.height = Math.floor(SH*scale)+'px';
     cv.width = dark.width = Math.round(VW*scale*dpr); cv.height = dark.height = Math.round(SH*scale*dpr);
     ctx.setTransform(scale*dpr,0,0,scale*dpr,0,0);
@@ -1377,7 +1455,7 @@ function resize(){
   }
   VW = W + 2*OX;
   scale = Math.min(r.width / VW, r.height / H);
-  dpr = Math.min(2, window.devicePixelRatio || 1);
+  dpr = Math.min(DPR_CAP, window.devicePixelRatio || 1);
   cv.style.width = Math.floor(VW*scale)+'px'; cv.style.height = Math.floor(H*scale)+'px';
   cv.width = dark.width = Math.round(VW*scale*dpr); cv.height = dark.height = Math.round(H*scale*dpr);
   ctx.setTransform(scale*dpr,0,0,scale*dpr,0,0);
@@ -1424,15 +1502,14 @@ function newGame(charKey, regionKey, L = null){
     [[1.6, '← → ya ungli se: side badlo'], [5, '↑ tez · ↓ dheere · Shift / laal button: BRAKE'], [8.5, 'Space / gol button: ' + act], [12, 'Gaddhe, khule manhole aur ulta traffic se bacho. Ghar tak zinda pahuncho!']]
       .forEach(([t, msg]) => later(t, () => say(W/2, G.p.y - 330, msg, '#fff4dc', 15, 3.2)));
   }
-  Radio.autostart(STATION_FOR[c.key]);
+  if (store.get('radio', false)) Radio.autostart(STATION_FOR[c.key]);
   updateMirror();
-  say(W/2, H*0.42, '📻 ' + RADIO[STATION_FOR[c.key]].name, '#cfe3ff', 13, 2.4);
   Dashcam.autostart();
   Stats.send('play', { lv: L ? L.id : '', veh: charKey });
   if (outside) outside.gain.setTargetAtTime(c.key === 'suv' ? 0.1 : 1, AC.currentTime, 0.3);
   if (c.key === 'suv') say(W/2, H*0.5, 'Sheesha band, AC on. Sheher ki awaaz sirf 10% 🤫', '#cfe3ff', 13, 2.6);
-  Tape.stop();
-  if (c.key === 'truck' || c.key === 'bus'){ Tape.start(); say(W/2, H*0.55, (c.key === 'truck' ? 'Truck' : 'Bus') + ' ka tape chalu: full volume 🔊🥁', '#ffb81c', 13, 2.6); }
+  Music.stop(); Music.start();
+  if (c.key === 'truck' || c.key === 'bus') say(W/2, H*0.55, (c.key === 'truck' ? 'Truck' : 'Bus') + ' ka tape chalu: full volume 🔊🥁', '#ffb81c', 13, 2.6);
 }
 
 function startPos(){
@@ -1464,7 +1541,10 @@ function startDay(d){
   p.x = startPos(); p.y = H*0.72; p.bp = 118; p.invT = 1.5; p.tx = p.ty = null;
   p.jumpT = 0; p.slowT = 0; p.stunT = 0; p.slideV = 0;
 }
-const diff = () => G.lv ? G.lv.d : 1 + 0.14*(G.day-1);
+// testers wanted more traffic and more speed: the first two levels stay gentle, then it ramps
+const curLv = () => G.lv ? LEVELS.indexOf(G.lv) : -1;
+const diff = () => G.lv ? G.lv.d * (curLv() < 2 ? 1 : 1.25) : 1.2 + 0.15*(G.day-1);
+const pace = () => G.lv ? (curLv() < 2 ? 1 : Math.min(1.45, 1.08 + 0.025*curLv())) : Math.min(1.5, 1.1 + 0.06*(G.day-1));
 const placeName = i => G.map.places[i][0];
 
 /* =====================================================================
@@ -2159,7 +2239,7 @@ function damage(cause, txt){
     return;
   }
   if (navigator.vibrate) try { navigator.vibrate(40); } catch (e) {}
-  p.hearts--; p.invT = 1.7; G.shake = 12; G.cause = cause; SFX.thud(); G.ds.hit++;
+  p.hearts--; p.invT = 1.2; G.shake = 12; G.cause = cause; SFX.thud(); G.ds.hit++;
   feed('💔 ' + ((CAUSES[cause] || CAUSES.vehicle).t));
   if (txt) say(p.x, p.y-30, txt, '#ff4d3d', 15, 1.4);
   if (c.precious){ addBP(20, 'scratch'); say(p.x, p.y-52, 'SCRATCH!! EMI ROYI 😱', '#ff3d7f', 13, 1.4); }
@@ -2243,7 +2323,7 @@ function update(dt){
 
   const f = 1.35 - (p.y - bandTop())/(bandBot() - bandTop())*0.75;
   G.f = f;
-  let speed = c.speed * (1 + 0.05*(G.day-1)) * f;
+  let speed = c.speed * pace() * f;
   if (p.slowT > 0) speed *= 0.45;
   if (p.stunT > 0) speed *= 0.15;
   p.brk += ((keys.brake ? 0.03 : 1) - p.brk) * Math.min(1, dt*(keys.brake ? 6 : 2.2));
@@ -2549,7 +2629,18 @@ function updateVehicle(e, dt, s){
     }
   }
   // collision
+  if (e.bumpT > 0) e.bumpT -= dt;
   if (!e.hitP && hitCR(p.x, p.y, p.r, e, 0.82)){
+    // still blinking from the last hit: no damage, but the bump is always felt and seen
+    if (p.invT > 0 && !c.rammer && c.mass <= e.m && !G.dying){
+      if ((e.bumpT || 0) <= 0){
+        e.bumpT = 0.5; G.shake = Math.max(G.shake, 6); SFX.thud();
+        say(p.x, p.y - 30, pick(R0, ['Phir se?! 😵', 'Bal bal bache (abhi blink ho rahe the)', 'DHAKKA!']), '#ffb81c', 13, 0.9);
+        p.x = clamp(p.x + (p.x < e.x ? -22 : 22), 12, W-12);
+        if (navigator.vibrate) try { navigator.vibrate(15); } catch (er) {}
+      }
+      return;
+    }
     e.hitP = true;
     if (c.rammer){ smash(e, c.digger ? 'Gaadi kuchal di. Khudai jaari hai.' : pick(R0, ['BHAUKAAL! 😎','Side nahi di? Ab lo','Papa ki gaadi hai 😎'])); return; }
     if (c.mass > e.m){
@@ -2844,20 +2935,79 @@ function drawTop(g, td, x, y, w, l, heading, col, o = {}){
 /* =====================================================================
    RENDER
    ===================================================================== */
-function emoji(e, x, y, size){
-  ctx.font = size + 'px ' + EMOJI_FONT;
-  ctx.fillStyle = '#000';
-  ctx.fillText(e, x, y);
+// Text and emoji are rasterised once into small canvases and then blitted: fillText of colour
+// emoji every frame was half of the frame time on phones.
+const GLYPH = new Map();
+function glyph(e, px){
+  const key = e + '|' + px;
+  let g = GLYPH.get(key);
+  if (!g){
+    if (GLYPH.size > 600) GLYPH.clear();
+    const c = document.createElement('canvas'), x = c.getContext('2d');
+    x.font = px + 'px ' + EMOJI_FONT;
+    const w = Math.max(px, Math.ceil(x.measureText(e).width));
+    c.width = Math.ceil(w*1.25) + 4; c.height = Math.ceil(px*1.4) + 4;
+    x.font = px + 'px ' + EMOJI_FONT; x.textAlign = 'center'; x.textBaseline = 'middle'; x.fillStyle = '#000';
+    x.fillText(e, c.width/2, c.height/2);
+    g = { c, w: w/px };
+    GLYPH.set(key, g);
+  }
+  return g;
 }
+const pxBucket = need => need <= 24 ? 24 : need <= 48 ? 48 : need <= 96 ? 96 : 160;
+function emoji(e, x, y, size){
+  if (!e || size <= 0) return;
+  const g = glyph(e, pxBucket(size*scale*dpr)), k = size / (g.c.height - 4) * 1.4;
+  const dw = g.c.width*k, dh = g.c.height*k;
+  const al = ctx.textAlign, bl = ctx.textBaseline;
+  const cx = al === 'left' || al === 'start' ? x + g.w*size/2 : al === 'right' || al === 'end' ? x - g.w*size/2 : x;
+  const cy = bl === 'middle' ? y : bl === 'top' ? y + size*0.5 : bl === 'bottom' ? y - size*0.5 : y - size*0.36;
+  ctx.drawImage(g.c, cx - dw/2, cy - dh/2, dw, dh);
+}
+// cached ctx.fillText: same font, colour, alignment and baseline as the live context
+const TXTC = new Map();
+const TB = [10, 14, 20, 28, 40, 56, 80, 112];
+function ftext(t, x, y, maxW){
+  if (t == null || t === '') return;
+  const f = ctx.font, m = /([\d.]+)px/.exec(f); if (!m) return ctx.fillText(t, x, y, maxW);
+  const size = +m[1], fs = ctx.fillStyle; if (typeof fs !== 'string' || size < 2) return;
+  const need = size*scale*dpr; let px = TB[TB.length-1]; for (const b of TB) if (b >= need){ px = b; break; }
+  const bl = ctx.textBaseline, key = t + '|' + f.replace(m[0], '') + '|' + px + '|' + fs + '|' + bl;
+  let c = TXTC.get(key);
+  if (!c){
+    if (TXTC.size > 900) TXTC.clear();
+    c = document.createElement('canvas'); const x2 = c.getContext('2d'), font = f.replace(m[0], px + 'px');
+    x2.font = font; const w = Math.ceil(x2.measureText(t).width) + 4;
+    c.width = Math.max(1, w); c.height = Math.ceil(px*2.4);
+    x2.font = font; x2.fillStyle = fs; x2.textAlign = 'left'; x2.textBaseline = bl; x2.fillText(t, 2, px*1.2);
+    c._w = w - 4;
+    TXTC.set(key, c);
+  }
+  const k = size/px; let dw = c.width*k; const tw = c._w*k;
+  let sx = 1; if (maxW && tw > maxW){ sx = maxW/tw; dw *= sx; }
+  const al = ctx.textAlign, left = al === 'center' ? x - tw*sx/2 : al === 'right' || al === 'end' ? x - tw*sx : x;
+  ctx.drawImage(c, left - 2*k*sx, y - px*1.2*k, dw, c.height*k);
+}
+const LABELS = new Map();
 function label(txt, x, y, col, size=10){
   if (!txt) return;
-  ctx.font = '800 ' + size + 'px ' + TXT_FONT;
-  const w = ctx.measureText(txt).width + 8;
+  const px = pxBucket(size*scale*dpr*2)/2, key = txt + '|' + col + '|' + px;
+  let L = LABELS.get(key);
+  if (!L){
+    if (LABELS.size > 400) LABELS.clear();
+    const c = document.createElement('canvas'), x2 = c.getContext('2d');
+    x2.font = '800 ' + px + 'px ' + TXT_FONT;
+    const w = x2.measureText(txt).width + px*0.8;
+    c.width = Math.ceil(w); c.height = Math.ceil(px*1.6);
+    x2.fillStyle = 'rgba(20,18,24,.84)'; x2.fillRect(0, 0, c.width, c.height);
+    x2.font = '800 ' + px + 'px ' + TXT_FONT; x2.fillStyle = col; x2.textAlign = 'center'; x2.textBaseline = 'middle';
+    x2.fillText(txt, c.width/2, c.height/2 + px*0.08);
+    L = { c, w: c.width/px, h: c.height/px };
+    LABELS.set(key, L);
+  }
+  const w = L.w*size, h = L.h*size;
   x = clamp(x, w/2 + 2, W - w/2 - 2);
-  ctx.fillStyle = 'rgba(20,18,24,.84)';
-  ctx.fillRect(x - w/2, y - size/2 - 3, w, size + 6);
-  ctx.fillStyle = col;
-  ctx.fillText(txt, x, y + 1);
+  ctx.drawImage(L.c, x - w/2, y - h/2, w, h);
 }
 function tiles(dist, T, fn){
   const k0 = Math.floor((dist - H - T)/T), k1 = Math.ceil((dist + T)/T);
@@ -3498,7 +3648,7 @@ function drawDarkness(alpha){
 }
 
 function drawMinimap(){
-  const ms = 80, mx = VW - ms - 8, my = 82;
+  const ms = 80, mx = VW - ms - 8, my = 68;
   const prog = clamp(G.dayDist / G.dayTarget, 0, 1);
   const pos = pointAt(G.route, prog), sc = 0.6;
   ctx.save();
@@ -3560,49 +3710,51 @@ function drawSidePanels(){
   ctx.textAlign = 'center';
 }
 function drawHUD(){
-  const p = G.p, c = G.c;
-  ctx.fillStyle = 'rgba(20,18,24,.88)'; ctx.fillRect(0, 0, VW, 56);
-  const narrow = VW < 560;
-  const hx = narrow ? 18 : Math.max(136, (5*42 + 22)/scale + 14);   // clear of the HTML buttons on the left
-  const hy = narrow ? 90 : 16;
-  if (narrow){ ctx.fillStyle = 'rgba(20,18,24,.75)'; ctx.fillRect(4, 78, 196, 36); }
-  for (let i=0;i<3;i++) emoji(i < p.hearts ? '❤️' : '🤍', hx + i*20, hy, 15);
-  if (p.helmet) emoji(c.mass >= 2 ? '🔧' : '⛑️', hx + 62, hy, 14);
-  if (p.cloudT > 0) emoji('☁️', hx + 82, hy, 14);
-  const bx = hx - 8, by = narrow ? 102 : 32, bw = 100, bh = 9;
-  const bpN = clamp((p.bp - 90)/(200-90), 0, 1);
-  ctx.fillStyle = '#3a3442'; ctx.fillRect(bx, by, bw, bh);
-  ctx.fillStyle = bpN > 0.75 ? '#ff4d3d' : bpN > 0.45 ? '#ffb81c' : '#13b3a3'; ctx.fillRect(bx, by, bw*bpN, bh);
-  ctx.textAlign = 'left'; ctx.font = '800 10.5px ' + TXT_FONT; ctx.fillStyle = '#fff4dc';
-  ctx.fillText('BP ' + Math.round(p.bp), bx + bw + 5, by + 5);
-  ctx.textAlign = 'right';
-  ctx.font = '800 13px ' + TXT_FONT; ctx.fillStyle = '#ffb81c'; ctx.fillText(G.lv ? 'LEVEL ' + G.S.name : 'DIN ' + G.day + ' · ' + G.S.name, VW - 8, 13);
-  ctx.font = '700 11px ' + TXT_FONT; ctx.fillStyle = '#fff4dc'; ctx.fillText(Math.floor(G.score) + ' pts · 🪙 ' + G.coins + (G.lv ? '/' + G.coinsTotal : ''), VW - 8, 28);
-  ctx.fillStyle = '#b9ae98';
-  const extra = c.cams ? '📸 ' + G.challans + ' challan' : c.digger ? '⛏️ ' + G.dug + ' khudai' : '🙏 ' + G.near + ' bache';
-  ctx.fillText(extra, VW - 8, 43);
-  if ($('mirror').hidden) drawMinimap();
-  drawSidePanels();
-  ctx.textAlign = 'right';
-  ctx.textAlign = 'center';
-  // route strip
+  // Minimal HUD: a thin route line on top, one chip on the right (jaan, BP, score). Everything else
+  // (level name, missions, naksha) appears only when it matters or on wide screens.
+  const p = G.p, c = G.c, narrow = VW < 560;
   const prog = clamp(G.dayDist / G.dayTarget, 0, 1);
-  ctx.fillStyle = 'rgba(20,18,24,.78)'; ctx.fillRect(0, 56, VW, 20);
-  ctx.font = '700 9.5px ' + TXT_FONT; ctx.fillStyle = '#b9ae98';
-  ctx.textAlign = 'left'; ctx.fillText(placeName(G.leg[0]), 8, 66);
-  ctx.textAlign = 'right'; ctx.fillText(placeName(G.leg[1]) + ' 🏁', VW - 8, 66);
-  ctx.textAlign = 'center'; ctx.fillStyle = '#ffb81c'; if ($('mirror').hidden) ctx.fillText((G.routeKm*prog).toFixed(1) + ' / ' + G.routeKm.toFixed(1) + ' km', VW/2, 66);
-  ctx.fillStyle = '#4a4452'; ctx.fillRect(8, 73, VW - 16, 2);
-  ctx.fillStyle = '#ffb81c'; ctx.fillRect(8, 73, (VW - 16)*prog, 2);
-  if (G.S.fog) label((G.season === 'aandhi' ? 'DHOOL ' : 'AQI ') + (900 + Math.floor((G.time*37) % 99)) + (p.maskT > 0 ? ' · mask ' + Math.ceil(p.maskT) + 's' : ' · khaans khaans'), VW/2 - 50, 92, '#c8bfa8', 10);
-  if (G.S.heat) label('🌡️ 48°C · ' + G.R.treat.n + ' dhoondho', VW/2 - 50, 92, '#ffb81c', 10);
+  ctx.fillStyle = 'rgba(20,18,24,.55)'; ctx.fillRect(0, 0, VW, 4);
+  ctx.fillStyle = '#ffb81c'; ctx.fillRect(0, 0, VW*prog, 4);
+  // the chip
+  const cw = 136, ch = 56, cx = VW - cw - 8, cy = 10;
+  ctx.fillStyle = 'rgba(20,18,24,.72)'; rrect(ctx, cx, cy, cw, ch, 12); ctx.fill();
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  for (let i = 0; i < 3; i++) emoji(i < p.hearts ? '❤️' : '🤍', cx + 16 + i*19, cy + 14, 14);
+  if (p.helmet) emoji(c.mass >= 2 ? '🔧' : '⛑️', cx + 76, cy + 14, 13);
+  if (p.cloudT > 0) emoji('☁️', cx + 94, cy + 14, 13);
+  ctx.textBaseline = 'alphabetic';
+  ctx.textAlign = 'right'; ctx.font = '800 12px ' + TXT_FONT; ctx.fillStyle = '#fff4dc';
+  ctx.fillText(G.lv ? '🪙 ' + G.coins : Math.floor(G.score) + '', cx + cw - 9, cy + 19);
+  const bpN = clamp((p.bp - 90)/(200-90), 0, 1), bx = cx + 9, by = cy + 30, bw = cw - 52;
+  ctx.fillStyle = '#3a3442'; rrect(ctx, bx, by, bw, 8, 4); ctx.fill();
+  ctx.fillStyle = bpN > 0.75 ? '#ff4d3d' : bpN > 0.45 ? '#ffb81c' : '#13b3a3'; rrect(ctx, bx, by, Math.max(8, bw*bpN), 8, 4); ctx.fill();
+  ctx.font = '800 10px ' + TXT_FONT; ctx.fillStyle = bpN > 0.75 ? '#ff4d3d' : '#b9ae98'; ctx.fillText('BP ' + Math.round(p.bp), cx + cw - 9, by + 8);
+  ctx.textAlign = 'left'; ctx.font = '700 9.5px ' + TXT_FONT; ctx.fillStyle = '#b9ae98';
+  ctx.fillText((G.routeKm*prog).toFixed(1) + '/' + G.routeKm.toFixed(1) + ' km', bx, cy + ch - 6);
+  ctx.textAlign = 'right'; ctx.fillText('🏁 ' + placeName(G.leg[1]), cx + cw - 9, cy + ch - 6);
+  if ($('mirror').hidden && !narrow) drawMinimap();
+  drawSidePanels();
+  ctx.textAlign = 'center';
+  if (G.S.fog) label((G.season === 'aandhi' ? 'DHOOL ' : 'AQI ') + (900 + Math.floor((G.time*37) % 99)) + (p.maskT > 0 ? ' · mask ' + Math.ceil(p.maskT) + 's' : ' · khaans khaans'), VW/2, 76, '#c8bfa8', 10);
+  if (G.S.heat) label('🌡️ 48°C · ' + G.R.treat.n + ' dhoondho', VW/2, 76, '#ffb81c', 10);
 }
 
 /* =====================================================================
    DRIVER VIEW (pseudo-3D): the same world, seen from the driver's seat.
    World x = across the road (0..400), depth dz = how far ahead (p.y - e.y).
    ===================================================================== */
-const SEG = 25, NSEG = 100, CAM_BACK = 34;
+const SEG = 25, NSEG = 100;
+let CAM_BACK = 34;                 // 'chase' view pulls the camera back and up behind your own vehicle
+const PLAYER_TD = { cycle:'cycle', scooty:'scooter', car:'car', thar:'thar', suv:'lux', truck:'truck', bus:'bus', jcb:'jcb' };
+const PLAYER_COL = { car:'#e8331d', thar:'#2b2b2b', suv:'#f4f4f4', truck:'#e8c22a', bus:'#2e8b57', jcb:'#f2b705', scooty:'#ff3d7f', cycle:'#13b3a3' };
+function playerPOV(c, p, jump){
+  if (p.invT > 0 && G.bhaiT <= 0 && Math.floor(p.invT*12) % 2) return;
+  const q0 = proj(p.x, 0, 0), q = proj(p.x, jump*40, 0), sc = q.s, td = PLAYER_TD[c.key];
+  ctx.fillStyle = 'rgba(0,0,0,.3)'; ctx.beginPath(); ctx.ellipse(q0.x, q0.y, (td ? TDS[td][0] : 14)*sc*0.7, 5*sc, 0, 0, Math.PI*2); ctx.fill();
+  if (!td){ uprightEmoji(c.emoji, q.x, q.y, 44*sc); return; }
+  vehPOV(td, q.x, q.y, TDS[td][0]*sc, (VHT[td] || 36)*sc, PLAYER_COL[c.key] || '#ffb81c', false, 11, { brake: keys.brake });
+}
 const EYE = { paidal:66, cycle:62, scooty:58, car:50, thar:64, suv:56, truck:108, bus:102, jcb:94 };
 const VHT = { car:34, taxi:34, suvnpc:42, lux:38, thar:46, auto:40, erick:40, bike:44, scooter:42, cycle:46, bus:84, truck:78, tractor:50, cart:46, dj:78, roller:46, vip:36, amb:54, fire:74, jcb:62 };
 const cam = { x:200, h:52, f:600, hz:290 };
@@ -3672,7 +3824,7 @@ function drawRoadPOV(R, season){
   const base = Math.floor(povD/SEG), gc = GROUND[R.key];
   ctx.fillStyle = gc[0]; ctx.fillRect(0, cam.hz, VW, SH - cam.hz);
   const road = season === 'monsoon' ? ['#262628','#2a2a2c'] : R.key === 'city' ? ['#2f2d2c','#343231'] : [R.road, shade(R.road, 0.05)];
-  for (let i = NSEG; i >= 0; i--){
+  for (let i = NSEG; i >= -Math.ceil(CAM_BACK/SEG); i--){
     const wi = base + i, dzF = (wi + 1)*SEG - povD, dzN0 = wi*SEG - povD;
     if (dzF < -CAM_BACK + 6) continue;
     const n = Math.max(dzN0, -CAM_BACK + 6), alt = wi & 1, yTop = G ? G.p.y - (n + dzF)/2 : 0;
@@ -3723,7 +3875,7 @@ function facadePOV(x, y, w, h, k, key){
   ctx.strokeStyle = 'rgba(0,0,0,.25)'; ctx.lineWidth = 1; for (let yy = gy + fh*0.36; yy < y; yy += Math.max(2, fh*0.07)){ ctx.beginPath(); ctx.moveTo(x - w/2 + w*0.06, yy); ctx.lineTo(x + w/2 - w*0.06, yy); ctx.stroke(); }
   const shops = SHOPS[key] || SHOPS.city;
   ctx.fillStyle = BOARD[Math.floor(hash1(k + 3)*BOARD.length)]; ctx.fillRect(x - w/2 + w*0.03, gy + fh*0.05, w*0.94, fh*0.22);
-  if (w > 50){ ctx.fillStyle = '#fff'; ctx.font = '800 ' + Math.min(14, w*0.085) + 'px ' + TXT_FONT; ctx.textAlign = 'center'; ctx.fillText(shops[Math.floor(hash1(k + 4)*shops.length)], x, gy + fh*0.17, w*0.9); }
+  if (w > 50){ ctx.fillStyle = '#fff'; ctx.font = '800 ' + Math.min(14, w*0.085) + 'px ' + TXT_FONT; ctx.textAlign = 'center'; ftext(shops[Math.floor(hash1(k + 4)*shops.length)], x, gy + fh*0.17, w*0.9); }
   // roof: parapet, black water tank
   ctx.fillStyle = shade(col, -0.25); ctx.fillRect(x - w/2, y - h - Math.max(1, h*0.02), w, Math.max(2, h*0.03));
   if (hash1(k + 9) < 0.75){ const tw = w*0.2; ctx.fillStyle = hash1(k + 10) < 0.3 ? '#2f6fb7' : '#18181b'; ctx.fillRect(x + w*0.18, y - h - tw*0.9, tw, tw*0.9); ctx.beginPath(); ctx.ellipse(x + w*0.18 + tw/2, y - h - tw*0.9, tw/2, tw*0.15, 0, 0, Math.PI*2); ctx.fill(); }
@@ -3735,20 +3887,20 @@ function wallAdPOV(x, y, w, h, k){
   if (w < 30) return;
   const c = ['#2a6db0','#c0453a','#2e8b57','#7a3cc4','#1a1a1a'][k % 5];
   ctx.fillStyle = c; ctx.fillRect(x - w*0.46, y - h*0.82, w*0.92, h*0.62);
-  ctx.fillStyle = '#fff'; ctx.font = '800 ' + Math.max(5, h*0.32) + 'px ' + TXT_FONT; ctx.textAlign = 'center'; ctx.fillText(WALL_ADS[k % WALL_ADS.length], x, y - h*0.5, w*0.88);
+  ctx.fillStyle = '#fff'; ctx.font = '800 ' + Math.max(5, h*0.32) + 'px ' + TXT_FONT; ctx.textAlign = 'center'; ftext(WALL_ADS[k % WALL_ADS.length], x, y - h*0.5, w*0.88);
 }
 function plotPOV(x, y, w, sc, k){
   ctx.fillStyle = 'rgba(120,95,60,.55)'; ctx.beginPath(); ctx.ellipse(x, y - 4*sc, w/2, 10*sc, 0, 0, Math.PI*2); ctx.fill();
   ctx.fillStyle = '#555'; ctx.fillRect(x - 2*sc, y - 70*sc, 4*sc, 70*sc);
   ctx.fillStyle = '#fff4dc'; ctx.fillRect(x - 40*sc, y - 96*sc, 80*sc, 30*sc);
-  if (sc > 0.18){ ctx.fillStyle = '#c0453a'; ctx.font = '800 ' + (10*sc) + 'px ' + TXT_FONT; ctx.textAlign = 'center'; ctx.fillText(k % 2 ? 'PLOT FOR SALE' : 'YAHAN KACHRA NA DAALEIN', x, y - 78*sc, 76*sc); }
+  if (sc > 0.18){ ctx.fillStyle = '#c0453a'; ctx.font = '800 ' + (10*sc) + 'px ' + TXT_FONT; ctx.textAlign = 'center'; ftext(k % 2 ? 'PLOT FOR SALE' : 'YAHAN KACHRA NA DAALEIN', x, y - 78*sc, 76*sc); }
   if (k % 3 === 0){ ctx.fillStyle = '#4a3a28'; ctx.beginPath(); ctx.ellipse(x + 40*sc, y, 30*sc, 12*sc, 0, Math.PI, 0); ctx.fill(); }
 }
 function kioskPOV(x, y, w, h, k){
   ctx.fillStyle = ['#2e8b57','#2a6db0','#c0453a','#e8a21c'][k % 4]; ctx.fillRect(x - w/2, y - h, w, h);
   for (let i = 0; i < 6; i++){ ctx.fillStyle = i % 2 ? '#f4efe4' : ['#c0453a','#2e8b57','#2f6fb7'][k % 3]; ctx.fillRect(x - w/2 - w*0.05 + i*w*0.183, y - h*1.08, w*0.183, h*0.22); }   // awning
   ctx.fillStyle = '#3a2a1e'; ctx.fillRect(x - w*0.4, y - h*0.7, w*0.8, h*0.55);
-  if (w > 30){ ctx.fillStyle = '#fff'; ctx.font = '800 ' + Math.max(5, h*0.16) + 'px ' + TXT_FONT; ctx.textAlign = 'center'; ctx.fillText(['PAAN','CHAI','RECHARGE','SABZI','JUICE','MOMOS'][k % 6], x, y - h*0.82, w*0.9); }
+  if (w > 30){ ctx.fillStyle = '#fff'; ctx.font = '800 ' + Math.max(5, h*0.16) + 'px ' + TXT_FONT; ctx.textAlign = 'center'; ftext(['PAAN','CHAI','RECHARGE','SABZI','JUICE','MOMOS'][k % 6], x, y - h*0.82, w*0.9); }
 }
 function treePOV(x, y, sz, k){
   ctx.fillStyle = '#5a3d22'; ctx.fillRect(x - sz*0.05, y - sz*0.5, sz*0.1, sz*0.5);
@@ -3783,7 +3935,7 @@ function sceneryPOV(R, list, night){
         }
       } else if (R.key === 'hills'){
         if (side < 0 && wi % 2 === 0 && G && railAt(G.p.y - dz)) list.push({ dz, d: () => { const q = proj(ROAD_L - 4, 0, dz); ctx.fillStyle = (wi >> 1) & 1 ? '#e8c22a' : '#141216'; ctx.fillRect(q.x - 3*q.s, q.y - 26*q.s, 6*q.s, 26*q.s); ctx.fillStyle = '#d9d2c0'; ctx.fillRect(q.x - 3*q.s, q.y - 22*q.s, 60*q.s*0 + 3*q.s, 4*q.s); } });
-        if (wi % 3 === 0 && h < 0.7) list.push({ dz, d: () => { const q = proj(side < 0 ? -60 - h*200 : 470 + h*120, side < 0 ? -40 : 30, dz); ctx.font = (120*q.s) + 'px ' + EMOJI_FONT; ctx.fillStyle = '#000'; ctx.textAlign = 'center'; ctx.fillText('🌲', q.x, q.y - 50*q.s); } });
+        if (wi % 3 === 0 && h < 0.7) list.push({ dz, d: () => { const q = proj(side < 0 ? -60 - h*200 : 470 + h*120, side < 0 ? -40 : 30, dz); ctx.font = (120*q.s) + 'px ' + EMOJI_FONT; ctx.fillStyle = '#000'; ctx.textAlign = 'center'; ftext('🌲', q.x, q.y - 50*q.s); } });
         if (side > 0 && wi % 9 === 0) list.push({ dz: dz + 1, d: () => { const q = proj(520, 30, dz); facadePOV(q.x, q.y, 120*q.s, 70*q.s, k, 'hills'); } });
       } else {
         if (wi % 4 === 0 && h < 0.5) list.push({ dz, d: () => { const q = proj(side < 0 ? -120 - h*300 : 520 + h*300, 0, dz); treePOV(q.x, q.y, 130*q.s, k); } });
@@ -3806,8 +3958,8 @@ function vehPOV(td, x, y, w, h, col, front, k, o = {}){
   const wheel = (wx, ww, wh) => { ctx.fillStyle = '#0c0c0e'; ctx.fillRect(wx, y - wh, ww, wh); };
   const tail = (yy, hh) => { ctx.fillStyle = front ? '#fff6c8' : (o.brake ? '#ff2a2a' : '#a01818'); ctx.fillRect(L + w*0.04, yy, w*0.16, hh); ctx.fillRect(L + w*0.8, yy, w*0.16, hh);
     if (front && w > 10){ const g = ctx.createRadialGradient(x, yy, 1, x, yy, w*0.9); g.addColorStop(0, 'rgba(255,250,200,.35)'); g.addColorStop(1, 'rgba(255,250,200,0)'); ctx.fillStyle = g; ctx.fillRect(x - w, yy - w, w*2, w*2); } };
-  const plate = (yy, yellow) => { if (w < 34) return; ctx.fillStyle = yellow ? '#f2c200' : '#f4f4f4'; ctx.fillRect(x - w*0.17, yy, w*0.34, h*0.09); ctx.fillStyle = '#111'; ctx.font = '700 ' + Math.max(5, w*0.06) + 'px ' + TXT_FONT; ctx.textAlign = 'center'; ctx.fillText(PLATE(k), x, yy + h*0.065, w*0.32); };
-  const text = (t, yy, sz, c = '#fff') => { if (w < 46) return; ctx.fillStyle = c; ctx.font = '800 ' + sz + 'px ' + TXT_FONT; ctx.textAlign = 'center'; ctx.fillText(t, x, yy, w*0.9); };
+  const plate = (yy, yellow) => { if (w < 34) return; ctx.fillStyle = yellow ? '#f2c200' : '#f4f4f4'; ctx.fillRect(x - w*0.17, yy, w*0.34, h*0.09); ctx.fillStyle = '#111'; ctx.font = '700 ' + Math.max(5, w*0.06) + 'px ' + TXT_FONT; ctx.textAlign = 'center'; ftext(PLATE(k), x, yy + h*0.065, w*0.32); };
+  const text = (t, yy, sz, c = '#fff') => { if (w < 46) return; ctx.fillStyle = c; ctx.font = '800 ' + sz + 'px ' + TXT_FONT; ctx.textAlign = 'center'; ftext(t, x, yy, w*0.9); };
   switch (td){
     case 'car': case 'taxi': case 'suvnpc': case 'lux': case 'vip': case 'amb': case 'thar': {
       const c = td === 'taxi' ? '#f2c200' : (td === 'amb' || td === 'vip') ? '#f4f4f4' : (col || '#d33a2c');
@@ -3936,8 +4088,8 @@ function truckArt(L, T, w, h, x, y, col, k, tail){
     const sh = TRUCK_SHAYARI[k % TRUCK_SHAYARI.length];
     ctx.textAlign = 'center';
     ctx.fillStyle = '#fff4dc'; rrect(ctx, L + w*0.05, gy + gh*0.36, w*0.9, gh*0.33, w*0.03); ctx.fill();
-    ctx.fillStyle = '#7a1f1f'; ctx.font = '800 ' + Math.max(5, w*0.074) + 'px ' + TXT_FONT; ctx.fillText(sh[0], x, gy + gh*0.48, w*0.86); ctx.fillText(sh[1], x, gy + gh*0.62, w*0.86);
-    ctx.fillStyle = '#d6402b'; ctx.font = '800 ' + Math.max(4, w*0.07) + 'px ' + TXT_FONT; ctx.fillText('HORN OK PLEASE', x, gy + gh*0.8, w*0.9);
+    ctx.fillStyle = '#7a1f1f'; ctx.font = '800 ' + Math.max(5, w*0.074) + 'px ' + TXT_FONT; ftext(sh[0], x, gy + gh*0.48, w*0.86); ftext(sh[1], x, gy + gh*0.62, w*0.86);
+    ctx.fillStyle = '#d6402b'; ctx.font = '800 ' + Math.max(4, w*0.07) + 'px ' + TXT_FONT; ftext('HORN OK PLEASE', x, gy + gh*0.8, w*0.9);
   }
   // jhalar tassels under the tailgate
   const cols = ['#ff3d7f','#ffb81c','#13b3a3','#fff4dc'];
@@ -3949,14 +4101,14 @@ function truckArt(L, T, w, h, x, y, col, k, tail){
 function sideEmoji(e, q, sz){
   ctx.save(); ctx.translate(q.x, q.y - sz*0.45);
   if (e.vx > 0) ctx.scale(-1, 1);
-  ctx.font = sz + 'px ' + EMOJI_FONT; ctx.fillStyle = '#000'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(e.emoji, 0, 0);
+  ctx.font = sz + 'px ' + EMOJI_FONT; ctx.fillStyle = '#000'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ftext(e.emoji, 0, 0);
   ctx.restore();
 }
 const EMS = { '🐄':58, '🐃':64, '🐂':60, '🐕':24, '🐈':18, '🐒':26, '🐐':30, '🐑':30, '🐎':64,
   '🧍':46, '🧍‍♀️':44, '🧍‍♂️':46, '💃':46, '🕺':46, '👮':46, '🧑‍🦽':42, '👨‍🚀':46,
   '🥁':22, '🎺':20, '🎉':20, '📢':20, '🎈':24, '🍭':18, '🪧':26, '✊':18, '🎡':90, '🚧':28, '🪨':30, '🪵':26 };
 const esz = (em, def) => EMS[em] || def;
-function uprightEmoji(em, x, y, sz){ ctx.font = sz + 'px ' + EMOJI_FONT; ctx.fillStyle = '#000'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(em, x, y - sz*0.45); }
+function uprightEmoji(em, x, y, sz){ ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; emoji(em, x, y - sz*0.45, sz); }
 function povLabel(txt, x, y, q, col){ if (!txt || q.s < 0.32) return; label(txt, x - OX, y, col || '#fff4dc', Math.min(12, 6 + q.s*5)); }
 
 function entityPOV(e, dz){
@@ -4019,14 +4171,14 @@ function entityPOV(e, dz){
       case 'hafta': ctx.fillStyle = '#c9c2b0'; ctx.fillRect(q.x - 26*sc, q.y - 56*sc, 52*sc, 56*sc); uprightEmoji('👮', q.x - 8*sc, q.y, 46*sc); uprightEmoji('💰', q.x + 16*sc, q.y - 10*sc, 18*sc); povLabel(e.label, q.x, q.y - 70*sc, q, '#ff4d3d'); return;
       case 'fire': facadePOV(q.x, q.y, 140*sc, 160*sc, 99, 'city'); for (let i = 0; i < 4; i++) uprightEmoji('🔥', q.x - 50*sc + i*33*sc, q.y - 150*sc - Math.sin(Date.now()/120 + i)*6*sc, 40*sc); povLabel(e.label, q.x, q.y - 200*sc, q, '#ff4d3d'); return;
       case 'billboard': ctx.fillStyle = '#333'; ctx.fillRect(q.x - 3*sc, q.y - 90*sc, 6*sc, 90*sc); ctx.fillStyle = '#fff4dc'; ctx.fillRect(q.x - 70*sc, q.y - 150*sc, 140*sc, 60*sc); ctx.strokeStyle = '#ff3d7f'; ctx.lineWidth = Math.max(1, 4*sc); ctx.strokeRect(q.x - 70*sc, q.y - 150*sc, 140*sc, 60*sc);
-        if (sc > 0.25){ ctx.fillStyle = '#1a1300'; ctx.font = '800 ' + (13*sc) + 'px ' + TXT_FONT; ctx.textAlign = 'center'; ctx.fillText(e.text[0], q.x, q.y - 125*sc, 130*sc); ctx.fillText(e.text[1], q.x, q.y - 105*sc, 130*sc); } return;
+        if (sc > 0.25){ ctx.fillStyle = '#1a1300'; ctx.font = '800 ' + (13*sc) + 'px ' + TXT_FONT; ctx.textAlign = 'center'; ftext(e.text[0], q.x, q.y - 125*sc, 130*sc); ftext(e.text[1], q.x, q.y - 105*sc, 130*sc); } return;
       case 'metro': case 'fob': case 'tollmark': {
         const hgt = e.kind === 'metro' ? 150 : e.kind === 'fob' ? 120 : 110, a = proj(-60, hgt, dz), b = proj(460, hgt, dz), thick = (e.kind === 'metro' ? 30 : 16)*sc;
         if (e.kind !== 'tollmark') for (const px of [-40, 440]){ const pq = proj(px, 0, dz); ctx.fillStyle = '#8f8a80'; ctx.fillRect(pq.x - 10*sc, pq.y - hgt*sc, 20*sc, hgt*sc); }
         ctx.fillStyle = e.kind === 'metro' ? '#a8a49a' : e.kind === 'fob' ? '#7d8288' : 'rgba(30,60,40,.95)'; ctx.fillRect(a.x, a.y - thick, b.x - a.x, thick);
         if (e.kind === 'metro' && e.trainT > 0){ ctx.fillStyle = '#c43c8c'; const tx = a.x + (b.x - a.x)*((e.trainX + 80)/560); ctx.fillRect(tx - 120*sc, a.y - thick - 28*sc, 240*sc, 28*sc); }
         if (e.kind === 'fob'){ povLabel('LIFT ❌ KHARAB · SEEDHI TOOTI', VW/2 + OX, a.y - thick - 10, q, '#ff4d3d'); }
-        if (e.kind === 'tollmark' && sc > 0.2) for (const l of e.lanes){ const lq = proj(l.x, hgt, dz); ctx.fillStyle = l.closed ? '#ff4d3d' : '#7dffa8'; ctx.font = '800 ' + Math.max(6, 11*sc) + 'px ' + TXT_FONT; ctx.textAlign = 'center'; ctx.fillText((l.closed ? '✕ ' : '↓ ') + l.tag.split(' · ')[0], lq.x, lq.y - thick*0.4); }
+        if (e.kind === 'tollmark' && sc > 0.2) for (const l of e.lanes){ const lq = proj(l.x, hgt, dz); ctx.fillStyle = l.closed ? '#ff4d3d' : '#7dffa8'; ctx.font = '800 ' + Math.max(6, 11*sc) + 'px ' + TXT_FONT; ctx.textAlign = 'center'; ftext((l.closed ? '✕ ' : '↓ ') + l.tag.split(' · ')[0], lq.x, lq.y - thick*0.4); }
         return;
       }
       case 'mall': case 'hospital': {
@@ -4035,7 +4187,7 @@ function entityPOV(e, dz){
         if (e.kind === 'mall'){ ctx.strokeStyle = 'rgba(255,255,255,.4)'; ctx.lineWidth = 1; for (let yy = mq.y - 210*sc; yy < mq.y; yy += 18*sc){ ctx.beginPath(); ctx.moveTo(mq.x - 110*sc, yy); ctx.lineTo(mq.x + 110*sc, yy); ctx.stroke(); } }
         else { ctx.fillStyle = '#d33'; ctx.fillRect(mq.x - 8*sc, mq.y - 200*sc, 16*sc, 46*sc); ctx.fillRect(mq.x - 23*sc, mq.y - 185*sc, 46*sc, 16*sc); }
         ctx.fillStyle = e.kind === 'mall' ? '#c43c8c' : '#2a6db0'; ctx.fillRect(mq.x - 100*sc, mq.y - 120*sc, 200*sc, 26*sc);
-        if (sc > 0.2){ ctx.fillStyle = '#fff'; ctx.font = '800 ' + (16*sc) + 'px ' + TXT_FONT; ctx.textAlign = 'center'; ctx.fillText(e.kind === 'mall' ? 'ULTA MALL · PARKING ₹100/HR' : 'SARKARI ASPATAAL · BEDS FULL', mq.x, mq.y - 102*sc, 196*sc); }
+        if (sc > 0.2){ ctx.fillStyle = '#fff'; ctx.font = '800 ' + (16*sc) + 'px ' + TXT_FONT; ctx.textAlign = 'center'; ftext(e.kind === 'mall' ? 'ULTA MALL · PARKING ₹100/HR' : 'SARKARI ASPATAAL · BEDS FULL', mq.x, mq.y - 102*sc, 196*sc); }
         return;
       }
       case 'astro': uprightEmoji('👨‍🚀', q.x, q.y, 40*sc); uprightEmoji('🚩', q.x + 18*sc, q.y - 20*sc, 22*sc); povLabel('Ek chhota kadam, ek bada gaddha', q.x, q.y - 54*sc, q, '#c8bfa8'); return;
@@ -4101,7 +4253,7 @@ function cockpitPOV(c){
   // dashboard
   const g = ctx.createLinearGradient(0, dashY, 0, cy); g.addColorStop(0, k === 'suv' ? '#3a2a1e' : '#1d1d22'); g.addColorStop(1, '#0a0a0c');
   ctx.fillStyle = g; ctx.fillRect(0, dashY, VW, cy - dashY);
-  if (k === 'suv'){ ctx.fillStyle = '#6b4a2e'; ctx.fillRect(0, dashY + 10, VW, 8); ctx.fillStyle = '#0d1b2a'; rrect(ctx, VW/2 - 70, dashY + 22, 140, 64, 6); ctx.fill(); ctx.fillStyle = '#13b3a3'; ctx.font = '800 11px ' + TXT_FONT; ctx.textAlign = 'center'; ctx.fillText('AC 18° · sheesha band', VW/2, dashY + 46); ctx.fillText('Bahar ki awaaz: 10%', VW/2, dashY + 64); }
+  if (k === 'suv'){ ctx.fillStyle = '#6b4a2e'; ctx.fillRect(0, dashY + 10, VW, 8); ctx.fillStyle = '#0d1b2a'; rrect(ctx, VW/2 - 70, dashY + 22, 140, 64, 6); ctx.fill(); ctx.fillStyle = '#13b3a3'; ctx.font = '800 11px ' + TXT_FONT; ctx.textAlign = 'center'; ftext('AC 18° · sheesha band', VW/2, dashY + 46); ftext('Bahar ki awaaz: 10%', VW/2, dashY + 64); }
   // speedometer + steering (right-hand drive)
   const wx = VW/2 + Math.min(260, VW*0.22), wy = cy + 30, kmh = Math.round((G ? G.speedNow : 0)*0.18);
   ctx.fillStyle = '#000'; ctx.beginPath(); ctx.arc(wx, dashY + 40, 34, 0, Math.PI*2); ctx.fill();
@@ -4110,9 +4262,9 @@ function cockpitPOV(c){
   ctx.fillStyle = '#fff4dc'; ctx.font = '800 12px ' + TXT_FONT; ctx.textAlign = 'center'; ctx.fillText(kmh + ' km/h', wx, dashY + 62);
   ctx.strokeStyle = '#1a1a1e'; ctx.lineWidth = big ? 16 : 13; ctx.beginPath(); ctx.ellipse(wx, wy, big ? 130 : 96, big ? 60 : 70, 0, Math.PI*1.05, Math.PI*1.95); ctx.stroke();
   // dashboard trinkets
-  if (k === 'truck'){ ctx.fillStyle = '#ffb81c'; ctx.font = '800 13px ' + TXT_FONT; ctx.textAlign = 'center'; ctx.fillText('MAA KA AASHIRWAD', VW/2 - 120, dashY + 30); }
-  if (k === 'bus'){ ctx.fillStyle = '#fff4dc'; ctx.font = '700 12px ' + TXT_FONT; ctx.textAlign = 'center'; ctx.fillText('MAHILA SEAT · BUS STOP PE HI RUKEGI (shayad)', VW/2 - 120, dashY + 30); }
-  if (k === 'thar'){ ctx.fillStyle = '#ffb81c'; ctx.font = '800 12px ' + TXT_FONT; ctx.textAlign = 'center'; ctx.fillText('PAPA KI GAADI', VW/2, 16); }
+  if (k === 'truck'){ ctx.fillStyle = '#ffb81c'; ctx.font = '800 13px ' + TXT_FONT; ctx.textAlign = 'center'; ftext('MAA KA AASHIRWAD', VW/2 - 120, dashY + 30); }
+  if (k === 'bus'){ ctx.fillStyle = '#fff4dc'; ctx.font = '700 12px ' + TXT_FONT; ctx.textAlign = 'center'; ftext('MAHILA SEAT · BUS STOP PE HI RUKEGI (shayad)', VW/2 - 120, dashY + 30); }
+  if (k === 'thar'){ ctx.fillStyle = '#ffb81c'; ctx.font = '800 12px ' + TXT_FONT; ctx.textAlign = 'center'; ftext('PAPA KI GAADI', VW/2, 16); }
   uprightEmoji('🐶', VW/2 - 150, dashY + 6 + Math.sin(Date.now()/160)*2, 26);
   // rear-view mirror: who's behind you
   mirrorPOV(big);
@@ -4150,7 +4302,9 @@ function renderPOV(dt){
   const c = G && state !== 'menu' ? G.c : CHARS.car, p = G && state !== 'menu' ? G.p : { x:164, y:0, jumpT:0 };
   const jump = p.jumpT > 0 ? Math.sin((1 - p.jumpT/0.55)*Math.PI) : 0;
   const bob = c.key === 'paidal' ? Math.abs(Math.sin(povD*0.045))*5 : c.key === 'cycle' ? Math.abs(Math.sin(povD*0.03))*2 : 0;
-  cam.x = p.x; cam.h = (EYE[c.key] || 52) + jump*40 + bob; cam.f = Math.max(VW, 640)*0.5; cam.hz = SH*0.42;
+  const chase = VIEW === 'chase' && G && state !== 'menu';
+  CAM_BACK = chase ? 150 : 34;
+  cam.x = p.x; cam.h = chase ? (EYE[c.key] || 52) + 80 : (EYE[c.key] || 52) + jump*40 + bob; cam.f = Math.max(VW, 640)*0.5; cam.hz = SH*(chase ? 0.36 : 0.42);
   const night = !!(S.night || (G && G.darkT > 0));
   ctx.save();
   if (G && G.shake > 0 && state === 'play') ctx.translate((R0()-0.5)*G.shake, (R0()-0.5)*G.shake);
@@ -4172,6 +4326,7 @@ function renderPOV(dt){
     if (e.ground) continue;
     list.push({ dz, d: () => entityPOV(e, dz) });
   }
+  if (play && chase) list.push({ dz: 0.01, d: () => playerPOV(c, p, jump) });
   list.sort((a, b) => b.dz - a.dz).forEach(o => o.d());
   // weather and light
   if (S.rain){ ctx.strokeStyle = 'rgba(190,215,255,.45)'; ctx.lineWidth = 1; ctx.beginPath(); for (let i = 0; i < 120; i++){ const x = R0()*VW, y = R0()*SH; ctx.moveTo(x, y); ctx.lineTo(x - 4, y + 18); } ctx.stroke(); ctx.fillStyle = 'rgba(40,70,110,.12)'; ctx.fillRect(0, 0, VW, SH); }
@@ -4196,7 +4351,7 @@ function renderPOV(dt){
       if (!e.veh || !(e.y > G.p.y) || e.y - G.p.y > 260 || Math.abs(e.x - G.p.x) > 70) continue;
       label((e.amb ? '🚑 AMBULANCE' : e.siren ? '🚨 VIP' : '⚠ PEECHE SE') + (e.x < G.p.x ? ' ◀' : ' ▶'), e.x < G.p.x ? 110 : VW - 110 - OX, SH - 150, '#ffb81c', 12);
     }
-    cockpitPOV(c);
+    if (!chase) cockpitPOV(c);
     if (G.p.bp > 170){ const a = (G.p.bp - 170)/30 * (0.5 + 0.5*Math.sin(G.time*10)); ctx.fillStyle = `rgba(255,40,40,${0.18*a})`; ctx.fillRect(0, 0, VW, SH); }
     if (G.flash > 0){ ctx.fillStyle = `rgba(255,255,255,${G.flash*3})`; ctx.fillRect(0, 0, VW, SH); }
     if (G.p.invT > 1.2 && G.bhaiT <= 0){ ctx.fillStyle = 'rgba(255,40,40,.12)'; ctx.fillRect(0, 0, VW, SH); }
@@ -4371,7 +4526,7 @@ function drawDayMap(nextLeg){
 const overlays = ['menu','about','disc','dayclear','over','pause','tip','settings','levels','endless','lvdone'];
 function showOnly(id){ for (const o of overlays) $(o).hidden = o !== id; stage.classList.toggle('menu-open', ['menu','settings','about','disc','tip','levels','endless'].includes(id) && state !== 'over'); }
 function setGameButtons(on){
-  $('actBtn').hidden = $('brkBtn').hidden = $('pauseBtn').hidden = !on;
+  $('actBtn').hidden = $('brkBtn').hidden = $('pauseBtn').hidden = $('musicBtn').hidden = !on;
   if (!on) keys.brake = false;
   if (on && G){ const a = G.c.act; $('actBtn').innerHTML = a === 'jump' ? 'KOODO<br>⤴' : a === 'dig' ? 'KHODO<br>⛏️' : 'HORN<br>📯'; }
 }
@@ -4616,11 +4771,12 @@ function setMode(m){
 }
 function setView(v){
   VIEW = v; store.set('view', v);
-  $('viewPov').setAttribute('aria-pressed', v === 'pov'); $('viewTop').setAttribute('aria-pressed', v === 'top');
+  $('viewPov').setAttribute('aria-pressed', v === 'pov'); $('viewTop').setAttribute('aria-pressed', v === 'top'); $('viewChase').setAttribute('aria-pressed', v === 'chase');
   resize();
 }
 $('viewPov').onclick = () => setView('pov');
 $('viewTop').onclick = () => setView('top');
+$('viewChase').onclick = () => setView('chase');
 $('reroll').onclick = () => { menuSeed = (Math.random()*4294967296)>>>0; buildMenu(); setTicker(menuRegion); };
 $('modeDaily').onclick = () => setMode('daily');
 $('modeRandom').onclick = () => setMode('random');
@@ -4656,7 +4812,7 @@ function revive(){
   p.x = clamp(LANES.reduce((a, b) => Math.abs(b - p.x) < Math.abs(a - p.x) ? b : a), 20, W - 20);
   G.ents = G.ents.filter(e => !(Math.abs(e.y - p.y) < 160 && (e.ground || e.block || e.roller || e.veh)));
   state = 'play'; showOnly(null); setGameButtons(true);
-  if (G.c.key === 'truck' || G.c.key === 'bus') Tape.start();
+  Music.start();
   say(W/2, p.y - 200, 'Ek jaan aur mili. Is baar bach ke!', '#13b3a3', 15, 2);
 }
 $('ovRevive').onclick = revive;
@@ -4713,15 +4869,23 @@ $('resumeBtn').onclick = () => resumeGame();
 $('quitBtn').onclick = () => { state = 'menu'; setGameButtons(false); showOnly('menu'); Tape.stop(); };
 $('muteBtn').onclick = () => { ac(); setMuted(!muted); };
 function toggleMirror(){ ac(); if ($('phone').hidden) Radio.open(); else Radio.close(); }
-$('radioBtn').onclick = toggleMirror;
+$('radioBtn').onclick = () => { toggleMirror(); syncPauseToggles(); };
+$('musicBtn').onclick = () => Music.toggle();
+$('musicBtn2').onclick = () => { Music.toggle(); if (state !== 'play') Music.stop(); syncPauseToggles(); };
+function syncPauseToggles(){
+  $('musicBtn2').setAttribute('aria-pressed', Music.wanted() && !radioOpen());
+  $('musicBtn2').textContent = Music.wanted() ? '♪ Music' : '♪ Music band';
+  $('radioBtn').setAttribute('aria-pressed', !$('phone').hidden);
+  $('camBtn').setAttribute('aria-pressed', !$('dashcam').hidden);
+}
 $('rSt').onclick = () => Radio.setStation(Radio.station === 'safar' ? Radio.own : 'safar');
 $('rClose').onclick = () => Radio.close();
 $('rNext').onclick = () => Radio.next();
 $('rPrev').onclick = () => Radio.prev();
 $('rPlay').onclick = () => Radio.toggle();
 
-function pauseGame(){ if (state !== 'play') return; state = 'pause'; showOnly('pause'); setGameButtons(false); Tape.stop(); }
-function resumeGame(){ if (state !== 'pause') return; state = 'play'; showOnly(null); setGameButtons(true); if (G.c.key === 'truck' || G.c.key === 'bus') Tape.start(); }
+function pauseGame(){ if (state !== 'play') return; state = 'pause'; showOnly('pause'); setGameButtons(false); Music.stop(); syncPauseToggles(); }
+function resumeGame(){ if (state !== 'pause') return; state = 'play'; showOnly(null); setGameButtons(true); Music.start(); }
 document.addEventListener('visibilitychange', () => { if (document.hidden) pauseGame(); });
 
 /* input */
@@ -4742,10 +4906,10 @@ let pointerDown = false;
 function setTarget(ev){
   if (!G || state !== 'play') return;
   const r = cv.getBoundingClientRect();
-  if (VIEW === 'pov'){
+  if (VIEW !== 'top'){
     // finger left/right of centre steers; higher on screen = faster
     const sx = (ev.clientX - r.left)/scale, sy = (ev.clientY - r.top)/scale;
-    const s150 = cam.f / (150 + CAM_BACK);
+    const s150 = cam.f / (150 + 34);
     G.p.tx = clamp(G.p.x + (sx - VW/2)/s150*0.6, 10, W-10);
     G.p.ty = bandTop() + clamp(sy / SH, 0, 1)*(bandBot() - bandTop());
     return;
@@ -4767,10 +4931,12 @@ function frame(t){
   requestAnimationFrame(frame);
   const now = t/1000, d = Math.min(0.1, now - last); last = now;
   if (state === 'play' && G){
-    acc += G.slowmo > 0 ? d*0.45 : d;
-    while (acc >= STEP && state === 'play'){ update(STEP); acc -= STEP; }
-  } else acc = 0;
-  if (VIEW === 'pov') renderPOV(d); else render(d);
+    // split the real frame time into equal small steps: motion stays smooth whatever the refresh rate,
+    // and nothing moves more than a few pixels per step, so collisions are never skipped
+    const span = G.slowmo > 0 ? d*0.45 : d, n = Math.max(1, Math.ceil(span/STEP - 0.01)), st = span/n;
+    for (let i = 0; i < n && state === 'play'; i++) update(st);
+  }
+  if (VIEW !== 'top') renderPOV(d); else render(d);
   tickTicker(d);
   updateMirror();
   if (G && !$('mirror').hidden && (++mirFrame & 1)){ drawMirrorRear(); drawMirrorMap(); }
