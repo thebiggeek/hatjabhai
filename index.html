@@ -1007,7 +1007,7 @@ const Music = {
   on:false, g:null, key:null, el:null, urls:{}, t0:0, want:null,
   wanted(){ return store.get('music', true); },
   player(){
-    if (!this.el){ this.el = new Audio(); this.el.loop = true; this.el.preload = 'auto'; this.el.volume = MUSIC_VOL; this.el.setAttribute('playsinline', ''); }
+    if (!this.el){ this.el = new Audio(); this.el.loop = true; this.el.preload = 'auto'; this.el.volume = MUSIC_VOL; this.el.muted = muted; this.el.setAttribute('playsinline', ''); }
     return this.el;
   },
   async render(key){
@@ -1098,6 +1098,7 @@ const Amb = {
 function setMuted(m){
   muted = m; store.set('muted', muted);
   if (master) master.gain.value = muted ? 0 : 1;
+  if (typeof Music !== 'undefined' && Music.el) Music.el.muted = muted;
   $('muteBtn').textContent = muted ? '🔇 Awaaz band' : '🔊 Awaaz'; $('muteBtn').setAttribute('aria-pressed', !muted);
 }
 
