@@ -981,7 +981,7 @@ function ac(){
     // horns run through a soft-clip distortion: the cheap-speaker blare of a real pressure horn
     const curve = new Float32Array(1024);
     for (let i=0;i<1024;i++){ const x = i/512 - 1; curve[i] = Math.tanh(x*3.2); }
-    const mkFx = dest => { const sh = AC.createWaveShaper(); sh.curve = curve; sh.oversample = '2x'; const hi = AC.createBiquadFilter(); hi.type = 'peaking'; hi.frequency.value = 2200; hi.gain.value = 5; const hv = AC.createGain(); hv.gain.value = 0.5; sh.connect(hi).connect(hv).connect(dest); return sh; };   // horns at half volume (testers: too loud)
+    const mkFx = dest => { const sh = AC.createWaveShaper(); sh.curve = curve; sh.oversample = '2x'; const hi = AC.createBiquadFilter(); hi.type = 'peaking'; hi.frequency.value = 2200; hi.gain.value = 5; const hv = AC.createGain(); hv.gain.value = 0.25; sh.connect(hi).connect(hv).connect(dest); return sh; };   // horns at a quarter of the original (testers: too loud)
     hornFx = mkFx(outside);
     ambHornFx = mkFx(ambBus);
   }
@@ -2654,7 +2654,7 @@ function updateVehicle(e, dt, s){
   if ((behind || ahead || (e.angry && Math.abs(e.y - p.y) < 220)) && Math.abs(e.x - p.x) < (e.angry ? 90 : 44)){
     e.honkCd -= dt;
     if (e.honkCd <= 0){
-      e.honkCd = e.angry ? rr(R0, 0.35, 0.7) : rr(R0, 0.8, 1.5);
+      e.honkCd = e.angry ? rr(R0, 0.6, 1.1) : rr(R0, 1.3, 2.4);
       if (e.siren) SFX.siren(); else SFX.horn(e.horn || 'car', (e.x-200)/200);
       addBP(e.siren ? 10 : 6, 'horn'); G.honks++;
       say(e.x, e.y + (behind ? -40 : 40), e.siren ? 'HATO! VIP!' : pick(R0, SHOUTS), '#ffb81c', 14, 0.8);
