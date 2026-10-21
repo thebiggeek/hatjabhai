@@ -275,6 +275,7 @@ kbd{font-family:var(--f-body);background:#3a3442;border-radius:3px;padding:0 5px
 .toggles button{font:inherit;font-weight:700;font-size:14px;padding:10px 8px;border-radius:12px;border:2px solid transparent;background:var(--asphalt-2);color:var(--ink);cursor:pointer;text-align:left}
 .toggles button[aria-pressed="true"]{border-color:var(--teal)}
 .toggles button[hidden]{display:none}
+.toggles .selbtn{font:inherit;font-weight:700;font-size:14px;padding:10px 8px;border-radius:12px;border:2px solid transparent;background:var(--asphalt-2);color:var(--ink);grid-column:1 / -1}
 #actBtn{position:absolute;right:max(14px,env(safe-area-inset-right,0px));bottom:14px;width:80px;height:80px;border-radius:50%;background:var(--marigold);
   box-shadow:0 4px 0 #b37d00,0 6px 20px rgba(0,0,0,.4);font:inherit;font-weight:800;font-size:14px;line-height:1.05;border:0;color:#1a1300;cursor:pointer;
   user-select:none;-webkit-user-select:none;touch-action:none;z-index:3}
@@ -296,6 +297,13 @@ kbd{font-family:var(--f-body);background:#3a3442;border-radius:3px;padding:0 5px
 #lvSlide .lsUnlock:empty{display:none}
 #yt{position:absolute;left:max(10px,env(safe-area-inset-left,0px));bottom:12px;z-index:7;display:flex;align-items:center;gap:6px;height:44px;padding:4px 6px 4px 4px;max-width:min(340px,calc(100% - 20px));border-radius:22px;background:rgba(20,18,24,.9);box-shadow:0 6px 18px rgba(0,0,0,.45),inset 0 0 0 1px rgba(255,244,220,.15);color:var(--ink)}
 #ytWrap{flex:0 0 auto;width:64px;height:36px;border-radius:18px;overflow:hidden;background:#000}
+#ytWrap{cursor:pointer;position:relative}
+#yt.paused #ytWrap::after{content:"▶";position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.45);color:#fff;font-size:14px}
+#yt.inmirror{padding:0;gap:0;height:auto;background:transparent;box-shadow:none;border-radius:0;max-width:none}
+#yt.inmirror .ytinfo{display:none}
+#yt.inmirror #ytWrap{width:var(--mvw);height:var(--mvh);border-radius:12px;box-shadow:0 0 0 2px #050506}
+#yt.inmirror #ytWrap iframe{transform:scale(var(--mvs))}
+#yt.inmirror #rNext{position:absolute;right:-10px;bottom:-10px;width:22px;height:22px;font-size:9px;box-shadow:0 2px 6px rgba(0,0,0,.5)}
 #ytWrap iframe{width:128px!important;height:72px!important;display:block;pointer-events:none;transform:scale(.5);transform-origin:0 0}
 #yt button{flex:0 0 auto;font:inherit;font-size:14px;width:32px;height:32px;border:0;border-radius:50%;background:var(--marigold);color:#1a1300;cursor:pointer}
 #yt #rNext{background:#2a2730;color:var(--ink)}
@@ -348,7 +356,7 @@ kbd{font-family:var(--f-body);background:#3a3442;border-radius:3px;padding:0 5px
 
     <!-- MENU -->
     <!-- STEP 1: one tap to turn the music on (browsers need a tap before any sound) -->
-    <div class="overlay" id="intro">
+    <div class="overlay" id="intro" hidden>
       <div class="panel launch introp">
         <h1 class="title">हट जा भाई!</h1>
         <p class="tagline">Sadak ka survival game</p>
@@ -359,7 +367,7 @@ kbd{font-family:var(--f-body);background:#3a3442;border-radius:3px;padding:0 5px
       </div>
     </div>
 
-    <div class="overlay" id="menu" hidden>
+    <div class="overlay" id="menu">
       <div class="panel launch">
         <div class="streak" id="streak"></div>
         <h1 class="title">हट जा भाई!</h1>
@@ -558,6 +566,7 @@ kbd{font-family:var(--f-body);background:#3a3442;border-radius:3px;padding:0 5px
         <div class="toggles">
           <button type="button" id="muteBtn">🔊 Awaaz</button>
           <button type="button" id="ytBtn">📻 YouTube gaane</button>
+          <select id="rSel2" aria-label="Playlist chuno" class="selbtn"></select>
           <button type="button" id="fsBtn">⛶ Full screen</button>
         </div>
         <div class="row">
@@ -571,7 +580,6 @@ kbd{font-family:var(--f-body);background:#3a3442;border-radius:3px;padding:0 5px
     <!-- YouTube radio: the smallest player YouTube allows, visible whenever it plays -->
     <div id="yt" hidden>
       <div id="ytWrap"><div id="ytp"></div></div>
-      <button type="button" id="rPlay" aria-label="Play / pause">▶</button>
       <div class="ytinfo"><span id="rNow">Tune ho raha hai…</span><select id="rSel" aria-label="Playlist chuno"></select></div>
       <button type="button" id="rNext" aria-label="Agla gaana">⏭</button>
     </div>
@@ -923,7 +931,11 @@ function unlockAudio(){
   // a one-sample buffer played inside the gesture is what finally wakes old iOS Safari
   try { const b = a.createBuffer(1, 1, 22050), src = a.createBufferSource(); src.buffer = b; src.connect(a.destination); src.start(0); } catch (e) {}
   // browsers allow no sound before the first click, so the music starts on it (home screen included)
-  const go = () => { if ($('intro').hidden && Radio.want && Radio.ready && !Radio.playing) Radio.player.playVideo(); };
+  const go = () => {
+    if (!Radio.wanted()) return;
+    if (!Radio.player) Radio.start(Radio.stationFor(G && state !== 'menu' ? G.c.key : null));
+    else if (Radio.want && Radio.ready && !Radio.playing) Radio.player.playVideo();
+  };
   if (a.state !== 'running') a.resume().then(go).catch(() => {}); else go();
 }
 for (const ev of ['touchend', 'click', 'keydown', 'pointerup']) window.addEventListener(ev, unlockAudio, { capture: true, passive: true });
@@ -1270,10 +1282,10 @@ const Radio = {
   show(){
     const t = this.cur(); if (!t) return;
     $('rNow').textContent = t[1] + ' · ' + t[2];
-    $('rSel').value = this.pinned() === 'auto' ? 'auto' : this.station;
+    $('rSel').value = $('rSel2').value = this.pinned() === 'auto' ? 'auto' : this.station;
     this.sync();
   },
-  sync(){ $('rPlay').textContent = this.playing ? '❚❚' : '▶'; Music.label(); },
+  sync(){ $('yt').classList.toggle('paused', !this.playing); Music.label(); },
   play(){ if (this.ready){ this.player.loadVideoById(this.cur()[0]); this.show(); } },
   next(){ ac(); this.i = (this.i + 1) % this.order.length; this.play(); },
   toggle(){
@@ -1293,8 +1305,10 @@ const Radio = {
 };
 const Dashcam = { playing:false };
 $('rSel').innerHTML = '<option value="auto">🚗 Gaadi ke hisaab se</option>' + Object.keys(RADIO).map(k => `<option value="${k}">${RADIO[k].name}</option>`).join('');
-$('rSel').onchange = e => Radio.pick(e.target.value);
-$('rPlay').onclick = () => Radio.toggle();
+$('rSel2').innerHTML = $('rSel').innerHTML;
+$('rSel').onchange = $('rSel2').onchange = e => Radio.pick(e.target.value);
+$('ytWrap').onclick = () => Radio.toggle();
+$('ytWrap').title = 'Tap: gaana roko / chalao';
 function toggleFull(){
   if (document.fullscreenElement) document.exitFullscreen().catch(() => {});
   else if (document.documentElement.requestFullscreen) document.documentElement.requestFullscreen().catch(() => toast('Full screen yahan nahi chalega'));
@@ -4305,6 +4319,19 @@ function cockpitPOV(c){
   // rear-view mirror: who's behind you
   mirrorPOV(big);
 }
+// the YouTube radio sits in the right half of the rear-view mirror while you drive
+let ytBox = '';
+function ytInMirror(mx, my, mw, mh){
+  const el = $('yt'); if (el.hidden) return;
+  const r = cv.getBoundingClientRect(), sr = stage.getBoundingClientRect();
+  const h = mh*0.8*scale, w = h*16/9, x = r.left - sr.left + (mx + mw - 10)*scale - w, y = r.top - sr.top + (my + mh*0.1)*scale;
+  const key = [x, y, h].map(Math.round).join(',');
+  if (key === ytBox) return; ytBox = key;
+  el.classList.add('inmirror');
+  el.style.left = Math.round(x) + 'px'; el.style.top = Math.round(y) + 'px'; el.style.bottom = 'auto';
+  el.style.setProperty('--mvw', Math.round(w) + 'px'); el.style.setProperty('--mvh', Math.round(h) + 'px'); el.style.setProperty('--mvs', (h/72).toFixed(3));
+}
+function ytOutOfMirror(){ const el = $('yt'); if (!ytBox && !el.classList.contains('inmirror')) return; ytBox = ''; el.classList.remove('inmirror'); el.style.left = el.style.top = el.style.bottom = ''; }
 function mirrorPOV(big){
   const mw = 250, mh = 64, mx = VW/2 - mw/2, my = 84;
   ctx.fillStyle = '#121214'; ctx.fillRect(VW/2 - 4, 0, 8, my);
@@ -4324,6 +4351,7 @@ function mirrorPOV(big){
   }
   ctx.fillStyle = 'rgba(255,255,255,.12)'; ctx.fillRect(mx, my, mw*0.35, mh);
   ctx.restore();
+  ytInMirror(mx, my, mw, mh);
   // nimbu-mirchi
   const sw = Math.sin(Date.now()/400)*6;
   ctx.strokeStyle = '#ddd'; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(VW/2 + 40, my + mh + 4); ctx.lineTo(VW/2 + 40 + sw, my + mh + 26); ctx.stroke();
@@ -4979,6 +5007,8 @@ function frame(t){
     const span = G.slowmo > 0 ? d*0.45 : d, n = Math.max(1, Math.ceil(span/STEP - 0.01)), st = span/n;
     for (let i = 0; i < n && state === 'play'; i++) update(st);
   }
+  const inCockpit = VIEW === 'pov' && G && (state === 'play');
+  if (!inCockpit) ytOutOfMirror();
   if (VIEW !== 'top') renderPOV(d); else render(d);
   tickTicker(d);
   updateMirror();
@@ -4989,13 +5019,12 @@ let mirFrame = 0;
 if (WHATSAPP_URL){ $('ldCrew').href = WHATSAPP_URL; $('ldCrew').hidden = false; }
 $('crewCta').innerHTML = WHATSAPP_URL ? `<a href="${WHATSAPP_URL}" target="_blank" rel="noopener">Join free</a>` : '<em>Jald aa raha hai</em>';
 if ('serviceWorker' in navigator && location.protocol.startsWith('http')) navigator.serviceWorker.register('sw.js').catch(() => {});
-stage.classList.add('menu-open', 'intro-open');
+stage.classList.add('menu-open');
 buildMenu();
 syncLaunch();
 // render every groove up front (no sound needed for that), then try to start the home-screen music right away
 // step 1 screen: skip it when music is off by choice, or when the browser already let it play
 function leaveIntro(){ if (!$('intro').hidden){ showOnly('menu'); setTimeout(() => $('playLevels').focus(), 50); } }
-if (!Radio.wanted()) leaveIntro();
 $('introGo').onclick = () => { store.set('yt', true); unlockAudio(); Radio.start(Radio.stationFor(null)); leaveIntro(); };
 $('introQuiet').onclick = () => { store.set('yt', false); leaveIntro(); };
 document.addEventListener('visibilitychange', () => { if (document.hidden){ if (Music.el) Music.el.pause(); } else if (Music.on && Music.el) Music.el.play().catch(() => {}); });
