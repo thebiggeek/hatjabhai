@@ -968,7 +968,7 @@ function ac(){
     // horns run through a soft-clip distortion: the cheap-speaker blare of a real pressure horn
     const curve = new Float32Array(1024);
     for (let i=0;i<1024;i++){ const x = i/512 - 1; curve[i] = Math.tanh(x*3.2); }
-    const mkFx = dest => { const sh = AC.createWaveShaper(); sh.curve = curve; sh.oversample = '2x'; const hi = AC.createBiquadFilter(); hi.type = 'peaking'; hi.frequency.value = 2200; hi.gain.value = 5; sh.connect(hi).connect(dest); return sh; };
+    const mkFx = dest => { const sh = AC.createWaveShaper(); sh.curve = curve; sh.oversample = '2x'; const hi = AC.createBiquadFilter(); hi.type = 'peaking'; hi.frequency.value = 2200; hi.gain.value = 5; const hv = AC.createGain(); hv.gain.value = 0.5; sh.connect(hi).connect(hv).connect(dest); return sh; };   // horns at half volume (testers: too loud)
     hornFx = mkFx(outside);
     ambHornFx = mkFx(ambBus);
   }
@@ -977,8 +977,22 @@ function ac(){
   if (AC.state === 'suspended') AC.resume();
   return AC;
 }
-// phones only allow sound after a touch: unlock on the very first one
-for (const ev of ['pointerdown', 'keydown']) window.addEventListener(ev, () => ac(), { once: true, capture: true });
+// Phones only allow sound inside a tap. iOS counts touchend/click (not pointerdown), and on silent mode
+// web audio stays muted unless a media element is playing, so a silent looping clip plays alongside.
+let silentEl = null;
+function unlockAudio(){
+  const a = ac(); if (!a) return;
+  if (!silentEl){
+    silentEl = document.createElement('audio');
+    silentEl.setAttribute('playsinline', ''); silentEl.loop = true; silentEl.volume = 0.01;
+    silentEl.src = 'data:audio/wav;base64,UklGRmQGAABXQVZFZm10IBAAAAABAAEAQB8AAIA+AAACABAAZGF0YUAGAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
+  }
+  if (silentEl.paused) silentEl.play().catch(() => {});
+  // a one-sample buffer played inside the gesture is what finally wakes old iOS Safari
+  try { const b = a.createBuffer(1, 1, 22050), src = a.createBufferSource(); src.buffer = b; src.connect(a.destination); src.start(0); } catch (e) {}
+  if (a.state !== 'running') a.resume().then(() => { if (state === 'play' && G) Music.start(); }).catch(() => {});
+}
+for (const ev of ['touchend', 'click', 'keydown', 'pointerup']) window.addEventListener(ev, unlockAudio, { capture: true, passive: true });
 function out(pan, bus){
   const a = AC, dest = bus === 'in' ? master : bus === 'tape' ? tapeBus : bus === 'music' ? musicBus : (bus || outside);
   if (pan && a.createStereoPanner){ const p = a.createStereoPanner(); p.pan.value = clamp(pan,-1,1); p.connect(dest); return p; }
@@ -1088,7 +1102,7 @@ const Music = {
   wanted(){ return store.get('music', true); },
   start(){
     const a = ac(); if (!a) return;
-    if (!this.wanted() || radioOpen()){ this.stop(); this.label(); return; }
+    if (!this.wanted() || Radio.playing){ this.stop(); this.label(); return; }
     const key = GROOVE_FOR[G ? G.c.key : 'car'] || 'dhol';
     this.bus = G && (G.c.key === 'truck' || G.c.key === 'bus') ? 'tape' : 'music';
     if (this.on && this.g === GROOVES[key]) return;
@@ -1200,7 +1214,7 @@ const Radio = {
       playerVars:{ playsinline:1, rel:0, modestbranding:1 },
       events:{
         onReady: e => { this.ready = true; e.target.playVideo(); this.show(); },
-        onStateChange: e => { this.playing = e.data === 1; Music.label(); if (e.data === 0) this.next(); },
+        onStateChange: e => { this.playing = e.data === 1; if (this.playing) Music.stop(); else if (e.data === 2 && state === 'play') Music.start(); Music.label(); if (e.data === 0) this.next(); },
         onError: () => this.next(),
       }});
   },
@@ -1502,7 +1516,7 @@ function newGame(charKey, regionKey, L = null){
     [[1.6, '← → ya ungli se: side badlo'], [5, '↑ tez · ↓ dheere · Shift / laal button: BRAKE'], [8.5, 'Space / gol button: ' + act], [12, 'Gaddhe, khule manhole aur ulta traffic se bacho. Ghar tak zinda pahuncho!']]
       .forEach(([t, msg]) => later(t, () => say(W/2, G.p.y - 330, msg, '#fff4dc', 15, 3.2)));
   }
-  if (store.get('radio', false)) Radio.autostart(STATION_FOR[c.key]);
+  if (store.get('radio', false) && stage.getBoundingClientRect().width >= 900) Radio.autostart(STATION_FOR[c.key]);
   updateMirror();
   Dashcam.autostart();
   Stats.send('play', { lv: L ? L.id : '', veh: charKey });
@@ -4954,7 +4968,7 @@ setTicker(menuRegion);
 setMuted(muted);
 resize();
 requestAnimationFrame(frame);
-window.__bkc = { get G(){ return G; }, newGame, REGIONS, CHARS, SPECIAL, LEVELS, startLevel, openLevels };
+window.__bkc = { get G(){ return G; }, get audio(){ return AC ? AC.state : "none"; }, get music(){ return Music.on; }, newGame, REGIONS, CHARS, SPECIAL, LEVELS, startLevel, openLevels };
 })();
 </script>
 </body>
