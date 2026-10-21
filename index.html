@@ -103,6 +103,7 @@ p{margin:6px 0;line-height:1.45}
 .howto li{display:flex;justify-content:space-between;gap:12px;padding:10px 0;border-bottom:1px solid var(--line);font-size:14px}
 .howto span{color:var(--muted);text-align:right}
 #stage.menu-open .hudbtn{display:none}
+#stage.menu-open #musicBtn:not([hidden]){display:block;left:max(10px,env(safe-area-inset-left,0px))}
 .nextlv{font-size:13px;color:var(--muted);margin:8px 0 0}
 .lvover{align-items:center;padding-left:0;padding-right:0;overflow:hidden}
 .lvwrap{width:100%;max-width:560px;height:100%;max-height:760px;display:flex;flex-direction:column;margin:auto}
@@ -331,7 +332,7 @@ kbd{font-family:var(--f-body);background:#3a3442;border-radius:3px;padding:0 5px
     <canvas id="game" aria-label="Bach Ke Chalo game ka maidaan"></canvas>
 
     <button class="hudbtn" id="pauseBtn" type="button" aria-label="Pause" hidden>II</button>
-    <button class="hudbtn" id="musicBtn" type="button" aria-label="Music chalu/band">♪ Music</button>
+    <button class="hudbtn" id="musicBtn" type="button" aria-label="Music chalu/band">♪ Music chalu karo</button>
     <button id="actBtn" type="button" aria-label="Action" hidden>KOODO<br>⤴</button>
     <button id="brkBtn" type="button" aria-label="Brake" hidden>BRAKE</button>
 
@@ -1002,7 +1003,9 @@ function unlockAudio(){
   if (silentEl.paused) silentEl.play().catch(() => {});
   // a one-sample buffer played inside the gesture is what finally wakes old iOS Safari
   try { const b = a.createBuffer(1, 1, 22050), src = a.createBufferSource(); src.buffer = b; src.connect(a.destination); src.start(0); } catch (e) {}
-  if (a.state !== 'running') a.resume().then(() => { if (state === 'play' && G) Music.start(); }).catch(() => {});
+  // browsers allow no sound before the first click, so the music starts on it (home screen included)
+  const go = () => { if ((state === 'menu' || state === 'play') && !Music.on && Music.wanted() && !Radio.playing) Music.start(); };
+  if (a.state !== 'running') a.resume().then(go).catch(() => {}); else go();
 }
 for (const ev of ['touchend', 'click', 'keydown', 'pointerup']) window.addEventListener(ev, unlockAudio, { capture: true, passive: true });
 function out(pan, bus){
@@ -1117,10 +1120,10 @@ const Music = {
   start(){
     const a = ac(); if (!a) return;
     if (!this.wanted() || Radio.playing){ this.stop(); this.label(); return; }
-    const key = GROOVE_FOR[G ? G.c.key : 'car'] || 'dhol';
-    this.bus = G && (G.c.key === 'truck' || G.c.key === 'bus') ? 'tape' : 'music';
+    const inGame = G && state !== 'menu', key = GROOVE_FOR[inGame ? G.c.key : 'car'] || 'dhol';
+    this.bus = inGame && (G.c.key === 'truck' || G.c.key === 'bus') ? 'tape' : 'music';
     if (this.on && this.g === GROOVES[key]) return;
-    this.stop(); this.g = GROOVES[key]; this.on = true; this.step = 0; this.next = a.currentTime + 0.08;
+    this.stop(); this.g = GROOVES[key]; this.on = true; this.t0 = performance.now(); this.step = 0; this.next = a.currentTime + 0.08;
     this.timer = setInterval(() => this.sched(), 50);
     this.label();
   },
@@ -1133,7 +1136,8 @@ const Music = {
       this.step++; this.next += spb;
     }
   },
-  toggle(){ ac(); if (radioOpen()){ Radio.close(); store.set('music', true); this.start(); return; } store.set('music', !this.wanted()); if (this.wanted()) this.start(); else this.stop(); },
+  toggle(){ ac(); if (this.on && performance.now() - this.t0 < 400) return;   // this very tap just started it
+    if (radioOpen()){ Radio.close(); store.set('music', true); this.start(); return; } store.set('music', !this.wanted()); if (this.wanted()) this.start(); else this.stop(); },
   label(){
     const b = $('musicBtn'); if (!b) return;
     const name = this.on && this.g ? this.g.name : radioOpen() ? '📻 ' + RADIO[Radio.station].name : 'Music band';
@@ -4554,7 +4558,8 @@ function drawDayMap(nextLeg){
 const overlays = ['menu','about','disc','dayclear','over','pause','tip','settings','levels','endless','lvdone'];
 function showOnly(id){ for (const o of overlays) $(o).hidden = o !== id; stage.classList.toggle('menu-open', ['menu','settings','about','disc','tip','levels','endless'].includes(id) && state !== 'over'); }
 function setGameButtons(on){
-  $('actBtn').hidden = $('brkBtn').hidden = $('pauseBtn').hidden = $('musicBtn').hidden = !on;
+  $('actBtn').hidden = $('brkBtn').hidden = $('pauseBtn').hidden = !on;
+  $('musicBtn').hidden = !on && state !== 'menu';
   if (!on) keys.brake = false;
   if (on && G){ const a = G.c.act; $('actBtn').innerHTML = a === 'jump' ? 'KOODO<br>⤴' : a === 'dig' ? 'KHODO<br>⛏️' : 'HORN<br>📯'; }
 }
@@ -4909,7 +4914,7 @@ for (const ev of ['pointerup','pointerleave','pointercancel']) $('brkBtn').addEv
 $('actBtn').addEventListener('pointerdown', e => { e.preventDefault(); e.stopPropagation(); action(); });
 $('pauseBtn').onclick = () => pauseGame();
 $('resumeBtn').onclick = () => resumeGame();
-$('quitBtn').onclick = () => { state = 'menu'; setGameButtons(false); showOnly('menu'); Tape.stop(); };
+$('quitBtn').onclick = () => { state = 'menu'; setGameButtons(false); showOnly('menu'); Music.start(); };
 $('muteBtn').onclick = () => { ac(); setMuted(!muted); };
 function toggleMirror(){ ac(); if ($('phone').hidden) Radio.open(); else Radio.close(); }
 $('radioBtn').onclick = () => { toggleMirror(); syncPauseToggles(); };
