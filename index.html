@@ -267,6 +267,17 @@ kbd{font-family:var(--f-body);background:#3a3442;border-radius:3px;padding:0 5px
 #brkBtn{position:absolute;right:calc(max(14px,env(safe-area-inset-right,0px)) + 92px);bottom:18px;width:66px;height:66px;border-radius:50%;background:#e8331d;color:#fff;
   box-shadow:0 4px 0 #8a1a0e,0 6px 20px rgba(0,0,0,.4);font:inherit;font-weight:800;font-size:13px;border:0;cursor:pointer;user-select:none;-webkit-user-select:none;touch-action:none;z-index:3}
 #brkBtn:active,#brkBtn.on{transform:translateY(3px);box-shadow:0 1px 0 #8a1a0e}
+#lvSlide{position:absolute;left:50%;bottom:120px;z-index:6;width:min(92%,420px);transform:translate(-50%,calc(100% + 140px));transition:transform .45s cubic-bezier(.2,1.4,.4,1);
+  background:rgba(20,18,24,.94);border:3px solid var(--marigold);border-radius:18px;padding:12px 16px;text-align:center;pointer-events:none;box-shadow:0 10px 30px rgba(0,0,0,.5)}
+#lvSlide.up{transform:translate(-50%,0)}
+@media (prefers-reduced-motion:reduce){#lvSlide{transition:none}}
+#lvSlide .lsTop{display:flex;justify-content:center;align-items:center;gap:10px;font-weight:800;font-size:17px;color:var(--ink)}
+#lvSlide .lsStars{color:var(--marigold);font-size:22px;letter-spacing:2px}
+#lvSlide .lsStars i{font-style:normal;color:#3a3442}
+#lvSlide .lsNext{margin-top:4px;font-family:var(--f-display);color:var(--marigold);font-size:20px}
+#lvSlide .lsNext small{display:block;font-family:var(--f-body);font-size:13px;color:var(--muted)}
+#lvSlide .lsUnlock{margin-top:4px;font-weight:700;font-size:13px;color:var(--teal)}
+#lvSlide .lsUnlock:empty{display:none}
 #toast{position:absolute;left:50%;top:22%;transform:translateX(-50%);background:var(--teal);color:#00201c;font-weight:800;padding:8px 14px;border-radius:5px;z-index:6;max-width:90%;text-align:center}
 
 /* rear-view mirror: slim capsule on a windshield stem, glass shows the road behind (reversed) + a small naksha */
@@ -571,6 +582,7 @@ kbd{font-family:var(--f-body);background:#3a3442;border-radius:3px;padding:0 5px
     </div>
 
     <div id="toast" hidden></div>
+    <div id="lvSlide" aria-live="polite"><div class="lsTop"><span id="lsDone"></span><span class="lsStars" id="lsStars"></span></div><div class="lsNext" id="lsNextTxt"></div><div class="lsUnlock" id="lsUnlock"></div></div>
   </div>
   <div id="ticker" aria-hidden="true"><span class="tag" id="tickerTag">ULTAPUR LIVE</span><span class="run" id="tickerRun"></span></div>
 </div>
@@ -1052,6 +1064,8 @@ const SFX = {
   bark(pan=0,v=1,bus){ tone(520,.07,'square',.05*v,-260,0,pan,bus); tone(480,.08,'square',.05*v,-240,.13,pan,bus); },
   ghat(){ noise(.07,.35,220,'lowpass',0,0,'in'); tone(75,.09,'sine',.18,-25,0,0,'in'); },
   win(){ [523,659,784,1046].forEach((f,i)=>tone(f,.18,'triangle',.06,0,i*.11,0,'in')); },
+  // a crowd clapping: lots of short, slightly random hand-claps for about two seconds
+  claps(){ for (let i = 0; i < 46; i++){ const t = i*0.045 + Math.random()*0.05, v = 0.22*(1 - i/60); noise(.05, v, 1200 + Math.random()*900, 'bandpass', t, Math.random()*1.4 - 0.7, 'in', 1.2); noise(.03, v*0.6, 2600, 'bandpass', t + .008, 0, 'in', 2); } tone(1046, .25, 'triangle', .05, 0, .05, 0, 'in'); tone(1318, .3, 'triangle', .05, 0, .2, 0, 'in'); },
   pop(){ noise(.12,.25,3000,'highpass'); },
   inverter(){ for (let i=0;i<3;i++) tone(2000,.07,'square',.02,0,i*.25); },
   whoosh(){ noise(1.1,.22,600,'bandpass',0,-0.6,null,0.7); noise(1.1,.18,900,'bandpass',.3,0.6,null,0.7); },
@@ -1522,7 +1536,7 @@ function newGame(charKey, regionKey, L = null){
   Stats.send('play', { lv: L ? L.id : '', veh: charKey });
   if (outside) outside.gain.setTargetAtTime(c.key === 'suv' ? 0.1 : 1, AC.currentTime, 0.3);
   if (c.key === 'suv') say(W/2, H*0.5, 'Sheesha band, AC on. Sheher ki awaaz sirf 10% 🤫', '#cfe3ff', 13, 2.6);
-  Music.stop(); Music.start();
+  Music.start();
   if (c.key === 'truck' || c.key === 'bus') say(W/2, H*0.55, (c.key === 'truck' ? 'Truck' : 'Bus') + ' ka tape chalu: full volume 🔊🥁', '#ffb81c', 13, 2.6);
 }
 
@@ -3746,7 +3760,7 @@ function drawHUD(){
   ctx.font = '800 10px ' + TXT_FONT; ctx.fillStyle = bpN > 0.75 ? '#ff4d3d' : '#b9ae98'; ctx.fillText('BP ' + Math.round(p.bp), cx + cw - 9, by + 8);
   ctx.textAlign = 'left'; ctx.font = '700 9.5px ' + TXT_FONT; ctx.fillStyle = '#b9ae98';
   ctx.fillText((G.routeKm*prog).toFixed(1) + '/' + G.routeKm.toFixed(1) + ' km', bx, cy + ch - 6);
-  ctx.textAlign = 'right'; ctx.fillText('🏁 ' + placeName(G.leg[1]), cx + cw - 9, cy + ch - 6);
+  ctx.textAlign = 'right'; ctx.fillText('🏁 ' + placeName(G.leg[1]), cx + cw - 9, cy + ch - 6, cw*0.46);
   if ($('mirror').hidden && !narrow) drawMinimap();
   drawSidePanels();
   ctx.textAlign = 'center';
@@ -4747,8 +4761,9 @@ $('playEndless').onclick = () => { ac(); showOnly('endless'); };
 $('endBack').onclick = () => showOnly('menu');
 function syncLaunch(){ const i = nextLevelIdx(), L = LEVELS[i]; $('nextLv').textContent = 'Agla: ' + L.id + ' · ' + L.name; }
 function levelDone(){
-  state = 'lvdone'; Tape.stop(); setGameButtons(false); SFX.win();
   const L = G.lv, i = LEVELS.indexOf(L);
+  const last = i + 1 >= LEVELS.length;
+  if (last){ state = 'lvdone'; Tape.stop(); setGameButtons(false); SFX.win(); }
   const s2 = G.ds.hit === 0, s3 = G.coinsTotal === 0 || G.coins >= Math.ceil(G.coinsTotal*0.7);
   const stars = 1 + (s2 ? 1 : 0) + (s3 ? 1 : 0);
   const all = lvStars(), prev = all[L.id] || 0; all[L.id] = Math.max(prev, stars); store.set('lv', all);
@@ -4757,6 +4772,20 @@ function levelDone(){
   let unlockTxt = '';
   if (L.unlock && !store.get('lvUnlocks', []).includes(L.unlock)){ store.set('lvUnlocks', [...store.get('lvUnlocks', []), L.unlock]); unlockTxt = '🔓 Naya vehicle: ' + CHARS[L.unlock].emoji + ' ' + CHARS[L.unlock].name + '!'; }
   if (i + 1 < LEVELS.length && LEVELS[i + 1].world !== L.world && prev === 0) unlockTxt += (unlockTxt ? ' · ' : '') + '🌍 Nayi duniya khuli: ' + WORLDS.find(w => w[0] === LEVELS[i + 1].world)[1];
+  if (!last){
+    // keep driving: claps, a card slides up, and the next level rolls straight on
+    SFX.claps(); if (navigator.vibrate) try { navigator.vibrate([30, 60, 30]); } catch (e) {}
+    const N = LEVELS[i + 1], ck = N.char || G.c.key;
+    $('lsDone').textContent = 'Level ' + L.id + ' poora!';
+    $('lsStars').innerHTML = '★'.repeat(stars) + '<i>' + '★'.repeat(3 - stars) + '</i>';
+    $('lsNextTxt').innerHTML = (N.char && N.char !== G.c.key ? CHARS[N.char].emoji + ' ' : '') + 'Agla: ' + N.id + ' · ' + N.name + '<small>' + N.intro + '</small>';
+    $('lsUnlock').textContent = unlockTxt;
+    const el = $('lvSlide'); el.classList.remove('up'); void el.offsetWidth; el.classList.add('up');
+    clearTimeout(levelDone._t); levelDone._t = setTimeout(() => el.classList.remove('up'), 3800);
+    startLevel(i + 1, N.char ? null : ck);
+    G.banner = 0;
+    return;
+  }
   $('ldId').textContent = 'Level ' + L.id + ' · ' + L.name;
   $('ldGoals').innerHTML = [['Ghar pahuncho', true], ['Ek bhi chot nahi', s2], ['🪙 ' + G.coins + '/' + G.coinsTotal + ' chillar (70% chahiye)', s3]].map(([t, ok]) => `<li class="${ok ? 'ok' : ''}">${ok ? '★' : '☆'} ${t}</li>`).join('');
   $('ldUnlock').hidden = !unlockTxt; $('ldUnlock').textContent = unlockTxt;
@@ -4968,7 +4997,7 @@ setTicker(menuRegion);
 setMuted(muted);
 resize();
 requestAnimationFrame(frame);
-window.__bkc = { get G(){ return G; }, get audio(){ return AC ? AC.state : "none"; }, get music(){ return Music.on; }, newGame, REGIONS, CHARS, SPECIAL, LEVELS, startLevel, openLevels };
+window.__bkc = { get G(){ return G; }, get state(){ return state; }, get audio(){ return AC ? AC.state : "none"; }, get music(){ return Music.on; }, newGame, REGIONS, CHARS, SPECIAL, LEVELS, startLevel, openLevels };
 })();
 </script>
 </body>
