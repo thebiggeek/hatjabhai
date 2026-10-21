@@ -15,7 +15,7 @@ open http://localhost:8918
 ## What's in it
 - **Driver's view (default):** a pseudo-3D road with bends and hills, buildings streaming past, rear-view traffic sprites and a cockpit for each vehicle with a real rear-view mirror. "Upar se" (top-down) is an option in the menu.
 - **4 fictional places:** Ultapur (city), Fisalgarh (hills), Dhoolnagar (town) and Ulta Expressway, each with 5 seasons.
-- **9 vehicles:** they unlock as you play. Each has its own YouTube playlist from official channels, in the smallest player YouTube allows (200×200, closable); built-in synthesised music plays when YouTube can't.
+- **9 vehicles:** they unlock as you play. Each has its own YouTube playlist from official channels, played in a slim radio bar (tiny live video, play/pause, next, playlist picker) from the first tap.
 - **The menu:** 2 random places and 3 random vehicles per visit. "Aaj ki Sadak" gives everyone the same road each day.
 - **Daily missions,** an event feed, badges, a daily streak and near-miss combos with slow-mo.
 - **One free revive** a day, and the Bhai Mode easter egg.
@@ -51,4 +51,4 @@ Local test: `npx wrangler@4.20.0 pages dev --port 8788` (uses a local copy of th
 - Contact and takedown: gagandeep.sapra@gmail.com
 
 ## Credits
-Inspired by Rahgir's "Aadmi Chutiya Hai" (theme only) and mantarjantar.com. Songs play through YouTube's embedded player from official channels; all rights remain with the labels, composers and performers. Takedown requests go to the email above. The fallback music is original and generated in the browser. All places, departments and headlines are fictional.
+Inspired by Rahgir's "Aadmi Chutiya Hai" (theme only) and mantarjantar.com. Songs play through YouTube's embedded player from official channels; all rights remain with the labels, composers and performers. Takedown requests go to the email above. All places, departments and headlines are fictional.

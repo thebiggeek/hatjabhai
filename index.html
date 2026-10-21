@@ -294,15 +294,17 @@ kbd{font-family:var(--f-body);background:#3a3442;border-radius:3px;padding:0 5px
 #lvSlide .lsNext small{display:block;font-family:var(--f-body);font-size:13px;color:var(--muted)}
 #lvSlide .lsUnlock{margin-top:4px;font-weight:700;font-size:13px;color:var(--teal)}
 #lvSlide .lsUnlock:empty{display:none}
-#yt{position:absolute;left:max(10px,env(safe-area-inset-left,0px));bottom:12px;z-index:5;width:200px;border-radius:12px;overflow:hidden;background:#111;box-shadow:0 8px 24px rgba(0,0,0,.55)}
-#ytWrap{width:200px;height:200px;background:#000}
-#yt .ytbar{display:flex;align-items:center;gap:4px;padding:4px 4px 4px 8px;font-size:10.5px;color:var(--ink)}
-#yt .ytinfo{flex:1;min-width:0;line-height:1.15}
-#yt .ytinfo b,#yt .ytinfo span{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-#yt .ytinfo b{color:var(--marigold);font-size:11px}
-#yt .ytinfo span{color:var(--muted)}
-#yt .ytbar button{font:inherit;font-size:13px;width:28px;height:26px;border:0;border-radius:6px;background:#2a2730;color:var(--ink);cursor:pointer}
-@media (max-width:600px){#yt{bottom:auto;top:calc(max(10px,env(safe-area-inset-top,0px)) + 44px)}}
+#yt{position:absolute;left:max(10px,env(safe-area-inset-left,0px));bottom:12px;z-index:7;display:flex;align-items:center;gap:6px;height:44px;padding:4px 6px 4px 4px;max-width:min(340px,calc(100% - 20px));border-radius:22px;background:rgba(20,18,24,.9);box-shadow:0 6px 18px rgba(0,0,0,.45),inset 0 0 0 1px rgba(255,244,220,.15);color:var(--ink)}
+#ytWrap{flex:0 0 auto;width:64px;height:36px;border-radius:18px;overflow:hidden;background:#000}
+#ytWrap iframe{width:128px!important;height:72px!important;display:block;pointer-events:none;transform:scale(.5);transform-origin:0 0}
+#yt button{flex:0 0 auto;font:inherit;font-size:14px;width:32px;height:32px;border:0;border-radius:50%;background:var(--marigold);color:#1a1300;cursor:pointer}
+#yt #rNext{background:#2a2730;color:var(--ink)}
+#yt .ytinfo{flex:1;min-width:0;display:flex;flex-direction:column;line-height:1.1}
+#yt #rNow{font-size:11px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#yt select{font:inherit;font-size:10.5px;color:var(--marigold);background:transparent;border:0;padding:0;margin-top:1px;max-width:100%;cursor:pointer}
+#yt select option{color:#000}
+#stage.intro-open #yt{display:none!important}
+@media (max-width:600px){#stage:not(.menu-open) #yt{bottom:auto;top:calc(max(10px,env(safe-area-inset-top,0px)) + 44px);max-width:calc(100% - 170px)}#stage:not(.menu-open) #yt select{display:none}}
 #toast{position:absolute;left:50%;top:22%;transform:translateX(-50%);background:var(--teal);color:#00201c;font-weight:800;padding:8px 14px;border-radius:5px;z-index:6;max-width:90%;text-align:center}
 
 /* rear-view mirror: slim capsule on a windshield stem, glass shows the road behind (reversed) + a small naksha */
@@ -555,7 +557,6 @@ kbd{font-family:var(--f-body);background:#3a3442;border-radius:3px;padding:0 5px
         <p class="muted">Sadak kahin nahi jaa rahi. Gaddhe bhi nahi.</p>
         <div class="toggles">
           <button type="button" id="muteBtn">🔊 Awaaz</button>
-          <button type="button" id="musicBtn2">♪ Music</button>
           <button type="button" id="ytBtn">📻 YouTube gaane</button>
           <button type="button" id="fsBtn">⛶ Full screen</button>
         </div>
@@ -570,7 +571,9 @@ kbd{font-family:var(--f-body);background:#3a3442;border-radius:3px;padding:0 5px
     <!-- YouTube radio: the smallest player YouTube allows, visible whenever it plays -->
     <div id="yt" hidden>
       <div id="ytWrap"><div id="ytp"></div></div>
-      <div class="ytbar"><div class="ytinfo"><b id="rDial">Radio</b><span id="rNow"></span></div><button type="button" id="rNext" aria-label="Agla gaana">⏭</button><button type="button" id="rClose" aria-label="YouTube gaane band karo">✕</button></div>
+      <button type="button" id="rPlay" aria-label="Play / pause">▶</button>
+      <div class="ytinfo"><span id="rNow">Tune ho raha hai…</span><select id="rSel" aria-label="Playlist chuno"></select></div>
+      <button type="button" id="rNext" aria-label="Agla gaana">⏭</button>
     </div>
     <div id="lvSlide" aria-live="polite"><div class="lsTop"><span id="lsDone"></span><span class="lsStars" id="lsStars"></span></div><div class="lsNext" id="lsNextTxt"></div><div class="lsUnlock" id="lsUnlock"></div></div>
   </div>
@@ -920,7 +923,7 @@ function unlockAudio(){
   // a one-sample buffer played inside the gesture is what finally wakes old iOS Safari
   try { const b = a.createBuffer(1, 1, 22050), src = a.createBufferSource(); src.buffer = b; src.connect(a.destination); src.start(0); } catch (e) {}
   // browsers allow no sound before the first click, so the music starts on it (home screen included)
-  const go = () => { if ((state === 'menu' || state === 'play') && $('intro').hidden && !Music.on && Music.wanted() && !Radio.playing) Music.start(); };
+  const go = () => { if ($('intro').hidden && Radio.want && Radio.ready && !Radio.playing) Radio.player.playVideo(); };
   if (a.state !== 'running') a.resume().then(go).catch(() => {}); else go();
 }
 for (const ev of ['touchend', 'click', 'keydown', 'pointerup']) window.addEventListener(ev, unlockAudio, { capture: true, passive: true });
@@ -1048,7 +1051,7 @@ const GROOVE_FOR = { paidal:'jazz', cycle:'retro', scooty:'retro', car:'dhol', t
 const MUSIC_VOL = 0.55;
 const Music = {
   on:false, g:null, key:null, el:null, urls:{}, t0:0, want:null,
-  wanted(){ return store.get('music', true); },
+  wanted(){ return false; },   // the synthesised loops are retired: YouTube playlists only
   player(){
     if (!this.el){ this.el = new Audio(); this.el.loop = true; this.el.preload = 'auto'; this.el.volume = MUSIC_VOL; this.el.muted = muted; this.el.setAttribute('playsinline', ''); }
     return this.el;
@@ -1086,8 +1089,8 @@ const Music = {
     store.set('music', !this.wanted()); if (this.wanted()) this.start(); else this.stop(); },
   label(){
     const b = $('musicBtn'); if (!b) return;
-    b.textContent = Radio.playing ? '📻 ' + RADIO[Radio.station].name : '♪ ' + (this.on && this.g ? this.g.name : this.wanted() ? 'Music chalu karo' : 'Music band');
-    b.setAttribute('aria-pressed', this.on || Radio.playing);
+    b.textContent = Radio.playing ? '📻 ' + RADIO[Radio.station].name : Radio.player && Radio.wanted() ? '📻 ▶ ' + RADIO[Radio.station].name : Radio.wanted() ? '📻 Music chalu karo' : '📻 Music band';
+    b.setAttribute('aria-pressed', Radio.playing);
   },
 };
 function wavBlob(data, sr){
@@ -1236,51 +1239,62 @@ function withYT(cb){
   if (ytWaiters.length > 1) return;
   window.onYouTubeIframeAPIReady = () => ytWaiters.splice(0).forEach(f => f());
   const sc = document.createElement('script'); sc.src = 'https://www.youtube.com/iframe_api';
-  sc.onerror = () => { ytWaiters.length = 0; Radio.giveUp(); };
+  sc.onerror = () => { ytWaiters.length = 0; $('rNow').textContent = 'Radio signal nahi aa raha (internet?)'; };
   document.head.appendChild(sc);
 }
 const Radio = {
-  player:null, ready:false, station:'safar', order:[], i:0, playing:false, want:false, guard:null,
+  player:null, ready:false, station:'retro', order:[], i:0, playing:false, want:false,
   wanted(){ return store.get('yt', true); },
+  pinned(){ return store.get('station', 'auto'); },
+  stationFor(veh){ const p = this.pinned(); return p !== 'auto' && RADIO[p] ? p : veh ? STATION_FOR[veh] : 'retro'; },
   shuffle(){ const n = RADIO[this.station].tracks.length; this.order = [...Array(n).keys()].sort(() => Math.random() - 0.5); this.i = 0; },
   cur(){ return RADIO[this.station].tracks[this.order[this.i]]; },
-  autostart(st){
+  start(st){
     if (!this.wanted() || !RADIO[st]) return;
     this.want = true;
     if (this.station !== st || !this.order.length){ this.station = st; this.shuffle(); if (this.ready) this.play(); }
     $('yt').hidden = false; this.show();
     if (!this.player) withYT(() => this.make()); else if (this.ready && !this.playing) this.player.playVideo();
-    clearTimeout(this.guard); this.guard = setTimeout(() => { if (!this.playing) this.giveUp(); }, 9000);
   },
+  autostart(st){ this.start(st); },
   make(){
     if (this.player) return;
-    this.player = new YT.Player('ytp', { host:'https://www.youtube-nocookie.com', width:200, height:200, videoId:this.cur()[0],
-      playerVars:{ playsinline:1, rel:0, modestbranding:1, controls:0, fs:0, iv_load_policy:3 },
+    this.player = new YT.Player('ytp', { host:'https://www.youtube-nocookie.com', width:64, height:36, videoId:this.cur()[0],
+      playerVars:{ playsinline:1, rel:0, modestbranding:1, controls:0, fs:0, iv_load_policy:3, disablekb:1 },
       events:{
-        onReady: e => { this.ready = true; if (muted) e.target.mute(); if (this.want) e.target.playVideo(); },
-        onStateChange: e => {
-          this.playing = e.data === 1;
-          if (this.playing){ clearTimeout(this.guard); Music.stop(); $('yt').hidden = false; }
-          else if (e.data === 0) this.next();
-          Music.label();
-        },
+        onReady: e => { this.ready = true; if (muted) e.target.mute(); e.target.setVolume(70); if (this.want) e.target.playVideo(); },
+        onStateChange: e => { this.playing = e.data === 1; if (e.data === 0) this.next(); this.sync(); },
         onError: () => this.next(),
       }});
   },
   show(){
     const t = this.cur(); if (!t) return;
-    $('rDial').textContent = RADIO[this.station].name;
     $('rNow').textContent = t[1] + ' · ' + t[2];
+    $('rSel').value = this.pinned() === 'auto' ? 'auto' : this.station;
+    this.sync();
   },
+  sync(){ $('rPlay').textContent = this.playing ? '❚❚' : '▶'; Music.label(); },
   play(){ if (this.ready){ this.player.loadVideoById(this.cur()[0]); this.show(); } },
-  next(){ this.i = (this.i + 1) % this.order.length; this.play(); },
-  suspend(){ this.want = false; clearTimeout(this.guard); if (this.ready) this.player.pauseVideo(); this.playing = false; $('yt').hidden = true; },
-  resume(){ if (this.wanted() && this.player) this.autostart(this.station); },
-  giveUp(){ this.suspend(); if (state === 'play' || state === 'menu') Music.start(); },
-  close(){ store.set('yt', false); this.giveUp(); toast('YouTube gaane band. Pause mein phir chalu kar sakte ho.'); },
+  next(){ ac(); this.i = (this.i + 1) % this.order.length; this.play(); },
+  toggle(){
+    ac();
+    if (!this.wanted()){ store.set('yt', true); this.start(this.stationFor(G && state !== 'menu' ? G.c.key : null)); return; }
+    if (!this.player) return this.start(this.station);
+    if (this.playing){ this.want = false; this.player.pauseVideo(); } else { this.want = true; $('yt').hidden = false; this.player.playVideo(); }
+  },
+  pick(v){
+    store.set('station', v); ac();
+    this.start(this.stationFor(G && state !== 'menu' ? G.c.key : null));
+  },
+  suspend(){ this.want = false; if (this.ready) this.player.pauseVideo(); this.playing = false; this.sync(); },
+  resume(){ if (this.wanted() && this.player){ this.want = true; this.player.playVideo(); } },
+  close(){ store.set('yt', false); this.suspend(); $('yt').hidden = true; },
   mute(m){ if (this.ready) m ? this.player.mute() : this.player.unMute(); },
 };
 const Dashcam = { playing:false };
+$('rSel').innerHTML = '<option value="auto">🚗 Gaadi ke hisaab se</option>' + Object.keys(RADIO).map(k => `<option value="${k}">${RADIO[k].name}</option>`).join('');
+$('rSel').onchange = e => Radio.pick(e.target.value);
+$('rPlay').onclick = () => Radio.toggle();
 function toggleFull(){
   if (document.fullscreenElement) document.exitFullscreen().catch(() => {});
   else if (document.documentElement.requestFullscreen) document.documentElement.requestFullscreen().catch(() => toast('Full screen yahan nahi chalega'));
@@ -1526,7 +1540,7 @@ function newGame(charKey, regionKey, L = null){
   }
   updateMirror();
   Stats.send('play', { lv: L ? L.id : '', veh: charKey });
-  Radio.autostart(STATION_FOR[c.key]);
+  Radio.start(Radio.stationFor(c.key));
   if (outside) outside.gain.setTargetAtTime(c.key === 'suv' ? 0.1 : 1, AC.currentTime, 0.3);
   if (c.key === 'jcb') say(W/2, H*0.5, '♪ Khudai Drill: bass full, khudai full 🚜', '#ffb81c', 13, 2.6);
   if (c.key === 'suv') say(W/2, H*0.5, 'Sheesha band, AC on. Sheher ki awaaz sirf 10% 🤫', '#cfe3ff', 13, 2.6);
@@ -4549,7 +4563,6 @@ const overlays = ['intro','menu','about','disc','dayclear','over','pause','tip',
 function showOnly(id){ for (const o of overlays) $(o).hidden = o !== id; stage.classList.toggle('intro-open', id === 'intro'); stage.classList.toggle('menu-open', ['intro','menu','settings','about','disc','tip','levels','endless'].includes(id) && state !== 'over'); }
 function setGameButtons(on){
   $('actBtn').hidden = $('brkBtn').hidden = $('pauseBtn').hidden = !on;
-  if (!on) Radio.suspend(); else if (G) Radio.resume();
   $('musicBtn').hidden = !on && state !== 'menu';
   if (!on) keys.brake = false;
   if (on && G){ const a = G.c.act; $('actBtn').innerHTML = a === 'jump' ? 'KOODO<br>⤴' : a === 'dig' ? 'KHODO<br>⛏️' : 'HORN<br>📯'; }
@@ -4907,16 +4920,12 @@ $('pauseBtn').onclick = () => pauseGame();
 $('resumeBtn').onclick = () => resumeGame();
 $('quitBtn').onclick = () => { state = 'menu'; setGameButtons(false); showOnly('menu'); Music.start(); };
 $('muteBtn').onclick = () => { ac(); setMuted(!muted); };
-$('musicBtn').onclick = () => Music.toggle();
-$('musicBtn2').onclick = () => { Music.toggle(); if (state !== 'play') Music.stop(); syncPauseToggles(); };
+$('musicBtn').onclick = () => Radio.toggle();
 $('rNext').onclick = () => Radio.next();
-$('rClose').onclick = () => Radio.close();
-$('ytBtn').onclick = () => { store.set('yt', !Radio.wanted()); syncPauseToggles(); };
+$('ytBtn').onclick = () => { if (Radio.wanted()) Radio.close(); else Radio.toggle(); syncPauseToggles(); };
 function syncPauseToggles(){
   $('ytBtn').setAttribute('aria-pressed', Radio.wanted());
   $('ytBtn').textContent = Radio.wanted() ? '📻 YouTube gaane' : '📻 YouTube band';
-  $('musicBtn2').setAttribute('aria-pressed', Music.wanted() && !radioOpen());
-  $('musicBtn2').textContent = Music.wanted() ? '♪ Music' : '♪ Music band';
 }
 
 function pauseGame(){ if (state !== 'play') return; state = 'pause'; showOnly('pause'); setGameButtons(false); Music.stop(); syncPauseToggles(); }
@@ -4984,20 +4993,18 @@ stage.classList.add('menu-open', 'intro-open');
 buildMenu();
 syncLaunch();
 // render every groove up front (no sound needed for that), then try to start the home-screen music right away
-Promise.all(Object.keys(GROOVES).map(k => Music.render(k).catch(() => {}))).then(() => { if (state === 'menu') Music.start(); });
 // step 1 screen: skip it when music is off by choice, or when the browser already let it play
 function leaveIntro(){ if (!$('intro').hidden){ showOnly('menu'); setTimeout(() => $('playLevels').focus(), 50); } }
-if (!Music.wanted()) leaveIntro();
-else { const t = setInterval(() => { if (Music.on){ clearInterval(t); leaveIntro(); } }, 200); setTimeout(() => clearInterval(t), 4000); }
-$('introGo').onclick = () => { store.set('music', true); unlockAudio(); Music.start(); leaveIntro(); };
-$('introQuiet').onclick = () => { store.set('music', false); Music.stop(); leaveIntro(); };
+if (!Radio.wanted()) leaveIntro();
+$('introGo').onclick = () => { store.set('yt', true); unlockAudio(); Radio.start(Radio.stationFor(null)); leaveIntro(); };
+$('introQuiet').onclick = () => { store.set('yt', false); leaveIntro(); };
 document.addEventListener('visibilitychange', () => { if (document.hidden){ if (Music.el) Music.el.pause(); } else if (Music.on && Music.el) Music.el.play().catch(() => {}); });
 setView(store.get('view', 'pov'));
 setTicker(menuRegion);
 setMuted(muted);
 resize();
 requestAnimationFrame(frame);
-window.__bkc = { get G(){ return G; }, get state(){ return state; }, get audio(){ return AC ? AC.state : "none"; }, get music(){ return Music.on; }, get musicUrls(){ return Music.urls; }, newGame, REGIONS, CHARS, SPECIAL, LEVELS, startLevel, openLevels };
+window.__bkc = { get G(){ return G; }, get state(){ return state; }, get audio(){ return AC ? AC.state : "none"; }, get music(){ return Music.on; }, get radio(){ return Radio.playing; }, get station(){ return Radio.station; }, get musicUrls(){ return Music.urls; }, newGame, REGIONS, CHARS, SPECIAL, LEVELS, startLevel, openLevels };
 })();
 </script>
 </body>
