@@ -3,3 +3,4 @@ node_modules/
 .bak/
 image inspiration.png
 .DS_Store
+.wrangler/

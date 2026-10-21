@@ -39,6 +39,13 @@ CI runs the same suite on every push (`.github/workflows/test.yml`).
 
 Every push to `main` redeploys automatically.
 
+## Live stats (hatjabhai.com/stats)
+A public page with players online now, plays per day, level finish rates, top game-over causes and vehicle picks.
+The game sends a ping a minute plus play / level-done / game-over events to `/api/ping` (Cloudflare Pages Functions in `functions/`), stored as anonymous counts in Cloudflare D1. No IPs, names or locations are stored.
+
+One-time setup: create a D1 database `hatjabhai-stats`, bind it to the Pages project as `DB` (Settings → Bindings), then redeploy. Tables are created automatically.
+Local test: `npx wrangler@4.20.0 pages dev . --d1 DB=hatjabhai-stats --port 8788`
+
 ## Config
 - `WHATSAPP_URL` in `index.html`: the Sadak Crew WhatsApp channel (https://whatsapp.com/channel/0029Vb9VzGZ6WaKldSHpUH3s).
 - Contact and takedown: gagandeep.sapra@gmail.com

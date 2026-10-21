@@ -462,7 +462,7 @@ kbd{font-family:var(--f-body);background:#3a3442;border-radius:3px;padding:0 5px
         <div class="eyebrow">Zaroori baatein</div>
         <h2>Disclaimers</h2>
         <p><b>Sadak pe khelna mana hai.</b> Ye game ghar pe, ruk ke khelo. Chalte hue ya gaadi chalate hue phone mat dekho.</p>
-        <p class="muted"><b>Aapka data:</b> koi login nahi, koi location nahi, koi tracking nahi. Score aur unlocks sirf isi browser mein save hote hain. Gaane YouTube se chalte hain (privacy-enhanced YouTube player); fonts Google Fonts se aate hain.</p>
+        <p class="muted"><b>Aapka data:</b> koi login nahi, koi location nahi, koi tracking nahi. Sirf anonymous ginti hoti hai (kitne log khel rahe hain, kaunsa level paar hua) jo sabke liye <a href="/stats/" target="_blank" rel="noopener">hatjabhai.com/stats</a> pe khuli hai. Score aur unlocks sirf isi browser mein save hote hain. Gaane YouTube se chalte hain (privacy-enhanced YouTube player); fonts Google Fonts se aate hain.</p>
         <p class="muted" id="sachAlbum"></p>
         <p class="muted">Saari jagah, naksha, vibhaag aur ticker ki khabrein kaalpanik hain. Koi asli vyakti, sanstha, sadak ya brand nahi dikhaya gaya hai. Radio ke gaane unke official YouTube channels se chalte hain; hum koi gaana host nahi karte.</p>
         <p class="muted">Gaane YouTube ke official channels se chalte hain; saare haq labels, composers aur kalakaron ke paas. Kuch hatwana ho toh email karein, hata denge.</p>
@@ -909,6 +909,18 @@ const store = {
   get(k,d){ try { const v=localStorage.getItem('bkc_'+k); return v==null?d:JSON.parse(v); } catch(e){ return d; } },
   set(k,v){ try { localStorage.setItem('bkc_'+k, JSON.stringify(v)); } catch(e){} },
 };
+
+/* Live counter for hatjabhai.com/stats: a random id, a ping a minute while the page is visible,
+   and play / level done / game over counts. Nothing personal is sent. */
+const Stats = (() => {
+  let sid = store.get('sid', '');
+  if (!/^[a-z0-9]{8,24}$/.test(sid)){ sid = (Math.random().toString(36).slice(2) + Math.random().toString(36).slice(2) + 'x0000000').slice(0, 16); store.set('sid', sid); }
+  const on = location.protocol === 'https:' || location.port === '8788';
+  const send = (ev, d) => { if (!on) return; try { fetch('/api/ping', { method:'POST', headers:{ 'content-type':'application/json' }, body: JSON.stringify({ sid, ev, d }), keepalive:true }).catch(() => {}); } catch (e) {} };
+  const beat = () => { if (document.visibilityState === 'visible') send(); };
+  beat(); setInterval(beat, 60e3); document.addEventListener('visibilitychange', beat);
+  return { send };
+})();
 
 /* =====================================================================
    AUDIO: synthesised SFX + street ambience
@@ -1416,6 +1428,7 @@ function newGame(charKey, regionKey, L = null){
   updateMirror();
   say(W/2, H*0.42, '📻 ' + RADIO[STATION_FOR[c.key]].name, '#cfe3ff', 13, 2.4);
   Dashcam.autostart();
+  Stats.send('play', { lv: L ? L.id : '', veh: charKey });
   if (outside) outside.gain.setTargetAtTime(c.key === 'suv' ? 0.1 : 1, AC.currentTime, 0.3);
   if (c.key === 'suv') say(W/2, H*0.5, 'Sheesha band, AC on. Sheher ki awaaz sirf 10% 🤫', '#cfe3ff', 13, 2.6);
   Tape.stop();
@@ -4407,6 +4420,7 @@ function nextDay(){
 
 function gameOver(){
   state = 'over';
+  Stats.send('over', { cause: G.cause });
   const runM = Math.floor(G.totalPx/10), before = store.get('xp', 0), gain = runM - G.xpAdded;
   G.xpAdded = runM; store.set('xp', before + gain);
   const newly = Object.keys(UNLOCK_M).filter(k => before < UNLOCK_M[k] && before + gain >= UNLOCK_M[k]);
@@ -4569,6 +4583,7 @@ function levelDone(){
   const s2 = G.ds.hit === 0, s3 = G.coinsTotal === 0 || G.coins >= Math.ceil(G.coinsTotal*0.7);
   const stars = 1 + (s2 ? 1 : 0) + (s3 ? 1 : 0);
   const all = lvStars(), prev = all[L.id] || 0; all[L.id] = Math.max(prev, stars); store.set('lv', all);
+  Stats.send('done', { lv: L.id, stars });
   const runM = Math.floor(G.totalPx/10); store.set('xp', store.get('xp', 0) + runM - G.xpAdded); G.xpAdded = runM;
   let unlockTxt = '';
   if (L.unlock && !store.get('lvUnlocks', []).includes(L.unlock)){ store.set('lvUnlocks', [...store.get('lvUnlocks', []), L.unlock]); unlockTxt = '🔓 Naya vehicle: ' + CHARS[L.unlock].emoji + ' ' + CHARS[L.unlock].name + '!'; }

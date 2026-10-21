@@ -1,0 +1,187 @@
+<!doctype html>
+<html lang="hi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Hat Ja Bhai! · Live Stats</title>
+<meta name="description" content="Kitne log abhi Hat Ja Bhai! ki sadak pe hain, kaunsa level sabse mushkil hai, aur sadak sabse zyada kaise haraati hai. Live, anonymous ginti.">
+<meta property="og:title" content="Hat Ja Bhai! · Live Sadak Report">
+<meta property="og:image" content="https://hatjabhai.com/og.png">
+<meta name="theme-color" content="#1c1a21">
+<link rel="icon" href="/icons/icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&family=Yatra+One&display=swap">
+<style>
+:root{
+  --asphalt:#1c1a21; --asphalt-2:#2a2730; --panel:#231f28; --line:#3d3845;
+  --ink:#fff4dc; --muted:#b9ae98; --marigold:#ffb81c; --rani:#ff3d7f; --teal:#13b3a3;
+  --f-display:"Yatra One","Baloo 2",system-ui,sans-serif;
+  --f-body:"Baloo 2",system-ui,-apple-system,"Segoe UI",sans-serif;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--asphalt);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.4}
+.trim{height:8px;background:repeating-linear-gradient(90deg,var(--rani) 0 14px,var(--marigold) 14px 28px,var(--teal) 28px 42px,var(--marigold) 42px 56px)}
+main{max-width:860px;margin:0 auto;padding:20px 16px 48px}
+header{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+h1{font-family:var(--f-display);font-weight:400;color:var(--marigold);font-size:30px;margin:0;text-shadow:2px 2px 0 var(--rani)}
+h1 small{display:block;font-family:var(--f-body);font-weight:700;font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:var(--teal);text-shadow:none}
+.play{font-weight:800;font-size:16px;text-decoration:none;color:#1a1300;background:var(--marigold);padding:10px 18px;border-radius:12px;box-shadow:0 4px 0 #b37d00}
+.live{margin:22px 0 8px;padding:22px 16px;border-radius:18px;background:var(--panel);border:3px solid var(--marigold);text-align:center}
+.live .n{font-size:clamp(56px,14vw,96px);font-weight:800;line-height:1;font-variant-numeric:tabular-nums}
+.live .l{font-size:17px;color:var(--muted)}
+.dot{display:inline-block;width:14px;height:14px;border-radius:50%;background:#2fd36b;margin-right:10px;vertical-align:middle;box-shadow:0 0 0 0 rgba(47,211,107,.6);animation:pulse 1.8s infinite}
+@keyframes pulse{70%{box-shadow:0 0 0 14px rgba(47,211,107,0)}100%{box-shadow:0 0 0 0 rgba(47,211,107,0)}}
+@media (prefers-reduced-motion:reduce){.dot{animation:none}}
+.grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+@media (max-width:640px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.kpi{background:var(--asphalt-2);border-radius:14px;padding:12px}
+.kpi b{display:block;font-size:26px;font-variant-numeric:tabular-nums}
+.kpi span{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
+section{margin-top:28px}
+h2{font-size:19px;margin:0 0 4px}
+.sub{color:var(--muted);font-size:13px;margin:0 0 12px}
+.days{display:flex;align-items:flex-end;gap:4px;height:140px;padding:8px 0 0;border-bottom:1px solid var(--line)}
+.days div{flex:1;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;height:100%;min-width:0}
+.days i{display:block;width:100%;max-width:34px;background:var(--marigold);border-radius:6px 6px 0 0;min-height:2px}
+.days small{font-size:10px;color:var(--muted);margin-top:4px;white-space:nowrap}
+.days em{font-style:normal;font-size:11px;font-variant-numeric:tabular-nums}
+.worlds{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+@media (max-width:640px){.worlds{grid-template-columns:1fr}}
+.world{background:var(--panel);border-radius:14px;padding:12px 14px}
+.world h3{margin:0 0 6px;font-size:15px}
+.row{display:grid;grid-template-columns:34px 1fr 64px;gap:8px;align-items:center;font-size:13px;padding:3px 0}
+.row .id{font-weight:800;color:var(--teal)}
+.bar{position:relative;height:18px;background:var(--asphalt-2);border-radius:9px;overflow:hidden}
+.bar i{position:absolute;inset:0 auto 0 0;background:rgba(19,179,163,.7);border-radius:9px}
+.bar span{position:relative;padding-left:8px;font-size:12px;line-height:18px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block}
+.row .pc{text-align:right;font-variant-numeric:tabular-nums;color:var(--muted)}
+.row.hard .id{color:var(--rani)}
+.row.hard .bar i{background:var(--rani)}
+.list{display:grid;gap:6px}
+.item{display:grid;grid-template-columns:30px 1fr 70px;align-items:center;gap:8px}
+.item .e{font-size:22px;text-align:center}
+.item .pc{text-align:right;font-variant-numeric:tabular-nums;color:var(--muted);font-size:13px}
+.item .bar i{background:rgba(255,184,28,.55)}
+.cols{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:24px}
+@media (max-width:640px){.cols{grid-template-columns:1fr}}
+.msg{color:var(--muted);text-align:center;padding:30px 0}
+footer{margin-top:36px;color:var(--muted);font-size:13px;border-top:1px solid var(--line);padding-top:14px}
+footer a{color:var(--ink)}
+</style>
+</head>
+<body>
+<div class="trim"></div>
+<main>
+  <header>
+    <h1><small>Live Sadak Report</small>हट जा भाई!</h1>
+    <a class="play" href="/">▶ Khelo</a>
+  </header>
+
+  <div class="live" aria-live="polite">
+    <div class="n"><span class="dot"></span><span id="online">–</span></div>
+    <div class="l">log abhi sadak pe</div>
+  </div>
+
+  <div class="grid">
+    <div class="kpi"><b id="pToday">–</b><span>Aaj ke players</span></div>
+    <div class="kpi"><b id="gToday">–</b><span>Aaj ke khel</span></div>
+    <div class="kpi"><b id="pWeek">–</b><span>7 din ke players</span></div>
+    <div class="kpi"><b id="gAll">–</b><span>Kul khel</span></div>
+  </div>
+
+  <p class="msg" id="msg" hidden></p>
+
+  <section>
+    <h2>Pichhle 14 din</h2>
+    <p class="sub">Har din kitne khel shuru hue</p>
+    <div class="days" id="days"></div>
+  </section>
+
+  <section>
+    <h2>Kaunsa level kitno ne paar kiya</h2>
+    <p class="sub">Shuru karne walon mein se kitne ghar pahunche. <span style="color:var(--rani)">Laal</span> = sabse mushkil.</p>
+    <div class="worlds" id="levels"></div>
+  </section>
+
+  <section class="cols">
+    <div>
+      <h2>Sadak ne kaise haraya</h2>
+      <p class="sub">Game over ki sabse badi wajah</p>
+      <div class="list" id="causes"></div>
+    </div>
+    <div>
+      <h2>Sabki pasand ki sawaari</h2>
+      <p class="sub">Kis gaadi se kitne khel</p>
+      <div class="list" id="veh"></div>
+    </div>
+  </section>
+
+  <footer>
+    Har 15 second mein update hota hai. Sirf anonymous ginti: koi naam, number, IP ya location save nahi hoti.
+    Saari jagah aur level kaalpanik hain. · <a href="/">hatjabhai.com</a>
+  </footer>
+</main>
+<script>
+const META = {"causes": {"manhole": ["🕳️", "Gutter mein gaye"], "manhole_car": ["🕳️", "Pahiya gutter mein"], "trench": ["🚧", "Khudai mein kho gaye"], "pothole": ["🕳️", "Gaddhe ne gale lagaya"], "vehicle": ["💥", "Gaadi ne thok diya"], "wrong": ["↩️", "Ulta aaya, seedha gaye"], "bus": ["🚌", "Bus ka pyaar"], "fpbike": ["🏍️", "Footpath pe bike"], "dog": ["🐕", "Kutte ne ilaka bachaya"], "bp": ["🤯", "BP 200 paar"], "bp_horn": ["📯", "BP 200 paar: Horn overdose"], "bp_jam": ["🚗", "BP 200 paar: Jam ka shikaar"], "bp_smog": ["😷", "BP 200 paar: Saans hi nahi aayi"], "bp_heat": ["🥵", "BP 200 paar: Garmi ka tandoor"], "bp_noise": ["🔊", "BP 200 paar: Trending audio"], "bp_scratch": ["😱", "BP 200 paar: Scratch ka sadma"], "bp_near": ["😰", "BP 200 paar: Bal-bal bache, baar-baar"], "bp_challan": ["📸", "BP 200 paar: Challan ka sadma"], "bp_chhee": ["🤢", "BP 200 paar: Chhee overdose"], "bp_dark": ["🌑", "BP 200 paar: Bijli gayi, BP aaya"], "vipcar": ["🚨", "VIP ko side nahi di"], "cliff": ["🏔️", "Khaai mein gaye"], "naala": ["🌊", "Naale mein gaye"], "drain": ["🌊", "Khuli naali"], "chowk": ["🚦", "Chowk pe thoka"], "wire": ["⚡", "Current laga"], "rock": ["🪨", "Pahad ne jawab diya"], "saand": ["🐂", "Saand ne seedha kiya"], "heat": ["🔥", "Loo lag gayi"]}, "levels": [{"id": "1-1", "w": "city", "n": "Pehla Kadam"}, {"id": "1-2", "w": "city", "n": "Do Pahiye, Do Kutte"}, {"id": "1-3", "w": "city", "n": "Ulta Raasta"}, {"id": "1-4", "w": "city", "n": "Monsoon Masti"}, {"id": "1-5", "w": "city", "n": "VIP Movement"}, {"id": "2-1", "w": "town", "n": "Garmi aur Loo"}, {"id": "2-2", "w": "town", "n": "Bijli Gayi"}, {"id": "2-3", "w": "town", "n": "Aandhi"}, {"id": "2-4", "w": "town", "n": "Mela Sadak Pe"}, {"id": "2-5", "w": "town", "n": "Chunav Season"}, {"id": "3-1", "w": "hills", "n": "Selfie Point"}, {"id": "3-2", "w": "hills", "n": "Landslide"}, {"id": "3-3", "w": "hills", "n": "Barfbaari"}, {"id": "3-4", "w": "hills", "n": "Long Weekend"}, {"id": "3-5", "w": "hills", "n": "Pahad Katai"}, {"id": "4-1", "w": "highway", "n": "Dhund"}, {"id": "4-2", "w": "highway", "n": "Toll Plaza"}, {"id": "4-3", "w": "highway", "n": "Diversion"}, {"id": "4-4", "w": "highway", "n": "Overload"}, {"id": "4-5", "w": "highway", "n": "Ulta Raaj"}], "veh": {"paidal": ["🚶", "Paidal Yatri"], "cycle": ["🚴", "Cycle-wala"], "scooty": ["🛵", "Scooty Sawaar"], "car": ["🚗", "Car-wala"], "thar": ["🚙", "Bhaukaal 4x4"], "suv": ["🚘", "Mehngi SUV"], "truck": ["🚚", "Truck-wala"], "bus": ["🚌", "Bus-wala"], "jcb": ["🚜", "Khudai-wala"]}};
+const WORLD = { city:'🏙️ Ultapur', town:'🌾 Dhoolnagar', hills:'🏔️ Fisalgarh', highway:'🛣️ Expressway' };
+const $ = id => document.getElementById(id);
+const fmt = n => (n || 0).toLocaleString('en-IN');
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;' }[c]));
+
+function bars(el, rows, total){
+  el.innerHTML = rows.length ? rows.map(([e, name, n]) => {
+    const w = total ? Math.round(100*n/total) : 0;
+    return `<div class="item"><span class="e">${e}</span><div class="bar"><i style="width:${Math.max(w, 2)}%"></i><span>${esc(name)}</span></div><span class="pc">${fmt(n)} · ${w}%</span></div>`;
+  }).join('') : '<p class="sub">Abhi data nahi aaya.</p>';
+}
+
+function render(s){
+  $('online').textContent = fmt(s.online);
+  $('pToday').textContent = fmt(s.playersToday);
+  $('gToday').textContent = fmt(s.today.play);
+  $('pWeek').textContent = fmt(s.playersWeek);
+  $('gAll').textContent = fmt(s.all.play);
+
+  // last 14 days, gaps filled with zero
+  const byDay = Object.fromEntries(s.daily.map(d => [d.day, d.plays]));
+  const days = [];
+  for (let i = 13; i >= 0; i--){ const d = new Date(Date.parse(s.day) - i*864e5).toISOString().slice(0, 10); days.push([d, byDay[d] || 0]); }
+  const max = Math.max(1, ...days.map(d => d[1]));
+  $('days').innerHTML = days.map(([d, n]) => `<div title="${d}: ${n} khel"><em>${n || ''}</em><i style="height:${Math.round(100*n/max)}%"></i><small>${+d.slice(8)}/${+d.slice(5, 7)}</small></div>`).join('');
+
+  // level funnel; the hardest level (lowest finish rate, at least 5 tries) is marked
+  const rate = L => { const p = s.all['play:' + L.id] || 0, d = s.all['done:' + L.id] || 0; return p ? d/p : null; };
+  const tried = META.levels.filter(L => (s.all['play:' + L.id] || 0) >= 5);
+  const hard = tried.length ? tried.reduce((a, b) => rate(b) < rate(a) ? b : a).id : null;
+  $('levels').innerHTML = Object.keys(WORLD).map(w => `<div class="world"><h3>${WORLD[w]}</h3>${META.levels.filter(L => L.w === w).map(L => {
+    const p = s.all['play:' + L.id] || 0, d = s.all['done:' + L.id] || 0, r = p ? Math.min(100, Math.round(100*d/p)) : 0;
+    return `<div class="row${L.id === hard ? ' hard' : ''}"><span class="id">${L.id}</span><div class="bar"><i style="width:${r}%"></i><span>${esc(L.n)}${L.id === hard ? ' · sabse mushkil' : ''}</span></div><span class="pc">${p ? r + '% · ' + fmt(p) : '–'}</span></div>`;
+  }).join('')}</div>`).join('');
+
+  const pick = (pre, labels) => Object.entries(s.all).filter(([k]) => k.startsWith(pre)).map(([k, n]) => { const key = k.slice(pre.length), m = labels[key] || ['💥', key]; return [m[0], m[1], n]; }).sort((a, b) => b[2] - a[2]);
+  const causes = pick('cause:', META.causes);
+  bars($('causes'), causes.slice(0, 8), causes.reduce((a, r) => a + r[2], 0));
+  const veh = pick('veh:', META.veh);
+  bars($('veh'), veh, veh.reduce((a, r) => a + r[2], 0));
+}
+
+async function load(){
+  try {
+    const r = await fetch('/api/stats', { cache:'no-store' });
+    const s = await r.json();
+    if (!s.ok) throw new Error(s.why || 'down');
+    $('msg').hidden = true;
+    render(s);
+  } catch (e) {
+    $('msg').hidden = false;
+    $('msg').textContent = 'Stats abhi load nahi hue. Thodi der mein phir dekho.';
+  }
+}
+load();
+setInterval(() => { if (document.visibilityState === 'visible') load(); }, 15000);
+document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') load(); });
+</script>
+</body>
+</html>
