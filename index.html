@@ -103,6 +103,20 @@ p{margin:6px 0;line-height:1.45}
 .howto li{display:flex;justify-content:space-between;gap:12px;padding:10px 0;border-bottom:1px solid var(--line);font-size:14px}
 .howto span{color:var(--muted);text-align:right}
 #stage.menu-open .hudbtn{display:none}
+.introp{text-align:center}
+.soundBtn{position:relative;display:block;margin:26px auto 10px;width:132px;height:132px;border-radius:50%;border:0;background:var(--marigold);color:#1a1300;font-size:54px;cursor:pointer;box-shadow:0 6px 0 #b37d00,0 10px 30px rgba(255,184,28,.35)}
+.soundBtn:active{transform:translateY(4px);box-shadow:0 2px 0 #b37d00}
+.soundBtn .ring{position:absolute;inset:-10px;border-radius:50%;border:3px solid var(--marigold);opacity:.7;animation:ring 1.6s ease-out infinite}
+@keyframes ring{0%{transform:scale(.9);opacity:.8}100%{transform:scale(1.25);opacity:0}}
+@media (prefers-reduced-motion:reduce){.soundBtn .ring{animation:none}}
+.introCta{font-weight:800;font-size:19px;margin:6px 0 14px}
+.steps{font-size:13px;color:var(--muted);margin:0 0 16px}
+.steps b{display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:50%;background:var(--teal);color:#00201c;font-size:12px;margin-right:4px}
+.steps b.dim{background:#3a3442;color:var(--muted)}
+.steps span{margin:0 4px}
+.steps i{font-style:normal;white-space:nowrap}
+@media (max-width:420px){.steps{font-size:12px}}
+#stage.intro-open #musicBtn{display:none!important}
 #stage.menu-open #musicBtn:not([hidden]){display:block;left:max(10px,env(safe-area-inset-left,0px))}
 .nextlv{font-size:13px;color:var(--muted);margin:8px 0 0}
 .lvover{align-items:center;padding-left:0;padding-right:0;overflow:hidden}
@@ -270,7 +284,8 @@ kbd{font-family:var(--f-body);background:#3a3442;border-radius:3px;padding:0 5px
 #brkBtn:active,#brkBtn.on{transform:translateY(3px);box-shadow:0 1px 0 #8a1a0e}
 #lvSlide{position:absolute;left:50%;bottom:120px;z-index:6;width:min(92%,420px);transform:translate(-50%,calc(100% + 140px));transition:transform .45s cubic-bezier(.2,1.4,.4,1);
   background:rgba(20,18,24,.94);border:3px solid var(--marigold);border-radius:18px;padding:12px 16px;text-align:center;pointer-events:none;box-shadow:0 10px 30px rgba(0,0,0,.5)}
-#lvSlide.up{transform:translate(-50%,0)}
+#lvSlide{visibility:hidden}
+#lvSlide.up{transform:translate(-50%,0);visibility:visible}
 @media (prefers-reduced-motion:reduce){#lvSlide{transition:none}}
 #lvSlide .lsTop{display:flex;justify-content:center;align-items:center;gap:10px;font-weight:800;font-size:17px;color:var(--ink)}
 #lvSlide .lsStars{color:var(--marigold);font-size:22px;letter-spacing:2px}
@@ -321,7 +336,19 @@ kbd{font-family:var(--f-body);background:#3a3442;border-radius:3px;padding:0 5px
     </div>
 
     <!-- MENU -->
-    <div class="overlay" id="menu">
+    <!-- STEP 1: one tap to turn the music on (browsers need a tap before any sound) -->
+    <div class="overlay" id="intro">
+      <div class="panel launch introp">
+        <h1 class="title">हट जा भाई!</h1>
+        <p class="tagline">Sadak ka survival game</p>
+        <button class="soundBtn" type="button" id="introGo" aria-label="Music ke saath shuru karo"><span class="ring"></span>🔊</button>
+        <p class="introCta">Music ke saath shuru karo</p>
+        <p class="steps"><i><b>1</b>Awaaz chalu</i><span>›</span><i><b class="dim">2</b>Sadak chuno</i><span>›</span><i><b class="dim">3</b>Bach ke chalo</i></p>
+        <button class="linkish" type="button" id="introQuiet">Bina awaaz ke khelo</button>
+      </div>
+    </div>
+
+    <div class="overlay" id="menu" hidden>
       <div class="panel launch">
         <div class="streak" id="streak"></div>
         <h1 class="title">हट जा भाई!</h1>
@@ -877,7 +904,7 @@ function unlockAudio(){
   // a one-sample buffer played inside the gesture is what finally wakes old iOS Safari
   try { const b = a.createBuffer(1, 1, 22050), src = a.createBufferSource(); src.buffer = b; src.connect(a.destination); src.start(0); } catch (e) {}
   // browsers allow no sound before the first click, so the music starts on it (home screen included)
-  const go = () => { if ((state === 'menu' || state === 'play') && !Music.on && Music.wanted() && !Radio.playing) Music.start(); };
+  const go = () => { if ((state === 'menu' || state === 'play') && $('intro').hidden && !Music.on && Music.wanted()) Music.start(); };
   if (a.state !== 'running') a.resume().then(go).catch(() => {}); else go();
 }
 for (const ev of ['touchend', 'click', 'keydown', 'pointerup']) window.addEventListener(ev, unlockAudio, { capture: true, passive: true });
@@ -1034,7 +1061,7 @@ const Music = {
       if (this.want !== key || !this.wanted()) return;
       const el = this.player();
       if (this.key !== key){ el.src = url; this.key = key; this.g = GROOVES[key]; }
-      el.play().then(() => { this.on = true; this.label(); }).catch(() => { this.on = false; this.label(); });   // blocked: the first tap retries
+      el.play().then(() => { if (this.want !== key){ el.pause(); return; } this.on = true; this.label(); }).catch(() => { this.on = false; this.label(); });   // blocked: the first tap retries
     }).catch(() => {});
   },
   stop(){ this.want = null; this.on = false; if (this.el) this.el.pause(); this.label(); },
@@ -4368,8 +4395,8 @@ function drawDayMap(nextLeg){
 /* =====================================================================
    SCREENS
    ===================================================================== */
-const overlays = ['menu','about','disc','dayclear','over','pause','tip','settings','levels','endless','lvdone'];
-function showOnly(id){ for (const o of overlays) $(o).hidden = o !== id; stage.classList.toggle('menu-open', ['menu','settings','about','disc','tip','levels','endless'].includes(id) && state !== 'over'); }
+const overlays = ['intro','menu','about','disc','dayclear','over','pause','tip','settings','levels','endless','lvdone'];
+function showOnly(id){ for (const o of overlays) $(o).hidden = o !== id; stage.classList.toggle('intro-open', id === 'intro'); stage.classList.toggle('menu-open', ['intro','menu','settings','about','disc','tip','levels','endless'].includes(id) && state !== 'over'); }
 function setGameButtons(on){
   $('actBtn').hidden = $('brkBtn').hidden = $('pauseBtn').hidden = !on;
   $('musicBtn').hidden = !on && state !== 'menu';
@@ -4797,11 +4824,17 @@ let mirFrame = 0;
 if (WHATSAPP_URL){ $('ldCrew').href = WHATSAPP_URL; $('ldCrew').hidden = false; }
 $('crewCta').innerHTML = WHATSAPP_URL ? `<a href="${WHATSAPP_URL}" target="_blank" rel="noopener">Join free</a>` : '<em>Jald aa raha hai</em>';
 if ('serviceWorker' in navigator && location.protocol.startsWith('http')) navigator.serviceWorker.register('sw.js').catch(() => {});
-stage.classList.add('menu-open');
+stage.classList.add('menu-open', 'intro-open');
 buildMenu();
 syncLaunch();
 // render every groove up front (no sound needed for that), then try to start the home-screen music right away
 Promise.all(Object.keys(GROOVES).map(k => Music.render(k).catch(() => {}))).then(() => { if (state === 'menu') Music.start(); });
+// step 1 screen: skip it when music is off by choice, or when the browser already let it play
+function leaveIntro(){ if (!$('intro').hidden){ showOnly('menu'); setTimeout(() => $('playLevels').focus(), 50); } }
+if (!Music.wanted()) leaveIntro();
+else { const t = setInterval(() => { if (Music.on){ clearInterval(t); leaveIntro(); } }, 200); setTimeout(() => clearInterval(t), 4000); }
+$('introGo').onclick = () => { store.set('music', true); unlockAudio(); Music.start(); leaveIntro(); };
+$('introQuiet').onclick = () => { store.set('music', false); Music.stop(); leaveIntro(); };
 document.addEventListener('visibilitychange', () => { if (document.hidden){ if (Music.el) Music.el.pause(); } else if (Music.on && Music.el) Music.el.play().catch(() => {}); });
 setView(store.get('view', 'pov'));
 setTicker(menuRegion);
