@@ -1,0 +1,10 @@
+# Cloudflare Pages config: the site is the repo root (no build step); /api/* runs from functions/.
+name = "hatjabhai"
+pages_build_output_dir = "."
+compatibility_date = "2025-06-01"
+
+# anonymous play counters behind hatjabhai.com/stats
+[[d1_databases]]
+binding = "DB"
+database_name = "hatjabhai-stats"
+database_id = "95ca1a0a-b7cb-4181-ade5-0190e2965b32"
